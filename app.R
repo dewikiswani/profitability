@@ -24,6 +24,7 @@ source("alerts/alerts_tab.R")
 source("css_effects/effects_tab.R")
 
 
+
 # App
 shiny::shinyApp(
   ui = argonDashPage(
@@ -43,85 +44,6 @@ shiny::shinyApp(
     footer = argonFooter
   ),
   server = function(input, output) {
-    output$distPlot <- renderPlot({
-      hist(rnorm(input$obs))
-    })
-    
-    output$plot <- renderPlot({
-      dist <- switch(
-        input$dist,
-        norm = rnorm,
-        unif = runif,
-        lnorm = rlnorm,
-        exp = rexp,
-        rnorm
-      )
-      
-      hist(dist(500))
-    })
-    
-    # argonTable
-    output$argonTable <- renderUI({
-      
-      wrap <- if (input$cardWrap == "Enable") TRUE else FALSE
-      
-      argonTable(
-        cardWrap = wrap,
-        headTitles = c(
-          "PROJECT",
-          "BUDGET",
-          "STATUS",
-          "USERS",
-          "COMPLETION",
-          ""
-        ),
-        argonTableItems(
-          argonTableItem("Argon Design System"),
-          argonTableItem(dataCell = TRUE, "$2,500 USD"),
-          argonTableItem(
-            dataCell = TRUE, 
-            argonBadge(
-              text = "Pending",
-              status = "danger"
-            )
-          ),
-          argonTableItem(
-            argonAvatar(
-              size = "sm",
-              src = "https://image.flaticon.com/icons/svg/219/219976.svg"
-            )
-          ),
-          argonTableItem(
-            dataCell = TRUE, 
-            argonProgress(value = 60, status = "danger")
-          ),
-          argonTableItem(
-            argonButton(
-              name = "Click me!",
-              status = "warning",
-              icon = "atom",
-              size = "sm"
-            )
-          )
-        )
-      )
-    })
-    
-    
-    #A <- read.csv("C:/dw/ICRAF/profitability/data/upload data/tprice_1_trad.csv")
-    #B <- read.csv("C:/dw/ICRAF/profitability/data/upload data/tprice_2_nontrad.csv")
-    #C <- read.csv("C:/dw/ICRAF/profitability/data/upload data/tprice_3_labor.csv")
-    
-    data<- reactive({
-      get(input$dataset)
-    })
-    
-    ######## TAB SUMMARY METADATA
-    #tabel price
-    #sdata.1<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/p-trad%20nontrad.csv", header=T)
-    #sdata.2<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/p-labor.csv", header=T)
-    #sdata.3<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/p-output.csv", header=T)
-    
     sdata.1<-eventReactive(input$s.simulate,{
       read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/p-trad%20nontrad.csv", header=T)
     })
@@ -134,10 +56,6 @@ shiny::shinyApp(
       read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/p-output.csv", header=T)
     })
     
-    #Tabel I-O
-    #sdata.4<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/io-trad%20nontrad.csv", header=T)
-    #sdata.5<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/io-labor.csv", header=T)
-    #sdata.6<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/io-output.csv", header=T)
     
     sdata.4<-eventReactive(input$s.simulate,{
       read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/io-trad%20nontrad.csv", header=T)
@@ -199,7 +117,7 @@ shiny::shinyApp(
       df
       DT::datatable(df, editable = "column",options = list(pageLength = 50))
     }) 
-
+    
     #tabel i-o summary metadata
     sio.i<-eventReactive(input$s.simulate,{
       #browser()
@@ -475,12 +393,13 @@ shiny::shinyApp(
     sasumsi<-eventReactive(input$s.simulate,{
       read.csv("C:/dw/ICRAF/profitability/data/PAM/asumsi_rubber.csv", header=T)
     })
-      
-      
+    
+    
     output$svalue.3 <- renderPrint({ 
       hasil<-sasumsi()
       hasil
     })
+    
     
     
     #### tabel 1
@@ -769,7 +688,7 @@ shiny::shinyApp(
       hasil
     })
     
-  
+    
     
     output$nonlabor.cost<- renderPrint({
       hasil<-t(hitung.nlc())
@@ -850,8 +769,8 @@ shiny::shinyApp(
     })
     
     asumsi.1<-eventReactive(input$simulate,{
-        df<-data.frame(input$rate.p,input$rate.s)
-        
+      df<-data.frame(input$rate.p,input$rate.s)
+      
     })
     
     asumsi.2<-eventReactive(input$simulate,{
@@ -885,9 +804,7 @@ shiny::shinyApp(
       hasil<-t(hasil)
       hasil
     })
-    
-    
-    
+
   }
 )
 
