@@ -59,6 +59,7 @@ alerts_tab <- argonTabItem(
                        #h4("Assumption & Summary"),
                        fluidRow(column(12, verbatimTextOutput("value"))),
                        fluidRow(column(12, verbatimTextOutput("value.2"))),
+                       br(),
                        argonH1("Summary", display = 4),
                        #argonH1(verbatimTextOutput("npv"), display = 4),
                        #argonH1(verbatimTextOutput("nonlabor.cost"), display = 4),
@@ -98,13 +99,15 @@ alerts_tab <- argonTabItem(
         iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
         argonTab(
           tabName = "Table Price",
-          active = FALSE,
-          dataTableOutput("tabel.1")
+          active = T,
+          dataTableOutput("tabel.1"),
+          style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
         ),
         argonTab(
           tabName = "Table Input-Output",
-          active = TRUE,
-          dataTableOutput("tabel.2")
+          active = F,
+          dataTableOutput("tabel.2"),
+          style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
         )
       )
     )

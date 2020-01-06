@@ -1,4 +1,4 @@
-setwd("C:/dw/ICRAF/land use profitabilitas tool developer/syntak/argondash - dw")
+setwd("C:/dw/ICRAF/profitability")
 
 
 library(shiny)
@@ -107,6 +107,15 @@ shiny::shinyApp(
       )
     })
     
+    
+    #A <- read.csv("C:/dw/ICRAF/profitability/data/upload data/tprice_1_trad.csv")
+    #B <- read.csv("C:/dw/ICRAF/profitability/data/upload data/tprice_2_nontrad.csv")
+    #C <- read.csv("C:/dw/ICRAF/profitability/data/upload data/tprice_3_labor.csv")
+    
+    data<- reactive({
+      get(input$dataset)
+    })
+    
     ######## TAB SUMMARY METADATA
     #tabel price
     #sdata.1<-read.csv("https://raw.githubusercontent.com/dewikiswani/shiny/master/p-trad%20nontrad.csv", header=T)
@@ -188,6 +197,7 @@ shiny::shinyApp(
       rownames(df)<-c("Private","Social")
       df<-t(df)
       df
+      DT::datatable(df, editable = "column",options = list(pageLength = 50))
     }) 
 
     #tabel i-o summary metadata
@@ -230,6 +240,7 @@ shiny::shinyApp(
       rownames(df)<-paste(rep("Year", nrow(df)), seq(1,nrow(df),1), sep = "")
       df<-t(df)
       df
+      DT::datatable(df, editable = "row",options = list(pageLength = 50))
     })
     
     
@@ -275,11 +286,11 @@ shiny::shinyApp(
       }
       
       profit.s<-c(profit0,profit.s)
-      npv.pri<-npv(input$rate.p/100,profit.p)
-      npv.so<-npv(input$rate.s/100,profit.s)
+      npv.pri<-npv(input$srate.p/100,profit.p)
+      npv.so<-npv(input$srate.s/100,profit.s)
       hasil<-data.frame(PRIVATE=npv.pri,SOCIAL=npv.so)
-      npv.pri.us<-npv.pri/input$nilai.tukar
-      npv.so.us<-npv.so/input$nilai.tukar
+      npv.pri.us<-npv.pri/input$snilai.tukar
+      npv.so.us<-npv.so/input$snilai.tukar
       hasil.us<-data.frame(PRIVATE=npv.pri.us,SOCIAL=npv.so.us)
       hasil<-rbind(hasil,hasil.us)
       rownames(hasil)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
@@ -302,8 +313,8 @@ shiny::shinyApp(
       io.labor<-sdata.5()
       
       #replace value labor dengan nilai pada input slider
-      price.labor.p<-replace(x=price.labor[1,],values = input$labor.p)
-      price.labor.s<-replace(x=price.labor[2,],values = input$labor.s)
+      price.labor.p<-replace(x=price.labor[1,],values = input$slabor.p)
+      price.labor.s<-replace(x=price.labor[2,],values = input$slabor.s)
       price.labor<-rbind(price.labor.p, price.labor.s)
       
       
@@ -348,6 +359,126 @@ shiny::shinyApp(
     
     output$snonlabor.cost<- renderPrint({
       hasil<-t(hitung.snlc())
+      hasil
+    })
+    
+    hitung.sestcost<-eventReactive(input$s.simulate,{
+      #browser()
+      price<-sprice.i()
+      i.o<-sio.i()
+      
+      #untuk menghasilkan dataset p.budget dan s.budget
+      a<-t(as.matrix(i.o))
+      b<-t(as.matrix(price))
+      
+      #dataset p.budget
+      p.budget<-t(a*b[,1])
+      
+      #menghitung total cost input
+      total.cost.p<-rowSums(p.budget[,1:ncol(sprice.i())], na.rm = T)
+      total.cost.p<-total.cost.p[1]/1000000
+      
+      #dataset s.budget
+      s.budget<-t(a*b[,2])
+      
+      #menghitung total cost input
+      total.cost.s<-rowSums(s.budget[,1:ncol(sprice.i())], na.rm = T)
+      total.cost.s<-total.cost.s[1]/1000000
+      
+      hasil<-data.frame(PRIVATE=total.cost.p,SOCIAL=total.cost.s)
+      rownames(hasil)<-c("Establishment Cost (1st year only, MRp/Ha)")
+      hasil
+    })
+    
+    
+    output$sestcost.print<- renderPrint({
+      hasil<-t(hitung.sestcost())
+      hasil
+    })
+    
+    hitung.ssummary<-eventReactive(input$s.simulate,{
+      #hitung labor req for est
+      i.o<-sdata.5()
+      i.o<-rowSums(i.o)
+      i.o<-i.o[1]
+      
+      hasil<-data.frame(i.o)
+      rownames(hasil)<-c(" ")
+      colnames(hasil)<-c("Labor Req for Est (1st year only) = ")
+      hasil<-t(hasil)
+      hasil
+    })
+    
+    output$ssummary<- renderPrint({
+      signif(hitung.ssummary(),digits = 2)
+    })
+    
+    hitung.ssummary.2<-eventReactive(input$s.simulate,{
+      
+      #browser()
+      #hitung  harvesting product
+      total.labor<-sdata.5()
+      total.labor<-sum(rowSums(total.labor),na.rm = T)
+      total.prod<-sdata.6()
+      total.prod<-sum(rowSums(total.prod),na.rm = T)/1000
+      harvest.prod<-total.prod/total.labor
+      format(harvest.prod,digits = 2, nsmall = 2)
+      
+      hasil<-data.frame(harvest.prod)
+      rownames(hasil)<-c(" ")
+      colnames(hasil)<-c("Harvesting Product (ton/HOK) = ")
+      hasil<-t(hasil)
+      hasil
+    })
+    
+    output$ssummary.2<- renderPrint({
+      signif(hitung.ssummary.2(),digits = 2)
+    })
+    
+    sasumsi.1<-eventReactive(input$s.simulate,{
+      df<-data.frame(input$srate.p,input$srate.s)
+      
+    })
+    
+    sasumsi.2<-eventReactive(input$s.simulate,{
+      df<-data.frame(input$slabor.p,input$slabor.s)
+      
+    })
+    
+    
+    output$svalue <- renderPrint({ 
+      hasil<-sasumsi.1()
+      colnames(hasil)<-c("PRIVATE","SOCIAL")
+      rownames(hasil)<-c("Discount Rate")
+      
+      hasil.2<-sasumsi.2()
+      colnames(hasil.2)<-c("PRIVATE","SOCIAL")
+      rownames(hasil.2)<-c("Cost of Labor")
+      hasil<-rbind(hasil,hasil.2)
+      hasil<-t(hasil)
+      hasil
+    })
+    
+    sasumsi.3<-eventReactive(input$s.simulate,{
+      df<-data.frame(input$snilai.tukar)
+      
+    })
+    
+    output$svalue.2 <- renderPrint({ 
+      hasil<-sasumsi.3()
+      colnames(hasil)<-c("Rupiah Exchange Rate = ")
+      rownames(hasil)<-c(" ")
+      hasil<-t(hasil)
+      hasil
+    })
+    
+    sasumsi<-eventReactive(input$s.simulate,{
+      read.csv("C:/dw/ICRAF/profitability/data/PAM/asumsi_rubber.csv", header=T)
+    })
+      
+      
+    output$svalue.3 <- renderPrint({ 
+      hasil<-sasumsi()
       hasil
     })
     
@@ -432,15 +563,14 @@ shiny::shinyApp(
       df
     })
     
+    
     output$tabel.1 <- renderDataTable({
       df<-cbind(price.i(),price.o())
       rownames(df)<-c("Private","Social")
       df<-t(df)
       df
+      DT::datatable(df, editable = "column",options = list(pageLength = 20))
     }) 
-    
-    
-
     
     
     #### tabel 2
@@ -520,6 +650,7 @@ shiny::shinyApp(
       rownames(df)<-paste(rep("Year", nrow(df)), seq(1,nrow(df),1), sep = "")
       df<-t(df)
       df
+      DT::datatable(df, editable = "row",options = list(pageLength = 20))
     })
     
     
@@ -718,13 +849,23 @@ shiny::shinyApp(
       signif(hitung.summary.2(),digits = 2)
     })
     
+    asumsi.1<-eventReactive(input$simulate,{
+        df<-data.frame(input$rate.p,input$rate.s)
+        
+    })
+    
+    asumsi.2<-eventReactive(input$simulate,{
+      df<-data.frame(input$labor.p,input$labor.s)
+      
+    })
+    
     
     output$value <- renderPrint({ 
-      hasil<-data.frame(input$rate.p,input$rate.s)
+      hasil<-asumsi.1()
       colnames(hasil)<-c("PRIVATE","SOCIAL")
       rownames(hasil)<-c("Discount Rate")
       
-      hasil.2<-data.frame(input$labor.p,input$labor.s)
+      hasil.2<-asumsi.2()
       colnames(hasil.2)<-c("PRIVATE","SOCIAL")
       rownames(hasil.2)<-c("Cost of Labor")
       hasil<-rbind(hasil,hasil.2)
@@ -732,9 +873,13 @@ shiny::shinyApp(
       hasil
     })
     
+    asumsi.3<-eventReactive(input$simulate,{
+      df<-data.frame(input$nilai.tukar)
+      
+    })
     
     output$value.2 <- renderPrint({ 
-      hasil<-data.frame(input$nilai.tukar)
+      hasil<-asumsi.3()
       colnames(hasil)<-c("Rupiah Exchange Rate = ")
       rownames(hasil)<-c(" ")
       hasil<-t(hasil)
