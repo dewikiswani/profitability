@@ -1,5 +1,7 @@
 ###### database
-library("rio")
+library(rio)
+library(dplyr)
+library(stringr)
 
 # diperlukan 3 dataset
 ## data1=data io (1 sd 30 th) (dalam bentuk unit) (30 kolom)
@@ -7,7 +9,7 @@ library("rio")
 ## data3= data price (private dan social) (dalam bentuk Rp) (2 kolom)
 
 
-setwd("C:/dw/ICRAF/profitability/data/PAM")
+setwd("C:/dw/ICRAF/profitability/data/data clean")
 data1<-read.csv("data1.csv")
 data2<-read.csv("data2.csv")
 data3<-read.csv("data3.csv")
@@ -27,7 +29,6 @@ p.year<-data.frame(replicate(n,p.price$Private.Price))
 colnames(p.year)<-paste0(c(rep("Y", n)),1:n)
 p.price<-cbind(Status="Private Price",p.price[c(1:4)],p.year)
 
-
 s.price<-data3[-5]
 n=30
 s.year<-data.frame(replicate(n,s.price$Social.Price))
@@ -41,13 +42,9 @@ data.gab<-rbind(data1,p.price,s.price,pcap,scap)
 
 #export to rdata
 export(data.frame(data.gab), "1.rdata")
-#export(data.frame(data.cap), "2.rdata")
-#export(data.frame(data.cap), "3.rdata")
 
 #import rdata 
 load("1.rdata", gab <- new.env())
-#load("2.rdata", p.cap <- new.env())
-#load("3.rdata", s.cap <- new.env())
 ls.str(gab)
 
 #perkalian antara general dan Private Price
@@ -103,15 +100,15 @@ s.profit<-c(profit0,s.profit)
 npv.p<-npv(7/100,p.profit)
 npv.s<-npv(2/100,s.profit)
 
-hasil<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
 
 nilai.tukar <- 10000
 npv.p.us<-npv.p/nilai.tukar
 npv.s.us<-npv.s/nilai.tukar
-hasil.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
-hasil<-rbind(hasil,hasil.us)
-rownames(hasil)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
-hasil
+npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+hsl.npv<-rbind(hsl.npv,npv.us)
+rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
+hsl.npv
 
 ############### PENGHITUNGAN NON-LABOR COST
 p.tot.cost<- sum(p.sum.cost)
@@ -127,6 +124,11 @@ s.sum.labor <- s.labor.input[,-(1:5)] %>%
 
 nlc.p <- (p.tot.cost - p.sum.labor)/1000000
 nlc.s <- (s.tot.cost - s.sum.labor)/1000000
+nlc<-data.frame(PRIVATE=nlc.p,SOCIAL=nlc.s)
+rownames(nlc)<-c("Non Labor Cost (MRp/Ha)")
+nlc
+
+
 
 ############# PERHITUNGAN ESTABLISHMENT COST
 ec <- p.sum.cost[[1]]
@@ -147,4 +149,7 @@ hp <- tot.prod/tot.labor
 
 ############# PERHITUNGAN LABOR REQ FOR EST
 lr <- sum.labor[[1]]
+
+gab <- list(hsl.npv,nlc,hp,lr)
+gab
 

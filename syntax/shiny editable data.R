@@ -54,12 +54,7 @@ ui <- fluidPage(
                sliderInput("nilai.tukar", "Rupiah Exchange Rate", 10000 ,min = 9000, max = 20000, step = 100)
         ),
         column(6,
-               argonH1("Assumption", display = 4),
-               #h4("Assumption & Summary"),
-               #fluidRow(column(12, verbatimTextOutput("value"))),
-               #fluidRow(column(12, verbatimTextOutput("value.2"))),
                br(),
-               argonH1("Summary", display = 4),
                fluidRow(column(12, verbatimTextOutput("hitung")))
         )
         
@@ -75,7 +70,7 @@ ui <- fluidPage(
                br(),
                DTOutput("dt3"),
                br(),
-          
+               
         )
         
         
@@ -321,22 +316,10 @@ server <- function(input, output){
     
   })
   
-
   
-
+  
+  
   
 }
 
 shinyApp(ui, server)
-
-
-
-
-
-
-
-
-
-
-
-
