@@ -1,5 +1,4 @@
 library(shiny)
-#spy data price yg ada nilainya bukan hanya numeric bisa terbaca yaitu pada kolom 1
 library(DT)
 library(rio)
 

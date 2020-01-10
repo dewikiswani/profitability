@@ -1,5 +1,8 @@
 library(shiny)
 library(DT)
+library(dplyr)
+library(stringr)
+library(FinCal)
 
 callback <- c(
   "var tbl = $(table.table().node());",
@@ -84,7 +87,7 @@ ui <- fluidPage(
 
 server <- function(input, output){
   
-  load("1.rdata", dat <- new.env())
+  load("data/data clean/1.rdata", dat <- new.env())
   dat <- dat$x
   dat1 <- filter(dat, Status == c("General"))
   dat1 <- select(dat1,-Status)
