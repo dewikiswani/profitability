@@ -3,29 +3,52 @@ library(FinCal)
 library(rio)
 library(dplyr)
 library(stringr)
+#AE COMMENT1: saran saya mungkin package 'rio' tidak diperlukan sekiranya hanya
+#akan digunakan untuk menyimpan dan memanggilRData saja. Saran lain adalah
+#mungkin Dewi bisa explore package 'rtf' untuk membuat report secara otomatis
+#dari R
+
 
 # diperlukan 3 dataset
 ## data1=data io (1 sd 30 th) (dalam bentuk unit) (30 kolom)
 ## data2=data capital (1 sd 30 th) (dalam bentuk Rp) (30 kolom)
 ## data3= data price (private dan social) (dalam bentuk Rp) (2 kolom)
 
+#AE COMMENT2: saran saya sebaiknya dipisahkan saja data input dan data output menjadi dua input yang berbeda
+#AE COMMENT3: apakah data capital yang saat ini dimasukkan sebagai data2 tidak termasuk dalam kategori input seperti data1?
+#AE COMMENT4: informasi lain yang digunakan dalam perhitungan dibawah, seperti
+#daur tanam dan suku bunga, sebaiknya dimasukkan diawal sebagai input
+#AE COMMENT5: baisakan menggunakan section di dalam menulis code yha Dewi, supaya lebih mudah dilihat dan terstruktur
 
-setwd("C:/dw/ICRAF/profitability/data/data clean")
+# Section1: Input Data ----------------------------------------------------
+
+setwd("D:/1_Profitability/data")
 data1<-read.csv("data1.csv")
 data2<-read.csv("data2.csv")
 data3<-read.csv("data3.csv")
 
+
+# Section2: Data Pre-Processing -------------------------------------------
+
 #manipulasi data1
 data1 <- cbind(Status="General", data1)
+#AE COMMENT6: code pada line 30 diatas akan membuat kolom dengan class "factor". Apakah benar seperti itu yang diinginkan?
 
 #manipulasi data2
 ## asumsi data capital untuk private = social
+
+## AE COMMENT 7: Asumsi pada line 34 diatas, perlu dimasukkan sebagai input di
+## Section1, dengan demikian, user akan diberi pilihan apakah mereka ingin
+## memasukkan Private Capital yang sama persis dengan Social Capital.
+## Berdasarkan input tersebut, line coding dibawah akan dijalankan.
+
 pcap <- cbind(Status="Private Budget", data2)
 scap <- cbind(Status="Social Budget", data2)
 
 # manipulasi data3 = data price
 p.price<-data3[-6]
 n=30
+# AE COMMENT 8: jumlah tahun sebaiknya dimasukkan sebagai input di dalam Section1
 p.year<-data.frame(replicate(n,p.price$Private.Price))
 colnames(p.year)<-paste0(c(rep("Y", n)),1:n)
 p.price<-cbind(Status="Private Price",p.price[c(1:4)],p.year)
@@ -36,17 +59,47 @@ s.year<-data.frame(replicate(n,s.price$Social.Price))
 colnames(s.year)<-paste0(c(rep("Y", n)),1:n)
 s.price<-cbind(Status="Social Price",s.price[c(1:4)],s.year)
 
+# AE COMMENT 9: Really nice work on those lines above !!! Well done.
+
+
+# Section 3: Save to database ---------------------------------------------
+
 ## all data
 #untuk sementara
 #data.gab<-rbind(data1,p.price,s.price,p)
 data.gab<-rbind(data1,p.price,s.price,pcap,scap)
 
+# AE COMMENT 10: Pada line diatas, sebaiknya juga ditambahkan kolom-kolom yang
+# memuat informasi tentang komoditas yang sedang dianalisa, saran saya,
+# tambahkan kolom: nama komoditas, sistem usaha tani, lokasi-provinsi,
+# lokasi-kabupaten, lokasi-desa dan nama surveyor
+
 #export to rdata
 export(data.frame(data.gab), "1.rdata")
+
+# AE COMMENT 11: Selain Rdata, Dewi juga punya pilihan untuk menggunakan fungsi
+# saveRDS disini. Sebaiknya Dewi juga sudah mulai mengusulkan sistem penamaan
+# yang sistematis, mungkin informasi yang saya usulkan di comment 10 bisa dijadikan
+# bahan pemikiran
+
+# Section 4: Load database ------------------------------------------------
 
 #import rdata 
 load("1.rdata", gab <- new.env())
 ls.str(gab)
+
+# AE COMMENT 12: pada bagian ini, dewi juga mungkin sudah bisa memikirkan
+# bagaimana cara pemanggilan yang baik pada saat Rdata yang tersimpan sudah
+# banyak, mungkin perlu ditambahkan input seperti yang ada pada comment 10 untuk
+# menentukan file mana yang akan dipanggil.
+
+
+# Section 5: Data processing ----------------------------------------------
+
+# AE COMMENT 13: Dewi, walaupun saya letakkan section divider diatas, sebenarnya
+# section 5 ini lebih pas kalau diletakkan sebelum section 4. Sehingga Rdata
+# yang dihasilkan, selian menyimpan data mentah, juga menyimpan hasil
+# perhitungan NPV dll
 
 #perkalian antara general dan Private Price
 a <- filter(gab$x, Status == c("General"))
