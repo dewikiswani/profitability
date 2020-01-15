@@ -116,6 +116,7 @@ s.budget <- cbind(a[1:5],s.budget)
 s.budget <- s.budget %>% 
   mutate(Status = case_when(Status == "General" ~ "Social Budget", TRUE ~ as.character(Status)))
 
+#AE COMMENT 14: Nice works for the lines above!!
 
 #penggabungan dengan capital
 p.cap <- filter(gab$x, Status == c("Private Budget"))
@@ -151,18 +152,30 @@ s.profit <- s.sum.rev - s.sum.cost
 profit0 <- 0
 p.profit<-c(profit0,p.profit)
 s.profit<-c(profit0,s.profit)
+
 npv.p<-npv(7/100,p.profit)
 npv.s<-npv(2/100,s.profit)
+
+# AE COMMENT 15: suku bunga 7% dan 2% diatas, perlu dimasukkan sebagai data
+# input pada section1, mohon diingat bahwa suku bunga bisa bervariasi dalam
+# periode 30 tahun
 
 hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
 
 nilai.tukar <- 10000
+# AE COMMENT 16: nilai tukar usd=10000 idr, perlu dimasukkan sebagai data input
+# pada section1, mohon diingat bahwa nilai tukar bisa bervariasi dalam 30 tahun.
+# Usul saya, perhitungan ini sebaiknya diintegrasikan kedalam perhitungan cost
+# dan benefit yang ada pada line 150-154
+
 npv.p.us<-npv.p/nilai.tukar
 npv.s.us<-npv.s/nilai.tukar
 npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
 hsl.npv<-rbind(hsl.npv,npv.us)
 rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
 hsl.npv
+
+# AE COMMENT 17: object hsl.npv perlu disimpan dalam Rdata, bersama dengan informasi kunci yang ada pada comment 10
 
 ############### PENGHITUNGAN NON-LABOR COST
 p.tot.cost<- sum(p.sum.cost)
@@ -187,6 +200,9 @@ nlc
 ############# PERHITUNGAN ESTABLISHMENT COST
 ec <- p.sum.cost[[1]]
 
+# AE COMMENT 18: object ec perlu disimpan dalam Rdata, bersama dengan informasi kunci yang ada pada comment 10
+
+
 ############# PERHITUNGAN HARVESTING PRODUCT
 e <- filter(gab$x, Status == c("General"))
 fil.prod <- e %>%  filter(str_detect(Grup,"Output"))
@@ -201,9 +217,25 @@ tot.labor <- sum(sum.labor)
 
 hp <- tot.prod/tot.labor
 
+# AE COMMENT 19: object tot.labor dan hp perlu disimpan dalam Rdata, bersama dengan informasi kunci yang ada pada comment 10
+
+
 ############# PERHITUNGAN LABOR REQ FOR EST
 lr <- sum.labor[[1]]
 
 gab <- list(hsl.npv,nlc,hp,lr)
 gab
+
+
+# Section 6 : report ------------------------------------------------------
+
+# AE COMMENT 20: di bagian ini Dewi bisa mulai mencoba untuk membuat report dari
+# hasil-hasil diatas, packae rtf atau officeR bisa jadi pilihan untuk ini
+
+
+# Section 7: Simulation ---------------------------------------------------
+
+# AE COMMENT 21: di bagian ini Dewi bisa mulai mencoba untuk membangun modul scenario. Ini bisa kita diskusikan lebih lanjut nanti.
+
+
 
