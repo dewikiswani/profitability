@@ -1,8 +1,8 @@
 library(shiny)
 library(DT)
-library(dplyr)
-library(stringr)
-library(FinCal)
+library(dplyr) #utk filter
+library(stringr) #untuk str_detect
+library(FinCal) #untuk npv
 
 callback <- c(
   "var tbl = $(table.table().node());",
@@ -86,7 +86,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output){
-  
+  #browser()
   load("data/data clean/1.rdata", dat <- new.env())
   dat <- dat$x
   dat1 <- filter(dat, Status == c("General"))

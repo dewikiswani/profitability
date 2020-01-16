@@ -204,6 +204,7 @@ shiny::shinyApp(
       }
       
       profit.s<-c(profit0,profit.s)
+      
       npv.pri<-npv(input$srate.p/100,profit.p)
       npv.so<-npv(input$srate.s/100,profit.s)
       hasil<-data.frame(PRIVATE=npv.pri,SOCIAL=npv.so)
@@ -404,6 +405,7 @@ shiny::shinyApp(
     
     #### tabel 1
     data.1<-eventReactive(input$simulate,{
+      browser()
       inFile <- input$file.1
       if (is.null(inFile)) return(NULL)
       #if (is.null(inFile)){

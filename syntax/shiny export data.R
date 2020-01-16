@@ -1,6 +1,6 @@
 library(shiny)
 library(DT)
-library(rio)
+library(rio) # untuk function export
 
 
 ui <- fluidPage(
@@ -25,7 +25,7 @@ ui <- fluidPage(
         )),
     mainPanel(
       tabsetPanel(
-        tabPanel("Table Price", dataTableOutput("tabel.1"))
+        tabPanel("Table Budget", dataTableOutput("tabel.1"))
       )
       )))
 
@@ -96,6 +96,7 @@ server <- function(input, output, session) {
     
     #export to rdata
     export(data.frame(data.gab), "data/simulasi export/baru.rdata")
+    #save((data.gab),file= "data/simulasi export/baru.rdata")
     return(data.gab)
     #df = cbind(data.1,data.2,data.3)
     #check_df<-apply(apply(df,2,is.na),2,all)
