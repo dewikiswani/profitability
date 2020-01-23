@@ -38,7 +38,9 @@ price.out <- read.csv("price.out.csv",stringsAsFactors = F)
 ### kondisi 1 [cap.contition=="no"]: capital setiap tahun berbeda tiap unitnya, dengan nilai yg berbeda
 ### kondisi 2 [cap.condition=="repeat"]: capital setiap tahun berulang tiap tahunnya(konsisten), dengan nilai sama yang berulang
 #capital <- NULL
-cap.condition <- scan(what = "character") #isikan repeat atau no lalu enter 2 kali
+cap.condition <- scan(what = "character", n=1) #isikan repeat atau no lalu enter 2 kali
+no
+
 
 ######## ISI DULU KONDISI DI ATAS 
 if(cap.condition=="no"){
@@ -74,7 +76,8 @@ data1 <- data1 %>% mutate_if(is.factor,as.character) #change factor var to char 
 ## memasukkan Private Capital yang sama persis dengan Social Capital.
 ## Berdasarkan input tersebut, line coding dibawah akan dijalankan.
 
-cond.sosial <- scan(what = "character") #isikan beda atau sama lalu enter 2 kali
+cond.sosial <- scan(what = "character", n=1) #isikan beda atau sama lalu enter 2 kali
+sama
 
 if(cap.condition == "no" & cond.sosial == "sama"){
   pcap = capital
@@ -259,8 +262,7 @@ gab <- list(hsl.npv,nlc,hp,lr)
 gab
 
 
-# Section 4: Save to database ---------------------------------------------
-
+# Section 4: Save to database ---------------------------------------------?
 
 # AE COMMENT 10: Pada line diatas, sebaiknya juga ditambahkan kolom-kolom yang
 # memuat informasi tentang komoditas yang sedang dianalisa, saran saya,
@@ -270,6 +272,12 @@ gab
 #export to rdata
 #export(data.frame(data.gab), "1.rdata")
 
+
+save(io.in, io.out, price.in, price.out, cap.condition, cond.sosial, n, rate.p, rate.s, nilai.tukar, data1,  
+     pcap, scap, data3, data.gab, hsl.npv, nlc, ec, hp, lr, file = "gabung.Rdata")
+
+load("gabung.rdata",panggil <- new.env())
+ls.str(panggil)
 # AE COMMENT 11: Selain Rdata, Dewi juga punya pilihan untuk menggunakan fungsi
 # saveRDS disini. Sebaiknya Dewi juga sudah mulai mengusulkan sistem penamaan
 # yang sistematis, mungkin informasi yang saya usulkan di comment 10 bisa dijadikan
