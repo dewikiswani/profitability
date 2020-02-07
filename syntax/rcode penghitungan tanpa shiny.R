@@ -38,26 +38,49 @@ price.out <- read.csv("price.out.csv",stringsAsFactors = F)
 ### kondisi 1 [cap.contition=="no"]: capital setiap tahun berbeda tiap unitnya, dengan nilai yg berbeda
 ### kondisi 2 [cap.condition=="repeat"]: capital setiap tahun berulang tiap tahunnya(konsisten), dengan nilai sama yang berulang
 #capital <- NULL
-cap.condition <- scan(what = "character", n=1) #isikan repeat atau no lalu enter 2 kali
-no
+#cap.condition <- scan(what = "character", n=1) #isikan repeat atau no lalu enter 2 kali
+#no
+
+cap.condition <- function() {
+  ANSWER <- readline("Apakah modal kapital berulang ? [y/n] : ")
+  if (substr(ANSWER, 1, 1) == "n")
+    cap.con <- cat("Modal Kapital memiliki harga berbeda setiap tahunnya \n")
+  else if (substr(ANSWER, 1, 1) == "y")
+    cap.con <- cat("Modal kapital memiliki harga yang sama dan berulang setiap tahun \n")
+  else
+    print("ERROR: Kondisi Modal Kapital harus ditentukan")
+  return(ANSWER)
+  
+}
+cap.condition <- cap.condition()
+n
+
 
 
 ######## ISI DULU KONDISI DI ATAS 
-if(cap.condition=="no"){
+if(cap.condition=="n"){
   capital<- read.csv("capital.p.csv",stringsAsFactors = F) 
-}else if (cap.condition=="repeat"){
-  capital <- read.csv("capital.repeat.csv", stringsAsFactors = F)
+}else if (cap.condition=="y"){
+  capital <- read.csv("capital.repeat.csv", stringsAsFactors = F) #nilai social dan private diset di csvnya
 }else{
   print("ERROR: Kondisi Modal Kapital harus ditentukan") #case utk capital yg tidak ada isinya belum dibuat
 }
 
 
 #variabel input
+#user wajib isi untuk penamaan database 
+sut <- c("mono")
+kom <- c("oil palm")
+lokasi <- c("jambi")
+tahun <- c(2016)
+
+
 n=30 #jumlah tahun
 rate.p <- 7 #diskon rate private
 rate.s <- rate.p - 5 #diskon rate social
 profit0 <- 0 
 nilai.tukar <- 10000 #nilai tukar rupiah thd USD
+
 
 
 # Section2: Data Pre-Processing -------------------------------------------
@@ -75,23 +98,40 @@ data1 <- data1 %>% mutate_if(is.factor,as.character) #change factor var to char 
 ## Section1, dengan demikian, user akan diberi pilihan apakah mereka ingin
 ## memasukkan Private Capital yang sama persis dengan Social Capital.
 ## Berdasarkan input tersebut, line coding dibawah akan dijalankan.
+cond.sosial <- function() {
+  ANSWER <- readline("Apakah modal kapital sosial = private? [y/n] : ")
+  if (substr(ANSWER, 1, 1) == "n")
+    cap.sos <- cat("Modal kapital sosial tidak sama dengan private \n")
+  else if (substr(ANSWER, 1, 1) == "y")
+    cap.sos <- cat("Modal kapital sosial sama dengan private \n")
+  else
+    print("ERROR: Kondisi Modal Kapital Sosial harus ditentukan")
+  return(ANSWER)
+  
+}
+cond.sosial <- cond.sosial()
+y
 
-cond.sosial <- scan(what = "character", n=1) #isikan beda atau sama lalu enter 2 kali
-sama
+#cond.sosial <- scan(what = "character", n=1) #isikan beda atau sama lalu enter 2 kali
+#sama
 
-if(cap.condition == "no" & cond.sosial == "sama"){
+if(cap.condition == "n" & cond.sosial == "y"){
   pcap = capital
   pcap <- cbind(Status="Private Budget", pcap)
   pcap <- pcap %>% mutate_if(is.factor,as.character)
   
   scap = capital 
   scap <- cbind(Status="Social Budget", scap)
-  scap <- scap %>% mutate_if(is.factor,as.character) 
-}else if (cap.condition == "no"  & cond.sosial == "beda"){
+  scap <- scap %>% mutate_if(is.factor,as.character)
+  cap.status <- c("Modal Kapital memiliki harga berbeda setiap tahunnya, kondisi modal kapital private sama dengan sosial")
+  print("Modal Kapital memiliki harga berbeda setiap tahunnya, kondisi modal kapital private sama dengan sosial")
+}else if (cap.condition == "n"  & cond.sosial == "n"){
   scap = capital.s #jika capital social != dan hrus upload data baru
   scap <- cbind(Status="Social Budget", scap)
   scap <- scap %>% mutate_if(is.factor,as.character)
-} else if (cap.condition == "repeat"){
+  cap.status <- c("Modal Kapital memiliki harga berbeda setiap tahunnya, serta kondisi modal kapital private berbeda dengan sosial")
+  print("Modal Kapital memiliki harga berbeda setiap tahunnya, serta kondisi modal kapital private berbeda dengan sosial")
+} else if (cap.condition == "y"){
   pcap<-capital[-6]
   pcap.year<-data.frame(replicate(n,capital[[5]])) #replicate nilai private price sebanyak n tahun
   colnames(pcap.year)<-paste0(c(rep("Y", n)),1:n)
@@ -102,7 +142,9 @@ if(cap.condition == "no" & cond.sosial == "sama"){
   colnames(scap.year)<-paste0(c(rep("Y", n)),1:n)
   scap<-cbind(Status="Social Price",scap[c(1:4)],scap.year)
   scap <- scap %>% mutate_if(is.factor,as.character) #change factor var to char 
-}
+  cap.status <- c("Modal kapital memiliki harga yang sama dan berulang setiap tahun")
+  print("Modal kapital memiliki harga yang sama dan berulang setiap tahun")
+} else print("ERROR: Kondisi Modal Kapital belum ditentukan")
 
 
 # manipulasi data3 = data price
@@ -258,7 +300,7 @@ hp <- tot.prod/tot.labor
 ############# PERHITUNGAN LABOR REQ FOR EST
 lr <- sum.labor[[1]] #pekerja pada tahun 1
 
-gab <- list(hsl.npv,nlc,hp,lr)
+gab <- list(hsl.npv,nlc,hp,ec,lr)
 gab
 
 
@@ -269,15 +311,13 @@ gab
 # tambahkan kolom: nama komoditas, sistem usaha tani, lokasi-provinsi,
 # lokasi-kabupaten, lokasi-desa dan nama surveyor
 
-#export to rdata
-#export(data.frame(data.gab), "1.rdata")
 
 
+mytime <- format(Sys.time(), "%b_%d_%H_%M_%S_%Y")
+myfile <- file.path("C:/dw/ICRAF/profitability/data/data clean", 
+                    paste0(mytime, "_", sut, "_",kom,"_",lokasi,"_",tahun, ".Rdata"))
 save(io.in, io.out, price.in, price.out, cap.condition, cond.sosial, n, rate.p, rate.s, nilai.tukar, data1,  
-     pcap, scap, data3, data.gab, hsl.npv, nlc, ec, hp, lr, file = "gabung.Rdata")
-
-load("gabung.rdata",panggil <- new.env())
-ls.str(panggil)
+     pcap, scap, data3, data.gab, hsl.npv, nlc, ec, hp, lr, file = myfile)
 
 
 # AE COMMENT 11: Selain Rdata, Dewi juga punya pilihan untuk menggunakan fungsi
@@ -288,8 +328,8 @@ ls.str(panggil)
 # Section 5: Load database ------------------------------------------------
 
 #import rdata 
-#load("1.rdata", gab <- new.env())
-#ls.str(gab)
+load(myfile,panggil <- new.env())
+ls.str(panggil)
 
 # AE COMMENT 12: pada bagian ini, dewi juga mungkin sudah bisa memikirkan
 # bagaimana cara pemanggilan yang baik pada saat Rdata yang tersimpan sudah
@@ -301,10 +341,113 @@ ls.str(panggil)
 # AE COMMENT 20: di bagian ini Dewi bisa mulai mencoba untuk membuat report dari
 # hasil-hasil diatas, packae rtf atau officeR bisa jadi pilihan untuk ini
 
+# https://davidgohel.github.io/officer/articles/offcran/word.html#table-and-image-captions
+library(magrittr)
+library(officer)
+library(ggplot2)
+
+data1[is.na(data1)] <- c("") #if replace with null character
+scap[is.na(scap)] <- 0 #NA replace with zero
+
+doc <- read_docx() %>% 
+  body_add_par(value = "Table of content", style = "centered") %>% 
+  body_add_toc(level = 2) %>% 
+  
+  body_add_par(value = "Input", style = "heading 1") %>% 
+  
+  body_add_par(value = "Sistem Usaha Tani", style = "heading 2") %>% 
+  body_add_par(value = sut, style = "centered") %>% 
+  
+  body_add_par(value = "Komoditas", style = "heading 2") %>% 
+  body_add_par(value = kom, style = "centered") %>% 
+  
+  body_add_par(value = "Lokasi", style = "heading 2") %>% 
+  body_add_par(value = lokasi, style = "centered") %>% 
+  
+  body_add_par(value = "Tahun", style = "heading 2") %>% 
+  body_add_par(value = tahun, style = "centered") %>%
+  
+  body_add_par(value = "Jumlah tahun", style = "heading 2") %>% 
+  body_add_par(value = n, style = "centered") %>%
+  
+  body_add_par(value = "Discount Rate Private", style = "heading 2") %>% 
+  body_add_par(value = rate.p, style = "centered") %>%
+  
+  body_add_par(value = "Discount Rate Social", style = "heading 2") %>% 
+  body_add_par(value = rate.s, style = "centered") %>%
+  
+  body_add_par(value = "Exchange Rate", style = "heading 2") %>% 
+  body_add_par(value = nilai.tukar, style = "centered") %>%
+  
+  body_add_par(value = "Status Capital", style = "heading 2") %>% 
+  body_add_par(value = cap.status, style = "centered") %>%
+  
+  body_add_par(value = "Summary", style = "heading 1") %>% 
+  
+  body_add_par(value = "NPV", style = "heading 2") %>% 
+  body_add_table(value = hsl.npv, style = "table_template" ) %>% 
+  body_add_par(value = "NPV", style = "table title") %>% 
+  shortcuts$slip_in_tableref(depth = 2) %>%
+  
+  body_add_par(value = "Non Labor Cost (Mrp/Ha)", style = "heading 2") %>% 
+  body_add_table(value = nlc, style = "table_template" ) %>% 
+  body_add_par(value = "Non Labor Cost (Mrp/Ha)", style = "table title") %>% 
+  shortcuts$slip_in_tableref(depth = 2) %>%
+  
+  body_add_par(value = "Establishment Cost (1st year only, Mrp/Ha)", style = "heading 2") %>% 
+  body_add_par(value = ec, style = "centered") %>% 
+  
+  body_add_par(value = "Harvesting Product (TOn/HOK)", style = "heading 2") %>% 
+  body_add_par(value = hp, style = "centered") %>% 
+  
+  body_add_par(value = "Labor Req for Est (1st year only, HOK/Ha", style = "heading 2") %>% 
+  body_add_par(value = lr, style = "centered") %>% 
+  
+  body_add_par(value = "Tables", style = "heading 1") %>% 
+  
+  body_add_par(value = "Table Price", style = "heading 2") %>% 
+  body_add_table(value = data3, style = "table_template" ) %>% 
+  body_add_par(value = "Price", style = "table title") %>% 
+  shortcuts$slip_in_tableref(depth = 2) %>%
+  
+  body_end_section_portrait() %>% 
+  
+  body_add_par(value = "Table Input Output", style = "heading 2") %>% 
+  body_add_table(value = data1, style = "Normal Table" ) %>% 
+  body_add_par(value = "Input - Output", style = "table title") %>% 
+  shortcuts$slip_in_tableref(depth = 2) %>%
+  
+  body_add_par(value = "Table Capital", style = "heading 2") %>% 
+  body_add_table(value = pcap, style = "Light List Accent 2" ) %>% 
+  body_add_par(value = "Input - Output", style = "table title") %>% 
+  shortcuts$slip_in_tableref(depth = 2) %>%
+  
+  body_add_par(value = "Table Capital", style = "heading 2") %>% 
+  body_add_table(value = scap, style = "Table Professional" ) %>% 
+  body_add_par(value = "Input - Output", style = "table title") %>% 
+  shortcuts$slip_in_tableref(depth = 2) %>%
+
+  
+  body_end_section_columns_landscape()
+  
+  
+  myfile <- file.path("C:/dw/ICRAF/profitability/data/data clean", 
+                      paste0(sut, "_",kom,"_",lokasi,"_",tahun, ".docx")) 
+
+  print(doc, target = myfile) 
+  #kendala:tampilan di mengeluarkan table input output, font sizenya tdk bs custom klo pke officer
+  #solusi sementara: jika tampilan tabelnya ingin baik maka copas ke excel
+  #plus: bisa replace
+
+
+
+##### option kedua pakai flextable
+##### belum solved
+
+
 
 # Section 7: Simulation ---------------------------------------------------
 
 # AE COMMENT 21: di bagian ini Dewi bisa mulai mencoba untuk membangun modul scenario. Ini bisa kita diskusikan lebih lanjut nanti.
-
 
 
