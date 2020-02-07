@@ -278,6 +278,8 @@ save(io.in, io.out, price.in, price.out, cap.condition, cond.sosial, n, rate.p, 
 
 load("gabung.rdata",panggil <- new.env())
 ls.str(panggil)
+
+
 # AE COMMENT 11: Selain Rdata, Dewi juga punya pilihan untuk menggunakan fungsi
 # saveRDS disini. Sebaiknya Dewi juga sudah mulai mengusulkan sistem penamaan
 # yang sistematis, mungkin informasi yang saya usulkan di comment 10 bisa dijadikan
