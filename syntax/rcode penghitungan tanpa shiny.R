@@ -349,92 +349,84 @@ library(ggplot2)
 data1[is.na(data1)] <- c("") #if replace with null character
 scap[is.na(scap)] <- 0 #NA replace with zero
 
-doc <- read_docx() %>% 
-  body_add_par(value = "Table of content", style = "centered") %>% 
-  body_add_toc(level = 2) %>% 
-  
-  body_add_par(value = "Input", style = "heading 1") %>% 
-  
-  body_add_par(value = "Sistem Usaha Tani", style = "heading 2") %>% 
-  body_add_par(value = sut, style = "centered") %>% 
-  
-  body_add_par(value = "Komoditas", style = "heading 2") %>% 
-  body_add_par(value = kom, style = "centered") %>% 
-  
-  body_add_par(value = "Lokasi", style = "heading 2") %>% 
-  body_add_par(value = lokasi, style = "centered") %>% 
-  
-  body_add_par(value = "Tahun", style = "heading 2") %>% 
-  body_add_par(value = tahun, style = "centered") %>%
-  
-  body_add_par(value = "Jumlah tahun", style = "heading 2") %>% 
-  body_add_par(value = n, style = "centered") %>%
-  
-  body_add_par(value = "Discount Rate Private", style = "heading 2") %>% 
-  body_add_par(value = rate.p, style = "centered") %>%
-  
-  body_add_par(value = "Discount Rate Social", style = "heading 2") %>% 
-  body_add_par(value = rate.s, style = "centered") %>%
-  
-  body_add_par(value = "Exchange Rate", style = "heading 2") %>% 
-  body_add_par(value = nilai.tukar, style = "centered") %>%
-  
-  body_add_par(value = "Status Capital", style = "heading 2") %>% 
-  body_add_par(value = cap.status, style = "centered") %>%
-  
-  body_add_par(value = "Summary", style = "heading 1") %>% 
-  
-  body_add_par(value = "NPV", style = "heading 2") %>% 
-  body_add_table(value = hsl.npv, style = "table_template" ) %>% 
-  body_add_par(value = "NPV", style = "table title") %>% 
-  shortcuts$slip_in_tableref(depth = 2) %>%
-  
-  body_add_par(value = "Non Labor Cost (Mrp/Ha)", style = "heading 2") %>% 
-  body_add_table(value = nlc, style = "table_template" ) %>% 
-  body_add_par(value = "Non Labor Cost (Mrp/Ha)", style = "table title") %>% 
-  shortcuts$slip_in_tableref(depth = 2) %>%
-  
-  body_add_par(value = "Establishment Cost (1st year only, Mrp/Ha)", style = "heading 2") %>% 
-  body_add_par(value = ec, style = "centered") %>% 
-  
-  body_add_par(value = "Harvesting Product (TOn/HOK)", style = "heading 2") %>% 
-  body_add_par(value = hp, style = "centered") %>% 
-  
-  body_add_par(value = "Labor Req for Est (1st year only, HOK/Ha", style = "heading 2") %>% 
-  body_add_par(value = lr, style = "centered") %>% 
-  
-  body_add_par(value = "Tables", style = "heading 1") %>% 
-  
-  body_add_par(value = "Table Price", style = "heading 2") %>% 
-  body_add_table(value = data3, style = "table_template" ) %>% 
-  body_add_par(value = "Price", style = "table title") %>% 
-  shortcuts$slip_in_tableref(depth = 2) %>%
-  
-  body_end_section_portrait() %>% 
-  
-  body_add_par(value = "Table Input Output", style = "heading 2") %>% 
-  body_add_table(value = data1, style = "Normal Table" ) %>% 
-  body_add_par(value = "Input - Output", style = "table title") %>% 
-  shortcuts$slip_in_tableref(depth = 2) %>%
-  
-  body_add_par(value = "Table Capital", style = "heading 2") %>% 
-  body_add_table(value = pcap, style = "Light List Accent 2" ) %>% 
-  body_add_par(value = "Input - Output", style = "table title") %>% 
-  shortcuts$slip_in_tableref(depth = 2) %>%
-  
-  body_add_par(value = "Table Capital", style = "heading 2") %>% 
-  body_add_table(value = scap, style = "Table Professional" ) %>% 
-  body_add_par(value = "Input - Output", style = "table title") %>% 
-  shortcuts$slip_in_tableref(depth = 2) %>%
+input <- t(data.frame(sut,kom,lokasi,tahun,n,rate.p,rate.s,nilai.tukar,cap.status))
+nama.input <- c("Sistem Usaha Tani",
+                "Komoditas",
+                "Lokasi",
+                "Tahun",
+                "Jumlah Tahun",
+                "Discount Rate Private",
+                "Discount Rate Social",
+                "Exchange Rate",
+                "Status Capital")
+input <- cbind(nama.input,input[,1])
+input <- as.data.frame(input)
+colnames(input) <- c("Variable Input","value")
 
-  
-  body_end_section_columns_landscape()
+doc <- read_docx() %>% 
+    body_add_par(value = "Table of content", style = "centered") %>% 
+    body_add_toc(level = 2) %>% 
+    
+    body_add_par(value = "Input", style = "heading 1") %>% 
+    
+    #body_add_par(value = "NPV", style = "heading 2") %>% 
+    body_add_table(value = input, style = "table_template" ) %>% 
+    #body_add_par(value = "Input", style = "table title") %>% 
+    #shortcuts$slip_in_tableref(depth = 1) %>%
+    
+    body_add_par(value = "Summary", style = "heading 1") %>% 
+    
+    body_add_par(value = "NPV", style = "heading 2") %>% 
+    body_add_table(value = hsl.npv, style = "table_template" ) %>% 
+    body_add_par(value = "NPV", style = "table title") %>% 
+    shortcuts$slip_in_tableref(depth = 2) %>%
+    
+    body_add_par(value = "Non Labor Cost (Mrp/Ha)", style = "heading 2") %>% 
+    body_add_table(value = nlc, style = "table_template" ) %>% 
+    body_add_par(value = "Non Labor Cost (Mrp/Ha)", style = "table title") %>% 
+    shortcuts$slip_in_tableref(depth = 2) %>%
+    
+    body_add_par(value = "Establishment Cost (1st year only, Mrp/Ha)", style = "heading 2") %>% 
+    body_add_par(value = ec, style = "centered") %>% 
+    
+    body_add_par(value = "Harvesting Product (TOn/HOK)", style = "heading 2") %>% 
+    body_add_par(value = hp, style = "centered") %>% 
+    
+    body_add_par(value = "Labor Req for Est (1st year only, HOK/Ha", style = "heading 2") %>% 
+    body_add_par(value = lr, style = "centered") %>% 
+    
+    body_add_par(value = "Tables", style = "heading 1") %>% 
+    
+    body_add_par(value = "Table Price", style = "heading 2") %>% 
+    body_add_table(value = data3, style = "table_template" ) %>% 
+    body_add_par(value = "Price", style = "table title") %>% 
+    shortcuts$slip_in_tableref(depth = 2) %>%
+    
+    body_end_section_portrait() %>% 
+    
+    body_add_par(value = "Table Input Output", style = "heading 2") %>% 
+    body_add_table(value = data1, style = "Normal Table" ) %>% 
+    body_add_par(value = "Input - Output", style = "table title") %>% 
+    shortcuts$slip_in_tableref(depth = 2) %>%
+    
+    body_add_par(value = "Table Capital", style = "heading 2") %>% 
+    body_add_table(value = pcap, style = "Normal Table" ) %>% 
+    body_add_par(value = "Input - Output", style = "table title") %>% 
+    shortcuts$slip_in_tableref(depth = 2) %>%
+    
+    body_add_par(value = "Table Capital", style = "heading 2") %>% 
+    body_add_table(value = scap, style = "Normal Table" ) %>% 
+    body_add_par(value = "Input - Output", style = "table title") %>% 
+    shortcuts$slip_in_tableref(depth = 2) %>%
+    
+    body_end_section_landscape()
   
   
   myfile <- file.path("C:/dw/ICRAF/profitability/data/data clean", 
                       paste0(sut, "_",kom,"_",lokasi,"_",tahun, ".docx")) 
-
+  
   print(doc, target = myfile) 
+  
   #kendala:tampilan di mengeluarkan table input output, font sizenya tdk bs custom klo pke officer
   #solusi sementara: jika tampilan tabelnya ingin baik maka copas ke excel
   #plus: bisa replace
