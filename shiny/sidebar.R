@@ -16,10 +16,16 @@ argonSidebar <- argonDashSidebar(
     #  "Home"
     #),
     argonSidebarItem(
+      tabName = "uploadModal",
+      icon = argonIcon(name = "bullet-list-67", color = "danger"),
+      "Profitability"
+    ),
+
+    argonSidebarItem(
       tabName = "upload",
       icon = argonIcon(name = "bullet-list-67", color = "danger"),
       "Profitability - Upload file"
-    )
+    ),
   ),
   argonSidebarDivider()
   #argonSidebarHeader(title = "Other Items")
