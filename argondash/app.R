@@ -1,4 +1,4 @@
-setwd("C:/dw/ICRAF/profitability")
+#setwd("C:/dw/ICRAF/profitability/argondash")
 
 
 library(shiny)
@@ -405,7 +405,7 @@ shiny::shinyApp(
     
     #### tabel 1
     data.1<-eventReactive(input$simulate,{
-      browser()
+      #browser()
       inFile <- input$file.1
       if (is.null(inFile)) return(NULL)
       #if (is.null(inFile)){

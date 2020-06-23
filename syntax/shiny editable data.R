@@ -87,7 +87,7 @@ ui <- fluidPage(
 
 server <- function(input, output){
   #browser()
-  load("data/data clean/1.rdata", dat <- new.env())
+  load("C:/dw/ICRAF/profitability/data/data clean/1.Rdata", dat <- new.env())
   dat <- dat$x
   dat1 <- filter(dat, Status == c("General"))
   dat1 <- select(dat1,-Status)

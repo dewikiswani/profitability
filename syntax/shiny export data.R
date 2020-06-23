@@ -8,24 +8,16 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       fluidRow(
-        column(4,
+        column(12,
                fileInput("file.1", "Table Input-Output"),
                fileInput("file.2", "Table Capital"),
                fileInput("file.3", "Table Price"),
                actionButton("simulate","Simulate!")
-        ),
-        column(5,
-               sliderInput("rate.p", "Discount Rate Private", 7.8 ,min = 0, max = 15, step = 0.01),
-               sliderInput("rate.s", "Discount Rate Social", 2.8 ,min = 0, max = 8, step = 0.01),
-               sliderInput("labor.p", "Cost of Labor Private", 50000 ,min = 40000, max = 200000, step = 1000),
-               sliderInput("labor.s", "Cost of Labor Social", 50000 ,min = 40000, max = 200000, step = 1000),
-               sliderInput("n.tukar", "Rupiah Exchange Rate", 10000 ,min = 9000, max = 20000, step = 100),
-               #sliderInput("area", "Planting Area", 3000 ,min = 0, max = 10000, step = 100)
         )
         )),
     mainPanel(
       tabsetPanel(
-        tabPanel("Table Budget", dataTableOutput("tabel.1"))
+        tabPanel("Table", dataTableOutput("tabel.1"))
       )
       )))
 
@@ -95,7 +87,7 @@ server <- function(input, output, session) {
     data.gab<-rbind(data.1,p.price,s.price,cap.1,cap.2)
     
     #export to rdata
-    export(data.frame(data.gab), "data/simulasi export/baru.rdata")
+    export(data.frame(data.gab), "C:/dw/ICRAF/profitability/data/simulasi export/try.rdata")
     #save((data.gab),file= "data/simulasi export/baru.rdata")
     return(data.gab)
     #df = cbind(data.1,data.2,data.3)

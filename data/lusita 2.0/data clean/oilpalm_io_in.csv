@@ -1,0 +1,39 @@
+Grup,Var1,Var2,Unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
+Input,Pupuk,Urea ,Kg,199.8,199.8,199.8,199.8,199.8,499.5,499.5,499.5,499.5,499.5,500,500.175,500.175,500.175,500.175,500.175,500.175,500.175,500.175,500.175,0,0,0,0,0,0,0,0,0,0
+Input,Pupuk,TSP,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Pupuk,KCL,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Pupuk,NPK,Kg,399.6,399.6,399.6,399.6,399.6,499.5,499.5,499.5,499.5,499.5,500,500.175,500.175,500.175,500.175,500.175,500.175,500.175,500.175,500.175,270,270,270,270,270,270,270,270,270,270
+Input,Pupuk,Kapur/Dolomit,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Pupuk,MOP,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Pupuk,Borax,kg,0,0,0.675,0.675,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35
+Input,Pupuk,Kandang,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Herbisida,Round Up,Kg,2,2,1,1,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
+Input,Herbisida,Basmilang,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Herbisida,Lindomin,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Pestisida,Ally,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Pestisida,Decis,Kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Bahan Tanam /Bibit,Kelapa Sawit,Batang,135,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Bahan Tanam /Bibit,Padi,Kg,70,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Peralatan,Dodos,Buah,,,1,,1,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Peralatan,Egreg,Buah,,,,,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1
+Input,Peralatan,Angkong,Buah,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1
+Input,Peralatan,Sprayer,Buah,1,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1
+Input,Peralatan,Parang,Buah,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
+Input,Peralatan,Cangkul ,Buah,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Tebas,HOK,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Tumbang,HOK,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Bakar,HOK,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Pancang,HOK,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Pembuatan lubang,HOK,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Pembuatan Pagar,HOK,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Penanaman,HOK,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja KS,Pembersihan piringan,HOK,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
+Input,Tenaga Kerja KS,Pruning,HOK,,,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+Input,Tenaga Kerja KS,Penyemprotan,HOK,4,4,4,4,4,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+Input,Tenaga Kerja KS,Pemupukan,HOK,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
+Input,Tenaga Kerja KS,Pemanenan,HOK,,,24,24,24,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48
+Input,Tenaga Kerja Pd,Tugal,HOK,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Pd,Penyiangan,HOK,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Pd,Pencegahan Hama dan Penyakit,HOK,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Pd,Pemanenan,HOK,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Pd,"Pasca Panen (Jontok, Jemur)",HOK,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

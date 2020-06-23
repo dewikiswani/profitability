@@ -1,0 +1,31 @@
+Grup,Var1,Var2,Unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
+Input,Pupuk,Urea,kg,,,,,,,100,,,,,,,100,,,,,,,,,,,,,,,,
+Input,Pupuk,SP ,kg,,,,,,,50,,,,,,,50,,,,,,,,,,,,,,,,
+Input,Pupuk,KCL,kg,,,,,,,50,,,,,,,50,,,,,,,,,,,,,,,,
+Input,Pupuk,NPK,kg,,,,,,,50,,,,,,,50,,,,,,,,,,,,,,,,
+Input,Bahan Kimia,Basmilang,liter,,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
+Input,Bahan Tanam,Padi,Kg,50,50,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Bahan Tanam,Kopi,batang,3000,300,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tools,Karung,unit,,2.4,30,30,18,18,18,30,30,12,12,12,12,12,18,18,12,12,12,12,12,12,12,12,12,12,12,12,12,12
+Input,Tools,Cangkul,unit,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,
+Input,Tools,Parang,unit,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
+Input,Tools,Sprayer,unit,1,,,,,,,,,1,,,,,,,,,,1,,,,,,,,,,1
+Input,Tenaga Kerja Persiapan Lahan,tebas,HOK,30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Persiapan Lahan,tumbang,HOK,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Persiapan Lahan,bakar,HOK,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Padi,Tugal dan tanam padi,HOK,25,25,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Padi,Penyiangan,HOK,6,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Padi,Bird + pig waching,HOK,15,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Padi,Panen,HOK,20,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Padi,Perontokan + Pengeringan,HOK,5,5,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Kopi,Penanaman buah,HOK,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Kopi,Penanaman kopi,HOK,8,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Kopi,Pruning,HOK,,5,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Kopi,Pemangkasan tunas/ranting,HOK,,,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+Input,Tenaga Kerja Kopi,Penyiangan,HOK,,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+Input,Tenaga Kerja Kopi,Pemupukan,HOK,,,,,,,4,,,,,,,4,,,,,,,,,,,,,,,,
+Input,Tenaga Kerja Kopi,Penyemprotan,HOK,,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18
+Input,Tenaga Kerja Kopi,transport,Kg,,120,1500,1500,900,900,900,1500,1500,600,600,600,600,600,900,900,600,600,600,600,600,600,600,600,600,600,600,600,600,600
+Input,Tenaga Kerja Kopi,Kopi,HOK,,,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103
+Input,Tenaga Kerja Kopi,Giling kopi,Kg,,120,1500,1500,900,900,900,1500,1500,600,600,600,600,600,900,900,600,600,600,600,600,600,600,600,600,600,600,600,600,600
+Input,Tenaga Kerja Kopi,Penjemuran kopi,HOK,,,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3

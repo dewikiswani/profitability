@@ -35,8 +35,8 @@ price.out <- read.csv("price.out.csv",stringsAsFactors = F)
 
 #data capital 
 ## ada 2 kondisi
-### kondisi 1 [cap.contition=="no"]: capital setiap tahun berbeda tiap unitnya, dengan nilai yg berbeda
-### kondisi 2 [cap.condition=="repeat"]: capital setiap tahun berulang tiap tahunnya(konsisten), dengan nilai sama yang berulang
+### kondisi 1 [cap.contition=="n"]: capital setiap tahun berbeda tiap unitnya, dengan nilai yg berbeda
+### kondisi 2 [cap.condition=="y"]: capital setiap tahun berulang tiap tahunnya(konsisten), dengan nilai sama yang berulang
 #capital <- NULL
 #cap.condition <- scan(what = "character", n=1) #isikan repeat atau no lalu enter 2 kali
 #no
@@ -304,7 +304,9 @@ gab <- list(hsl.npv,nlc,hp,ec,lr)
 gab
 
 
-# Section 4: Save to database ---------------------------------------------?
+
+# Section 4: Save to database ---------------------------------------------
+
 
 # AE COMMENT 10: Pada line diatas, sebaiknya juga ditambahkan kolom-kolom yang
 # memuat informasi tentang komoditas yang sedang dianalisa, saran saya,
@@ -316,8 +318,7 @@ gab
 mytime <- format(Sys.time(), "%b_%d_%H_%M_%S_%Y")
 myfile <- file.path("C:/dw/ICRAF/profitability/data/data clean", 
                     paste0(mytime, "_", sut, "_",kom,"_",lokasi,"_",tahun, ".Rdata"))
-save(io.in, io.out, price.in, price.out, cap.condition, cond.sosial, n, rate.p, rate.s, nilai.tukar, data1,  
-     pcap, scap, data3, data.gab, hsl.npv, nlc, ec, hp, lr, file = myfile)
+save(data.gab, hsl.npv, nlc, ec, hp, lr, file = myfile)
 
 
 # AE COMMENT 11: Selain Rdata, Dewi juga punya pilihan untuk menggunakan fungsi

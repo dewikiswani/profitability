@@ -1,0 +1,13 @@
+Grup,Var1,Var2,Unit,Private Price,Social Price
+Input,Pupuk,Fertilizer: Urea ,Rp/kg,,
+Input,Pupuk,Herbisida,Rp/Lt,50000,50000
+Input,Pupuk,Seed ,Rp/kg,8000,8000
+Input,Peralatan,Sprayer,Rp/unit,250000,250000
+Input,Peralatan,Parang,Rp/unit,50000,50000
+Input,Tenaga Kerja,Persiapan Lahan,Rp/HOK,70000,70000
+Input,Tenaga Kerja,Pembuatan parit,Rp/HOK,60000,60000
+Input,Tenaga Kerja,Pemeliharaan parit,Rp/HOK,60000,60000
+Input,Tenaga Kerja,Penanaman (Tugal dan tanam),Rp/HOK,70000,70000
+Input,Tenaga Kerja,Penyiangan/penyemprotan,Rp/HOK,70000,70000
+Input,Tenaga Kerja,Panen,Rp/HOK,70000,70000
+Input,Tenaga Kerja,Pasca panen (kupas dan jemur),Rp/HOK,70000,70000
