@@ -1,0 +1,41 @@
+Grup,Var1,Var2,Unit,Y1
+Input,Pupuk,Urea ,Kg,199.8
+Input,Pupuk,TSP,Kg,
+Input,Pupuk,KCL,Kg,
+Input,Pupuk,NPK,Kg,399.6
+Input,Pupuk,Kapur/Dolomit,Kg,
+Input,Pupuk,MOP,Kg,
+Input,Pupuk,Borax,kg,0
+Input,Pupuk,Kandang,Kg,
+Input,Herbisida,Round Up,Kg,2
+Input,Herbisida,Basmilang,Kg,
+Input,Herbisida,Lindomin,Kg,
+Input,Pestisida,Ally,Kg,
+Input,Pestisida,Decis,Kg,
+Input,Bahan Tanam /Bibit,Kelapa Sawit,Batang,135
+Input,Bahan Tanam /Bibit,Padi,Kg,70
+Input,Peralatan,Dodos,Buah,
+Input,Peralatan,Egreg,Buah,
+Input,Peralatan,Angkong,Buah,
+Input,Peralatan,Sprayer,Buah,1
+Input,Peralatan,Parang,Buah,1
+Input,Peralatan,Cangkul ,Buah,
+Input,Tenaga Kerja KS,Tebas,HOK,15
+Input,Tenaga Kerja KS,Tumbang,HOK,4
+Input,Tenaga Kerja KS,Bakar,HOK,1
+Input,Tenaga Kerja KS,Pancang,HOK,2
+Input,Tenaga Kerja KS,Pembuatan lubang,HOK,6
+Input,Tenaga Kerja KS,Pembuatan Pagar,HOK,6
+Input,Tenaga Kerja KS,Penanaman,HOK,3
+Input,Tenaga Kerja KS,Pembersihan piringan,HOK,12
+Input,Tenaga Kerja KS,Pruning,HOK,
+Input,Tenaga Kerja KS,Penyemprotan,HOK,4
+Input,Tenaga Kerja KS,Pemupukan,HOK,6
+Input,Tenaga Kerja KS,Pemanenan,HOK,
+Input,Tenaga Kerja Pd,Tugal,HOK,10
+Input,Tenaga Kerja Pd,Penyiangan,HOK,6
+Input,Tenaga Kerja Pd,Pencegahan Hama dan Penyakit,HOK,15
+Input,Tenaga Kerja Pd,Pemanenan,HOK,20
+Input,Tenaga Kerja Pd,"Pasca Panen (Jontok, Jemur)",HOK,2
+Output,Utama,Tandan Buah Segar (TBS),Ton,0
+Output,Sampingan,Padi,Ton,0.5

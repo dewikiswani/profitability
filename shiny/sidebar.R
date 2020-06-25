@@ -15,11 +15,11 @@ argonSidebar <- argonDashSidebar(
     #  icon = argonIcon(name = "tv-2", color = "info"),
     #  "Home"
     #),
-    argonSidebarItem(
-      tabName = "uploadModal",
-      icon = argonIcon(name = "bullet-list-67", color = "danger"),
-      "Profitability"
-    ),
+    # argonSidebarItem(
+    #   tabName = "uploadModal",
+    #   icon = argonIcon(name = "bullet-list-67", color = "danger"),
+    #   "Profitability"
+    # ),
 
     argonSidebarItem(
       tabName = "upload",

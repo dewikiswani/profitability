@@ -13,6 +13,7 @@ library(DT)
 library(dplyr)
 library(stringr)
 library(tidyverse)
+library(rhandsontable)
 
 
 # template
@@ -21,9 +22,11 @@ source("navbar.R")
 source("header.R")
 source("footer.R")
 
+
 # elements
 source("home.R")
-source("upload lusita 2.R")
+source("module.R")
+source("upload modal dialog.R")
 
 # App
 shiny::shinyApp(
@@ -43,7 +46,7 @@ shiny::shinyApp(
     footer = argonFooter
   ),
   server = function(input, output,session) {
-    
+    callModule(buttonModule,"profit")
     ##kumpulan fungsi
     lowcase <- function(data, index.col){
       for(k in index.col){
@@ -230,33 +233,33 @@ shiny::shinyApp(
         data2 <- NULL
         return(data2)
       } else {
-      
-      pcap=data.5()
-      scap=data.6()
-      
-      
-      pcap[is.na(pcap)] <- 0 #NA replace with zero
-      pcap <- cbind(status="private budget", pcap)
-      pcap <- pcap %>% mutate_if(is.factor,as.character)
-      
-      scap[is.na(scap)] <- 0 #NA replace with zero
-      scap <- cbind(status="social budget", scap)
-      scap <- scap %>% mutate_if(is.factor,as.character)
-      
-      colnames(pcap) <- tolower(colnames(pcap))
-      colnames(scap) <- tolower(colnames(scap))
-      
-      pcap <- lowcase(pcap,c(1:4))
-      scap <- lowcase(scap,c(1,2,3,4))
-      
-      data2 <- rbind(pcap,scap)
-      return(data2)
+        
+        pcap=data.5()
+        scap=data.6()
+        
+        
+        pcap[is.na(pcap)] <- 0 #NA replace with zero
+        pcap <- cbind(status="private budget", pcap)
+        pcap <- pcap %>% mutate_if(is.factor,as.character)
+        
+        scap[is.na(scap)] <- 0 #NA replace with zero
+        scap <- cbind(status="social budget", scap)
+        scap <- scap %>% mutate_if(is.factor,as.character)
+        
+        colnames(pcap) <- tolower(colnames(pcap))
+        colnames(scap) <- tolower(colnames(scap))
+        
+        pcap <- lowcase(pcap,c(1:4))
+        scap <- lowcase(scap,c(1,2,3,4))
+        
+        data2 <- rbind(pcap,scap)
+        return(data2)
       }
     })
     
     #hitung.all<-eventReactive(
     observeEvent(input$simulate,{
-      browser()
+      #browser()
       
       data.gab<-rbind(price(),io(),capital())
       #perkalian antara general dan Private Price
