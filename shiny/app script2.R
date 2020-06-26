@@ -23,10 +23,13 @@ source("header.R")
 source("footer.R")
 
 
+
 # elements
 source("home.R")
 source("module.R")
 source("upload modal dialog.R")
+source("moduleAnalisis.R")
+source("analisis.R")
 
 # App
 shiny::shinyApp(
@@ -39,14 +42,19 @@ shiny::shinyApp(
     header = argonHeader,
     body = argonDashBody(
       argonTabItems(
-        #home,
+        home,
         upload
+        ,
+        analisis
       )
     ),
     footer = argonFooter
   ),
   server = function(input, output,session) {
     callModule(buttonModule,"profit")
+    callModule(analisisModule,"profit")
+    
+    
     ##kumpulan fungsi
     lowcase <- function(data, index.col){
       for(k in index.col){
@@ -62,53 +70,59 @@ shiny::shinyApp(
     #browser()
     #data price
     data.1 <- eventReactive(input$simulate,{
-      inFile <- input$file.1
-      if (is.null(inFile)){
-        stop("Harga Input harus dimasukkan") 
-      }else{
-        read.csv(inFile$datapath)#ganti read.csv jika delimiter excelnya ,
-      }
+      read.csv("data/template/oilpalm_price_in.csv", header = T, sep = ",")
+      # inFile <- input$file.1
+      # if (is.null(inFile)){
+      #   stop("Harga Input harus dimasukkan") 
+      # }else{
+      #   read.csv(inFile$datapath)#ganti read.csv jika delimiter excelnya ,
+      # }
     })
     
     data.2 <- eventReactive(input$simulate,{
-      inFile <- input$file.2
-      if (is.null(inFile)){
-        stop("Harga Output harus dimasukkan") 
-      }else{
-        read.csv(inFile$datapath)#ganti read.csv jika delimiter excelnya ,
-      }
+      read.csv("data/template/oilpalm_price_out.csv", header = T, sep = ",")
+      # inFile <- input$file.2
+      # if (is.null(inFile)){
+      #   stop("Harga Output harus dimasukkan") 
+      # }else{
+      #   read.csv(inFile$datapath)#ganti read.csv jika delimiter excelnya ,
+      # }
     })
     
     #data io
     data.3 <- eventReactive(input$simulate,{
-      inFile <- input$file.3
-      if (is.null(inFile)){
-        stop("I-O Input harus dimasukkan") 
-      }else{
-        read.csv(inFile$datapath) #ganti read.csv jika delimiter excelnya ,
-      }
+      read.csv("data/template/oilpalm_io_in.csv", header = T, sep = ",")
+      # inFile <- input$file.3
+      # if (is.null(inFile)){
+      #   stop("I-O Input harus dimasukkan") 
+      # }else{
+      #   read.csv(inFile$datapath) #ganti read.csv jika delimiter excelnya ,
+      # }
     })
     
     data.4 <- eventReactive(input$simulate,{
-      inFile <- input$file.4
-      if (is.null(inFile)){
-        stop("IO-Output harus dimasukkan") 
-      }else{
-        read.csv(inFile$datapath) #ganti read.csv jika delimiter excelnya ,
-      }
+      read.csv("data/template/oilpalm_io_out.csv", header = T, sep = ",")
+      # inFile <- input$file.4
+      # if (is.null(inFile)){
+      #   stop("IO-Output harus dimasukkan") 
+      # }else{
+      #   read.csv(inFile$datapath) #ganti read.csv jika delimiter excelnya ,
+      # }
     })
     
     #data capital
     data.5 <- eventReactive(input$simulate,{
-      inFile <- input$file.5
-      if (is.null(inFile)) return(NULL)
-      read.csv(inFile$datapath)
+      read.csv("data/template/oilpalm_capital_p.csv", header = T, sep = ",")
+      # inFile <- input$file.5
+      # if (is.null(inFile)) return(NULL)
+      # read.csv(inFile$datapath)
     })
     
     data.6 <- eventReactive(input$simulate,{
-      inFile <- input$file.6
-      if (is.null(inFile)) return(NULL)
-      read.csv(inFile$datapath)
+      read.csv("data/template/oilpalm_capital_s.csv", header = T, sep = ",")
+      # inFile <- input$file.6
+      # if (is.null(inFile)) return(NULL)
+      # read.csv(inFile$datapath)
     })
     
     
@@ -637,6 +651,15 @@ shiny::shinyApp(
       hasil
     })
     
+    # output$viewPrice <- renderDataTable({
+    #   dataView <- data.frame(price()[,2:7])
+    #   dataView
+    # })
+    # 
+    # output$viewIO <- renderDataTable({
+    #   dataView <- data.frame(io())
+    #   dataView
+    # })
   }
 )
 

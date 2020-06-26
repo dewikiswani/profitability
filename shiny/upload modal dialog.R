@@ -4,7 +4,7 @@ upload <- argonTabItem(
   argonRow(
     argonCard(
       width = 12,
-      title = "Unggah File, Variabel Input, Asumsi & Ringkasan Data",
+      title = "Unggah File & Variabel Input",
       src = NULL,
       hover_lift = TRUE,
       shadow = TRUE,
@@ -211,27 +211,28 @@ upload <- argonTabItem(
   argonColumn(
     width = 12,
     argonH1("Table", display = 4),
-    argonTabSet(
-      id = "tab-1",
-      card_wrapper = TRUE,
-      horizontal = TRUE,
-      circle = FALSE,
-      size = "sm",
-      width = 12,
-      iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
-      argonTab(
-        tabName = "Table Price",
-        active = T,
-        dataTableOutput("tabel.1"),
-        style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
-      ),
-      argonTab(
-        tabName = "Table Input-Output",
-        active = F,
-        dataTableOutput("tabel.2"),
-        style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
-      )
-    )
+    viewTableUI("profit")
+    # argonTabSet(
+    #   id = "tab-1",
+    #   card_wrapper = TRUE,
+    #   horizontal = TRUE,
+    #   circle = FALSE,
+    #   size = "sm",
+    #   width = 12,
+    #   iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
+    #   argonTab(
+    #     tabName = "Table Price",
+    #     active = T,
+    #     dataTableOutput("viewPrice"),
+    #     style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+    #   ),
+    #   argonTab(
+    #     tabName = "Table Input-Output",
+    #     active = F,
+    #     dataTableOutput("viewIO"),
+    #     style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+    #   )
+    # )
   )
   
   

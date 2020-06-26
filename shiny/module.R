@@ -1,3 +1,7 @@
+examplePrice <- read.table("data/template/price template.csv", header = T, sep = ",")
+exampleIO <- read.table("data/template/io template.csv", header = T, sep = ",")
+
+
 buttonUI <- function(id) {
   ns <- NS(id)
   tagList(
@@ -11,6 +15,30 @@ buttonUI <- function(id) {
   )
 }
 
+viewTableUI <- function(id){
+  ns <- NS(id)
+  argonTabSet(
+    id = "tab-1",
+    card_wrapper = TRUE,
+    horizontal = TRUE,
+    circle = FALSE,
+    size = "sm",
+    width = 12,
+    iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
+    argonTab(
+      tabName = "Table Price",
+      active = T,
+      dataTableOutput(ns("viewPrice")),
+      style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+    ),
+    argonTab(
+      tabName = "Table Input-Output",
+      active = F,
+      dataTableOutput(ns("viewIO")),
+      style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+    )
+  )
+}
 
 buttonModule <- function(input, output, session) {
   
@@ -47,14 +75,17 @@ buttonModule <- function(input, output, session) {
                   h2("Sunting Harga Input"),
                   fluidRow(
                     column(6,
-                           selectInput(ns("priceYear_input"),
-                                       "Pilih tahun skenario:",
-                                       choices = c(1:30),selected = 30)
-                    ),
-                    column(6,
                            selectInput(ns("priceComp_input"),
                                        "banyaknya komponen yang diinput:",
                                        choices = c(1:50),selected = 10)
+                           # selectInput(ns("priceYear_input"),
+                           #             "Pilih tahun skenario:",
+                           #             choices = c(1:30),selected = 30)
+                    ),
+                    column(6,
+                           # selectInput(ns("priceComp_input"),
+                           #             "banyaknya komponen yang diinput:",
+                           #             choices = c(1:50),selected = 10)
                     )
                   )
                   ),
@@ -76,14 +107,17 @@ buttonModule <- function(input, output, session) {
                   h2("Sunting Harga Output"),
                   fluidRow(
                     column(6,
-                           selectInput(ns("priceYear_output"),
-                                       "Pilih tahun skenario:",
-                                       choices = c(1:30),selected = 30)
+                           selectInput(ns("priceComp_output"),
+                                       "banyaknya komponen yang diinput:",
+                                       choices = c(1:10),selected = 2)
+                           # selectInput(ns("priceYear_output"),
+                           #             "Pilih tahun skenario:",
+                           #             choices = c(1:30),selected = 30)
                     ),
                     column(6,
-                                    selectInput(ns("priceComp_output"),
-                                                "banyaknya komponen yang diinput:",
-                                                choices = c(1:10),selected = 2)
+                            # selectInput(ns("priceComp_output"),
+                            #                     "banyaknya komponen yang diinput:",
+                            #                     choices = c(1:10),selected = 2)
                            )
                   )
                 ),
@@ -107,12 +141,43 @@ buttonModule <- function(input, output, session) {
   })
   
 
+# Start template data ketika peneliti memulai skenario ------------------
+
+  # ({
+  #   exampleData <- read.table("data/template/contoh.csv", header = T, sep = ",")
+  # })
   
-  # START Price Input ----------------------------------------------------------
-  satAkun <- reactiveValues(
-    table1 = NULL
+  # dataTemplate <- reactive({
+  #   #exampleData <- read.table("data/template/contoh.csv", header = T, sep = ",")
+  #   priceInput <- examplePrice
+  #   priceOutput <- examplePrice
+  #   ioInput <- exampleIO
+  #   ioOutput <- exampleIO
+  # 
+  #   capitalPrivate <- NULL
+  #   capitalSocial <- NULL
+  # 
+  #   combineDef <- list(priceInput=priceInput,priceOutput=priceOutput,ioInput=ioInput,
+  #                      capitalPrivate=capitalPrivate,
+  #                      capitalSocial=capitalSocial)
+  # 
+  #   combineDef
+  #   fileName <- c("data/template/profitabilityAnalysis.rds")
+  #   saveRDS(combineDef,file = fileName)
+  # })
+  reactData <- reactiveValues(
+    tableP1 = NULL, #price input
+    tableP2 = NULL, #price output
+    tableIO1 = NULL, #io input
+    tableIO2 = NULL, #io output
+    tableCapP = NULL, #capital privat
+    tableCapS = NULL #capital sosial
   )
+
+# Ending template data ----------------------------------------------------
+
   
+# START Price Input ----------------------------------------------------------
   observeEvent(input$priceInputHit, {
     insertUI(selector= paste0("#", ns("priceInputPlaceholder")),
              where='afterEnd',
@@ -127,8 +192,10 @@ buttonModule <- function(input, output, session) {
       tags$br(),
       tags$b('Sunting secara manual'),
       tags$br(),
-      tags$h4("untuk memilih tipe komponen dan unit disediakan menu dropdown pada kolom 1 dan 3"),
-      tags$h6("pastikan komponen dan unit sesuai dengan daftar yang disediakan pada menu dropdown"),
+      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      tags$hr(),
+      tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
+      tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
       tags$br(),
       rHandsontableOutput(ns('editPriceInput')),
       tags$br(),
@@ -139,93 +206,356 @@ buttonModule <- function(input, output, session) {
     )
   })
   
-  valSatLand <- eventReactive(input$priceInputHit,{
-    # selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    # fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-    # dataDefine <-  readRDS(fileName)
-    
-    # if (is.null(dataDefine$satSelisih)) {
-    #   satAkun$table1 = data$listConsumZero
-    #   satAkun$table1
-    # }else{
-    #   selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-    #   fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-    #   dataDefine <-  readRDS(fileName)
-    #   satAkun$table1 <- data$listConsumZero
-    #   tupla <- ordered(factor(sort(colnames(LDMProp_his)[landCover_his!=0])))
-    #   satAkun$table1[,1] <- tupla[1]
-    #   satAkun$table1[,2] <- tupla[1]
-    #   satAkun$table1 = dplyr::bind_rows(dataDefine$satSelisih,satAkun$table1)
-    # }
-    # 
-    # indexCol <- c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2],
-    #               paste0("y",input$pilihtahunSatLand))
-    # indexRow <- input$banyakTupla
-    # indexRow <- as.numeric(indexRow)
-    # satAkun$table1 <- satAkun$table1[1:indexRow,c(indexCol)]
-    # satAkun$table1
-    satAkun$table1 <- read.table("data/contoh.csv", header = T, sep = ",")
-    satAkun$table1
+  valP1 <- eventReactive(input$priceInputHit,{
+    #browser()
+    #indexCol <- as.numeric(input$priceYear_input)+3
+    indexRow <- as.numeric(input$priceComp_input)
+    reactData$tableP1 <- examplePrice
+    reactData$tableP1[,1] <- examplePrice[1,1]
+    reactData$tableP1[,2] <- examplePrice[1,2]
+    reactData$tableP1[,3] <- examplePrice[1,3]
+    reactData$tableP1 <- reactData$tableP1[1:indexRow,]
+    reactData$tableP1
   })
   
   output$editPriceInput <- renderRHandsontable({
-    rhandsontable(valSatLand(),
+    rhandsontable(valP1(),
                   rowHeaderWidth = 50,
-                  fixedColumnsLeft = 2,
-                  height = 200,
-    ) 
-    # %>% 
-    #   hot_table(contextMenu = TRUE) %>% 
-    #   hot_context_menu(customOpts = list(
-    #     search = list(name = "Search",
-    #                   callback = htmlwidgets::JS(
-    #                     "function (key, options) {
-    #                      var srch = prompt('Search criteria');
-    #                      this.search.query(srch);
-    #                      this.render();
-    #                    }")))) %>% 
-    #   hot_col(col = c(colnames(satAkun$table1)[1],colnames(satAkun$table1)[2]),
-    #           type = "dropdown", source = sort(colnames(LDMProp_his)[landCover_his!=0])) 
+                  fixedColumnsLeft = 3,
+                  height = 500,
+    )
+  })
+  
+  observeEvent(input$savePriceInput,{
+    removeUI(selector='#textTampil')
     
+    editNew<-as.data.frame(hot_to_r(input$editPriceInput))
+    editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+    
+    fileName <- c("data/template/profitabilityAnalysis.rds")
+    dataDefine <- readRDS(fileName)
+    dataDefine$priceInput <- editNew
+    saveRDS(dataDefine,file = fileName)
+    
+    insertUI(selector='#teksPriceInputSave',
+             where = 'afterEnd',
+             ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
+  })
+# ending Price Input -----------------------------------------------------------------
+
+
+# Start Price Output ------------------------------------------------------
+  observeEvent(input$priceOutputHit, {
+    insertUI(selector= paste0("#", ns("priceOutputPlaceholder")),
+             where='afterEnd',
+             ui= uiOutput(ns('priceOutputUI'))
+    )
+  })
+  
+  output$priceOutputUI<- renderUI({
+    
+    tagList(
+      tags$br(),
+      tags$br(),
+      tags$b('Sunting secara manual'),
+      tags$br(),
+      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      tags$hr(),
+      tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
+      tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
+      tags$br(),
+      rHandsontableOutput(ns('editPriceOutput')),
+      tags$br(),
+      actionButton(ns('savePriceOutput'), 'simpan tabel'), 
+      tags$br(), 
+      tags$br(),
+      tags$div(id='teksPriceOutputSave')
+    )
+  })
+  
+  valP2 <- eventReactive(input$priceOutputHit,{
+    #browser()
+    #indexCol <- as.numeric(input$priceYear_output)+3
+    indexRow <- as.numeric(input$priceComp_output)
+    reactData$tableP2 <- examplePrice
+    reactData$tableP2[,1] <- examplePrice[nrow(examplePrice),1]
+    reactData$tableP2[,2] <- examplePrice[nrow(examplePrice),2]
+    reactData$tableP2[,3] <- examplePrice[nrow(examplePrice),3]
+    reactData$tableP2 <- reactData$tableP2[1:indexRow,]
+    reactData$tableP2
+  })
+  
+  output$editPriceOutput <- renderRHandsontable({
+    rhandsontable(valP2(),
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 3,
+                  height = 300,
+    )
+  })
+  
+  observeEvent(input$savePriceOutput,{
+    removeUI(selector='#textTampilOutput')
+    
+    editNew<-as.data.frame(hot_to_r(input$editPriceOutput))
+    editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+    
+    fileName <- c("data/template/profitabilityAnalysis.rds")
+    dataDefine <- readRDS(fileName)
+    dataDefine$priceOutput <- editNew
+    saveRDS(dataDefine,file = fileName)
+    
+    insertUI(selector='#teksPriceOutputSave',
+             where = 'afterEnd',
+             ui = tags$div(id="textTampilOutput","tabel di atas sudah tersimpan"))
+  })
+
+# Ending Price Output -----------------------------------------------------
+
+  
+  ################################################################################
+  #                                                                              #
+  #                                 BUTTON IO                                    #
+  #                                                                              #
+  ################################################################################
+  observeEvent(input$modalIOButton,{
+    showModal(
+      modalDialog( 
+        footer=tagList(
+          actionButton(ns("closeModalIO"), "Tutup")
+        ),
+        #tabsetPanel(
+        argonTabSet(
+          #tabPanel(
+          id = "tabIO",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "lg",
+          width = 12,
+          iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
+          argonTab(
+            tabName = "Input",
+            active = T,
+            sidebarLayout(
+              sidebarPanel(
+                fluidPage(
+                  h2("Sunting Input Tabel I-O"),
+                  fluidRow(
+                    column(6,
+                           selectInput(ns("ioYear_input"),
+                                       "pilih tahun skenario:",
+                                       choices = c(1:30),selected = 30)
+                    ),
+                    column(6,
+                           selectInput(ns("ioComp_input"),
+                                       "banyaknya komponen:",
+                                       choices = c(1:50),selected = 10)
+                    )
+                  )
+                ),
+                tags$br(),
+                actionButton(ns("ioInputHit"),"tampilkan tabel"),
+                width=12
+              ),
+              mainPanel(
+                tags$div(id = ns('ioInputPlaceholder')),
+                width=12)
+            )
+          ),
+          argonTab(
+            tabName = "Output",
+            #active = T,
+            sidebarLayout(
+              sidebarPanel(
+                fluidPage(
+                  h2("Sunting Output Tabel I-O"),
+                  fluidRow(
+                    column(6,
+                           selectInput(ns("ioYear_output"),
+                                       "pilih tahun skenario:",
+                                       choices = c(2:30),selected = 30)
+                    ),
+                    column(6,
+                           selectInput(ns("ioComp_output"),
+                                       "banyaknya komponen:",
+                                       choices = c(1:10),selected = 2)
+                    )
+                  )
+                ),
+                tags$br(),
+                actionButton(ns("ioOutputHit"),"tampilkan tabel"),
+                width=12
+              ),
+              mainPanel(
+                tags$div(id = ns('ioOutputPlaceholder')),
+                width=12)
+            )
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    )
+  })
+  
+  observeEvent(input$closeModalIO,{
+    removeModal()
   })
   
   
-  ##### simpan tabel Sat baru ke dalam folder ####
-  observeEvent(input$savePriceInput,{
-    removeUI(selector='#textInvalid')
+  # START IO Input ----------------------------------------------------------
+  observeEvent(input$ioInputHit, {
+    insertUI(selector= paste0("#", ns("ioInputPlaceholder")),
+             where='afterEnd',
+             ui= uiOutput(ns('ioInputUI'))
+    )
+  })
+  
+  output$ioInputUI<- renderUI({
+    
+    tagList(
+      tags$br(),
+      tags$br(),
+      tags$b('Sunting secara manual'),
+      tags$br(),
+      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      tags$hr(),
+      tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
+      tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
+      tags$br(),
+      rHandsontableOutput(ns('editIOInput')),
+      tags$br(),
+      actionButton(ns('saveIOInput'), 'simpan tabel'), 
+      tags$br(), 
+      tags$br(),
+      tags$div(id='teksIOInputSave')
+    )
+  })
+  
+  valIO1 <- eventReactive(input$ioInputHit,{
+    #browser()
+    indexCol <- as.numeric(input$ioYear_input)+3
+    indexRow <- as.numeric(input$ioComp_input)
+    reactData$tableIO1 <- exampleIO
+    reactData$tableIO1[,1] <- exampleIO[1,1]
+    reactData$tableIO1[,2] <- exampleIO[1,2]
+    reactData$tableIO1[,3] <- exampleIO[1,3]
+    reactData$tableIO1 <- reactData$tableIO1[1:indexRow,c(1:3,4:(indexCol))]
+    reactData$tableIO1
+  })
+  
+  output$editIOInput <- renderRHandsontable({
+    rhandsontable(valIO1(),
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 3,
+                  height = 500,
+    )
+  })
+  
+  observeEvent(input$saveIOInput,{
     removeUI(selector='#textTampil')
     
-    satEditNew<-as.data.frame(hot_to_r(input$editPriceInput))
-    satInvalid <- satEditNew[-2,]
-    tupla <- ordered(factor(sort(colnames(LDMProp_his)[landCover_his!=0])))
-    satZero = data$listConsumZero
-    satZero[,1] <- tupla[1]
-    satZero[,2] <- tupla[1]
-    satSelisih <- dplyr::bind_rows(satZero,satEditNew)
-    satSelisih <- satSelisih[-(1:nrow(data$listConsumZero)),]
-    rownames(satSelisih) <- 1:nrow(satSelisih)
-    satSelisih[is.na(satSelisih)] <- 0
+    editNew<-as.data.frame(hot_to_r(input$editIOInput))
+    editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
     
-    if (nlevels(satSelisih[,1])==length(colnames(LDMProp_his)[landCover_his!=0]) & nlevels(satSelisih[,2])==length(colnames(LDMProp_his)[landCover_his!=0]) ) {
-      selectedRow <- as.numeric(strsplit(input$select_button,"_")[[1]][2])
-      fileName<- as.character(ListTableReact()[selectedRow,5]) #nama file
-      
-      dataDefine <-  readRDS(fileName)
-      dataDefine[5] <- list(dataDefine$fdSelisih)
-      dataDefine$satSelisih <- satSelisih
-      
-      saveRDS(dataDefine, file = fileName)
-      
-      insertUI(selector='#teksPriceInputSave',
-               where = 'afterEnd',
-               ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
-    }else {
-      
-      insertUI(selector='#teksPriceInputSave',
-               where = 'afterEnd',
-               ui =tags$h4(id='textInvalid', 
-                           "masih ada tutupan lahan yang belum dipilih, tabel tidak dapat disimpan"))
-    }
+    fileName <- c("data/template/profitabilityAnalysis.rds")
+    dataDefine <- readRDS(fileName)
+    dataDefine$priceInput <- editNew
+    saveRDS(dataDefine,file = fileName)
+    
+    insertUI(selector='#teksIOInputSave',
+             where = 'afterEnd',
+             ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
+  })
+  # ending IO Input -----------------------------------------------------------------
+  
+  
+  # Start IO Output ------------------------------------------------------
+  observeEvent(input$ioOutputHit, {
+    insertUI(selector= paste0("#", ns("ioOutputPlaceholder")),
+             where='afterEnd',
+             ui= uiOutput(ns('ioOutputUI'))
+    )
+  })
+  
+  output$ioOutputUI<- renderUI({
+    
+    tagList(
+      tags$br(),
+      tags$br(),
+      tags$b('Sunting secara manual'),
+      tags$br(),
+      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      tags$hr(),
+      tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
+      tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
+      tags$br(),
+      rHandsontableOutput(ns('editIOOutput')),
+      tags$br(),
+      actionButton(ns('saveIOOutput'), 'simpan tabel'), 
+      tags$br(), 
+      tags$br(),
+      tags$div(id='teksIOOutputSave')
+    )
+  })
+  
+  valIO2 <- eventReactive(input$ioOutputHit,{
+    #browser()
+    indexCol <- as.numeric(input$ioYear_output)+3
+    indexRow <- as.numeric(input$ioComp_output)
+    reactData$tableIO2 <- exampleIO
+    reactData$tableIO2[,1] <- exampleIO[nrow(exampleIO),1]
+    reactData$tableIO2[,2] <- exampleIO[nrow(exampleIO),2]
+    reactData$tableIO2[,3] <- exampleIO[nrow(exampleIO),3]
+    reactData$tableIO2 <- reactData$tableIO2[1:indexRow,c(1:3,4:(indexCol))]
+    reactData$tableIO2
+  })
+  
+  output$editIOOutput <- renderRHandsontable({
+    rhandsontable(valIO2(),
+                  rowHeaderWidth = 50,
+                  fixedColumnsLeft = 3,
+                  height = 300,
+    )
+  })
+  
+  observeEvent(input$saveIOOutput,{
+    removeUI(selector='#textTampil')
+    
+    editNew<-as.data.frame(hot_to_r(input$editIOOutput))
+    editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+    
+    fileName <- c("data/template/profitabilityAnalysis.rds")
+    dataDefine <- readRDS(fileName)
+    dataDefine$priceInput <- editNew
+    saveRDS(dataDefine,file = fileName)
+    
+    insertUI(selector='#teksIOOutputSave',
+             where = 'afterEnd',
+             ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
+  })
+  # Ending IO Output -----------------------------------------------------
+  # 
+  # output$viewPrice <- renderRHandsontable({
+  #   rhandsontable(valP1(),
+  #                 rowHeaderWidth = 50,
+  #                 fixedColumnsLeft = 3,
+  #                 height = 500,
+  #   )
+  # })
+  
+  output$viewPrice <- renderDataTable({
+    dataView <- valP1()
+    dataView
+      # rhandsontable(valP1(),
+      #               rowHeaderWidth = 50,
+      #               fixedColumnsLeft = 3,
+      #               height = 500,
+      # )
+  })
+
+  output$viewIO <- renderDataTable({
+    dataView <- exampleIO
+    dataView
   })
   
 }
