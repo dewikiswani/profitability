@@ -4,7 +4,7 @@ analisis <- argonTabItem(
   argonRow(
     argonCard(
       width = 12,
-      title = "Summary",
+      title = "Kumpulan Skenario Profitability",
       src = NULL,
       hover_lift = TRUE,
       shadow = TRUE,
@@ -21,9 +21,9 @@ analisis <- argonTabItem(
           width = 12,
           fluidRow(
             column(10,
-                   h1("Assumption & Summary"),
+                   h1("Seluruh skenario yang sudah disimpan terkumpul pada submenu ini."),
                    br(),
-                   h4("area skenario")
+                   h4("~~~keterangan~~~")
             )
           )
         )
@@ -32,10 +32,26 @@ analisis <- argonTabItem(
       
     )
   ),
-  
-  argonColumn(
+  argonTabSet(
+    id = "tab-analisis",
+    card_wrapper = TRUE,
+    horizontal = TRUE,
+    circle = FALSE,
+    size = "sm",
     width = 12,
-    analisisUI("lokasi")
+    iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
+    argonTab(
+      tabName = "Berdasarkan Lokasi",
+      analisisUI("lokasi"),
+      active = T,
+      
+    ),
+    argonTab(
+      tabName = "Berdasarkan Komoditas",
+      active = F,
+      analisisUI("komoditas"),
+      style = "height:600px; overflow-y: scroll;overflow-x: scroll;" #kalo mau pake scroll ini templatenya
+    )
   )
   
   
