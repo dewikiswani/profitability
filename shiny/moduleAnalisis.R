@@ -23,12 +23,32 @@ analisisUI <- function(id){
         argonColumn(
           width = 12,
           fluidRow(
-            column(10,
-                   h1("area list skenario"),
-                   br(),
-                   h4("area list skenario")
+            column(3,
+                   pickerInput(ns("penelitiAnalisis"),
+                               label="Peneliti:", 
+                               #selected = sector[1],
+                               choices=c("alfa","beta","gamma"),options = list(`actions-box` = TRUE),multiple = T)
+            ),
+            column(3,
+                   pickerInput(ns("sutAnalisis"),
+                               label="Sistem Usaha Tani",
+                               choices=c("Mono","Agro"),options = list(`actions-box` = TRUE),multiple = T)
+            ),
+            column(3,
+                   selectInput(ns("tahunAnalisis"),
+                               label="Tahun Skenario",
+                               choices=c(2001:2020))
+            ),
+            column(3,
+                   actionButton(ns("showAnalisisHit"),"Tampilkan tabel")
             )
-          )
+          ),
+          br(),
+          br(),
+          tags$div(id = ns('scenListAnalisisPlaceholder')), #tempat jika di klik tampilkan tabel 
+          br(),
+          br(),
+          h4("area list skenario")
         )
       )
     )

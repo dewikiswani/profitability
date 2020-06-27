@@ -14,6 +14,7 @@ library(dplyr)
 library(stringr)
 library(tidyverse)
 library(rhandsontable)
+library(shinyWidgets)
 
 
 # template
@@ -26,7 +27,7 @@ source("footer.R")
 
 # elements
 source("home.R")
-source("module.R")
+source("moduleUpload.R")
 source("upload modal dialog.R")
 source("moduleAnalisis.R")
 source("analisis.R")
@@ -43,8 +44,7 @@ shiny::shinyApp(
     body = argonDashBody(
       argonTabItems(
         home,
-        upload
-        ,
+        upload,
         analisis
       )
     ),
