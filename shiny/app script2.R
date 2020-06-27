@@ -52,8 +52,8 @@ shiny::shinyApp(
   ),
   server = function(input, output,session) {
     callModule(buttonModule,"profit")
-    callModule(analisisModule,"profit")
-    
+    callModule(analisisModule,"lokasi")
+    callModule(analisisModule,"komoditas")
     
     ##kumpulan fungsi
     lowcase <- function(data, index.col){
