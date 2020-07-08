@@ -55,6 +55,10 @@ shiny::shinyApp(
     callModule(analisisModule,"lokasi")
     callModule(analisisModule,"komoditas")
     
+    
+    # load the namespace
+    ns <- session$ns
+    
     ##kumpulan fungsi
     lowcase <- function(data, index.col){
       for(k in index.col){
@@ -127,32 +131,31 @@ shiny::shinyApp(
     
     
     # Section 2 -- variabel input ---------------------------------------------
-    
     indonesia <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/prov sampai desa.csv",
                           stringsAsFactors = F)
-    komoditas <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/komoditas.csv",
-                          stringsAsFactors = F)
-    peneliti <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/peneliti.csv",
-                         stringsAsFactors = F)
-    observe({
-      updateSelectInput(session,
-                        "kom",
-                        choices =sort(unique(komoditas$nama_komoditas))) 
-    })
+    # komoditas <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/komoditas.csv",
+    #                       stringsAsFactors = F)
+    # peneliti <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/peneliti.csv",
+    #                      stringsAsFactors = F)
+    # observe({
+    #   updateSelectInput(session,
+    #                     "user",
+    #                     choices =sort(unique(peneliti$nama_peneliti))) 
+    # })
     
-    observe({
-      updateSelectInput(session,
-                        "user",
-                        choices =sort(unique(peneliti$nama_peneliti))) 
-    })
+    # observe({
+    #   updateSelectInput(session,
+    #                     ("kom"),
+    #                     choices =sort(unique(komoditas$nama_komoditas))) 
+    # })
     
     observe({
       updateSelectInput(session,
                         "selected_provinsi",
-                        choices =sort(unique(indonesia$provinsi))) 
+                        choices =sort(unique(indonesia$provinsi)))
     })
-    
-    
+
+
     observe({
       updateSelectInput(
         session,
@@ -163,7 +166,7 @@ shiny::shinyApp(
           .[[1]]
       )
     })
-    
+
     observe({
       updateSelectInput(
         session,
@@ -174,7 +177,7 @@ shiny::shinyApp(
           .[[1]]
       )
     })
-    
+
     observe({
       updateSelectInput(
         session,
@@ -185,6 +188,8 @@ shiny::shinyApp(
           .[[1]]
       )
     })
+    
+    
     
     ### tabel price
     price<-eventReactive(input$simulate,{

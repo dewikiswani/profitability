@@ -1,5 +1,5 @@
 komponen,keterangan,Unit,harga privat,harga sosial
-pupuk,urea ,rp,2600,2600
+pupuk,urea,rp,2600,2600
 pupuk,sp,rp,2700,2700
 pupuk,round up,rp,80000,80000
 pupuk,formic acid,rp,6000,6000
@@ -25,6 +25,3 @@ tenaga kerja karet,pembuatan lubang,rp,80000,80000
 tenaga kerja karet,penyiangan,rp,80000,80000
 tenaga kerja karet,pruning,rp,80000,80000
 tenaga kerja karet,penyadapan,rp,80000,80000
-sampingan,padi,rp,10000,6000
-utama,karet basah,rp,6500,24000
-utama,kayu karet,rp,300000,350000

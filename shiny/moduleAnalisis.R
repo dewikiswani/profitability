@@ -40,6 +40,7 @@ analisisUI <- function(id){
                                choices=c(2001:2020))
             ),
             column(3,
+                   br(),
                    actionButton(ns("showAnalisisHit"),"Tampilkan tabel")
             )
           ),
