@@ -1,9 +1,9 @@
-
 komoditas <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/komoditas.csv",
                       stringsAsFactors = F)
-
-examplePrice <- read.table("data/MONOKULTUR/KELAPA SAWIT/price template input.csv", header = T, sep = ",")
-exampleIO <- read.table("data/template/io template.csv", header = T, sep = ",")
+templatePriceInput <- read.table("data/MONOKULTUR/KELAPA SAWIT/price template input.csv", header = T, sep = ",")
+templatePriceOutput <- read.table("data/MONOKULTUR/KELAPA SAWIT/price template output.csv", header = T, sep = ",")
+templateIOInput <- read.table("data/MONOKULTUR/KELAPA SAWIT/io template input.csv", header = T, sep = ",")
+templateIOOutput <- read.table("data/MONOKULTUR/KELAPA SAWIT/io template output.csv", header = T, sep = ",")
 
 
 
@@ -91,6 +91,16 @@ buttonUI <- function(id) {
       )
     )
 }
+
+resultUI <- function(id){
+  ns <- NS(id)
+  fluidPage(column(12, verbatimTextOutput("npv")),
+            verbatimTextOutput("nlc"),
+            verbatimTextOutput("ec"),
+            verbatimTextOutput("hp"),
+            verbatimTextOutput("lr"))
+}
+
 
 viewTableUI <- function(id){
   ns <- NS(id)
@@ -376,9 +386,17 @@ buttonModule <- function(input, output, session) {
     #browser()
     indexCol <- as.numeric(input$ioYear_output)+3
     indexRow <- as.numeric(input$ioComp_output)
-    reactData$tableIO2 <- templateIOOutput()
-    reactData$tableIO2 <- reactData$tableIO2[1:indexRow,c(1:3,4:(indexCol))]
-    reactData$tableIO2
+    
+    if(indexRow > nrow(templateIOOutput())){
+      dataAdd <- data.frame(matrix(data=0,nrow = indexRow - nrow(templateIOOutput()) , ncol = as.numeric(input$ioYear_input)))
+      colnames(dataAdd) <- paste0("Y",c(1:input$ioYear_input))
+      reactData$tableIO2 <- dplyr::bind_rows(templateIOOutput(),dataAdd)
+      reactData$tableIO2
+    }else {
+      reactData$tableIO2 <- templateIOOutput()
+      reactData$tableIO2 <- reactData$tableIO2[1:indexRow,c(1:3,4:(indexCol))]
+      reactData$tableIO2
+    }
   })
   
   output$editIOOutput <- renderRHandsontable({
@@ -436,22 +454,39 @@ buttonModule <- function(input, output, session) {
               sidebarPanel(
                 fluidPage(
                   h2("Sunting Harga Input"),
-                  fluidRow(
-                    column(6,
-                           selectInput(ns("priceComp_input"),
-                                       "banyaknya komponen yang diinput:",
-                                       choices = nrow(readDataTemplate()$ioInput),
-                                       selected = nrow(readDataTemplate()$ioInput) )
-                           # selectInput(ns("priceYear_input"),
-                           #             "Pilih tahun skenario:",
-                           #             choices = c(1:30),selected = 30)
-                    ),
-                    column(6,
-                           # selectInput(ns("priceComp_input"),
-                           #             "banyaknya komponen yang diinput:",
-                           #             choices = c(1:50),selected = 10)
-                    )
-                  )
+                  #   tagList(
+                  #     tags$br(),
+                  #     tags$br(),
+                  #     tags$b('Sunting secara manual'),
+                  #     tags$br(),
+                  #     tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+                  #     tags$hr(),
+                  #     tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
+                  #     tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
+                  #     tags$br(),
+                  #     rHandsontableOutput(ns('editPriceInput')),
+                  #     tags$br(),
+                  #     actionButton(ns('savePriceInput'), 'simpan tabel'), 
+                  #     tags$br(), 
+                  #     tags$br(),
+                  #     tags$div(id='teksPriceInputSave')
+                  #   )
+                  # fluidRow(
+                  #   column(6,
+                  #          # selectInput(ns("priceComp_input"),
+                  #          #             "banyaknya komponen yang diinput:",
+                  #          #             choices = nrow(readDataTemplate()$ioInput),
+                  #          #             selected = nrow(readDataTemplate()$ioInput) )
+                  #          # selectInput(ns("priceYear_input"),
+                  #          #             "Pilih tahun skenario:",
+                  #          #             choices = c(1:30),selected = 30)
+                  #   ),
+                  #   column(6,
+                  #          # selectInput(ns("priceComp_input"),
+                  #          #             "banyaknya komponen yang diinput:",
+                  #          #             choices = c(1:50),selected = 10)
+                  #   )
+                  # )
                   ),
                 tags$br(),
                 actionButton(ns("priceInputHit"),"tampilkan tabel"),
@@ -469,21 +504,22 @@ buttonModule <- function(input, output, session) {
               sidebarPanel(
                 fluidPage(
                   h2("Sunting Harga Output"),
-                  fluidRow(
-                    column(6,
-                           selectInput(ns("priceComp_output"),
-                                       "banyaknya komponen yang diinput:",
-                                       choices = c(1:10),selected = 2)
-                           # selectInput(ns("priceYear_output"),
-                           #             "Pilih tahun skenario:",
-                           #             choices = c(1:30),selected = 30)
-                    ),
-                    column(6,
-                            # selectInput(ns("priceComp_output"),
-                            #                     "banyaknya komponen yang diinput:",
-                            #                     choices = c(1:10),selected = 2)
-                           )
-                  )
+                  # fluidRow(
+                  #   column(6,
+                  #          # selectInput(ns("priceComp_output"),
+                  #          #             "banyaknya komponen yang diinput:",
+                  #          #             choices = nrow(readDataTemplate()$ioOutput),
+                  #          #             selected = nrow(readDataTemplate()$ioOutput))
+                  #          # selectInput(ns("priceYear_output"),
+                  #          #             "Pilih tahun skenario:",
+                  #          #             choices = c(1:30),selected = 30)
+                  #   ),
+                  #   column(6,
+                  #           # selectInput(ns("priceComp_output"),
+                  #           #                     "banyaknya komponen yang diinput:",
+                  #           #                     choices = c(1:10),selected = 2)
+                  #          )
+                  # )
                 ),
                 tags$br(),
                 actionButton(ns("priceOutputHit"),"tampilkan tabel"),
@@ -525,23 +561,19 @@ buttonModule <- function(input, output, session) {
              ui= uiOutput(ns('priceInputUI'))
     )
   })
-  
+
   output$priceInputUI<- renderUI({
-    
+
     tagList(
-      tags$br(),
-      tags$br(),
-      tags$b('Sunting secara manual'),
-      tags$br(),
-      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      #tags$br(),
       tags$hr(),
-      tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
-      tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
+      tags$b('Sunting secara manual'),
+      tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
       tags$br(),
       rHandsontableOutput(ns('editPriceInput')),
       tags$br(),
-      actionButton(ns('savePriceInput'), 'simpan tabel'), 
-      tags$br(), 
+      actionButton(ns('savePriceInput'), 'simpan tabel'),
+      tags$br(),
       tags$br(),
       tags$div(id='teksPriceInputSave')
     )
@@ -549,18 +581,20 @@ buttonModule <- function(input, output, session) {
   
   valP1 <- eventReactive(input$priceInputHit,{
     #browser()
-    indexRow <- as.numeric(input$priceComp_input)
+    indexRow <- as.numeric(nrow(readDataTemplate()$ioInput))
     
     reactData$tableP1 <- readDataTemplate()$ioInput[,1:2]
+    no.id <- as.numeric(rownames(reactData$tableP1))
+    reactData$tableP1 <- cbind(no.id,reactData$tableP1)
     #reactData$tableP1 <- reactData$tableP1[1:indexRow,]
-    examplePrice2 <- examplePrice[,-1]
-    reactData$tableP1 <- merge(reactData$tableP1,unique(examplePrice2), by.x = "keterangan",by.y = "keterangan", all.x = T)
-    reactData$tableP1 <- reactData$tableP1[, c(2, 1, 3, 4, 5)]
-    
-    #sort by nomor krn g alfabet urutannya PR
+    templatePrice <- (templatePriceInput[,-1])
+    reactData$tableP1 <- merge(reactData$tableP1,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
+    reactData$tableP1 <- reactData$tableP1[order(reactData$tableP1$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+    rownames(reactData$tableP1) <- no.id
+    reactData$tableP1 <- reactData$tableP1[, c(3, 1, 4, 5,6)]
     reactData$tableP1
   })
-  
+    
   output$editPriceInput <- renderRHandsontable({
     rhandsontable(valP1(),
                   rowHeaderWidth = 50,
@@ -570,7 +604,7 @@ buttonModule <- function(input, output, session) {
   })
   
   observeEvent(input$savePriceInput,{
-    browser()
+    #browser()
     removeUI(selector='#textTampil')
     
     editNew<-as.data.frame(hot_to_r(input$editPriceInput))
@@ -600,14 +634,9 @@ buttonModule <- function(input, output, session) {
   output$priceOutputUI<- renderUI({
     
     tagList(
-      tags$br(),
-      tags$br(),
-      tags$b('Sunting secara manual'),
-      tags$br(),
-      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
       tags$hr(),
-      tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
-      tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
+      tags$b('Sunting secara manual'),
+      tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
       tags$br(),
       rHandsontableOutput(ns('editPriceOutput')),
       tags$br(),
@@ -621,11 +650,18 @@ buttonModule <- function(input, output, session) {
   valP2 <- eventReactive(input$priceOutputHit,{
     #browser()
     #indexCol <- as.numeric(input$priceYear_output)+3
-    indexRow <- as.numeric(input$priceComp_output)
-    reactData$tableP2 <- examplePrice
-    #reactData$tableP2[,1] <- examplePrice[nrow(examplePrice),1]
-    #reactData$tableP2[,2] <- examplePrice[nrow(examplePrice),2]
-    #reactData$tableP2[,3] <- examplePrice[nrow(examplePrice),3]
+    indexRow <- as.numeric(nrow(readDataTemplate()$ioOutput))
+    
+    reactData$tableP2 <- readDataTemplate()$ioOutput[,1:2]
+    no.id <- as.numeric(rownames(reactData$tableP2))
+    reactData$tableP2 <- cbind(no.id,reactData$tableP2)
+    templatePrice <- (templatePriceOutput[,-1])
+    reactData$tableP2 <- merge(reactData$tableP2,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
+    reactData$tableP2 <- reactData$tableP2[order(reactData$tableP2$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+    rownames(reactData$tableP2) <- no.id
+    reactData$tableP2 <- reactData$tableP2[, c(3, 1, 4, 5,6)]
+    reactData$tableP2
+    
     reactData$tableP2 <- reactData$tableP2[1:indexRow,]
     reactData$tableP2
   })
@@ -667,7 +703,7 @@ buttonModule <- function(input, output, session) {
   # })
   
   output$viewPrice <- renderDataTable({
-    dataView <- valP1()
+    dataView <- rbind(valP1(),valP2())
     dataView
       # rhandsontable(valP1(),
       #               rowHeaderWidth = 50,
@@ -677,7 +713,7 @@ buttonModule <- function(input, output, session) {
   })
 
   output$viewIO <- renderDataTable({
-    dataView <- exampleIO
+    dataView <- rbind(valIO1(),valIO2())
     dataView
   })
   

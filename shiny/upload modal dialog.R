@@ -54,14 +54,15 @@ upload <- argonTabItem(
             column(10,
                    h1("Hasil Analisis"),
                    br(),
-                   fluidRow(column(12, verbatimTextOutput("value"))),
-                   fluidRow(column(12, verbatimTextOutput("value.2"))),
-                   br(),
-                   fluidRow(column(12, verbatimTextOutput("npv"))),
-                   fluidRow(column(12, verbatimTextOutput("nlc"))),
-                   fluidRow(column(12, verbatimTextOutput("ec"))),
-                   fluidRow(column(12, verbatimTextOutput("hp"))),
-                   fluidRow(column(12, verbatimTextOutput("lr")))
+                   resultUI("profit")
+                   # fluidRow(column(12, verbatimTextOutput("value"))),
+                   # fluidRow(column(12, verbatimTextOutput("value.2"))),
+                   # br(),
+                   # fluidRow(column(12, verbatimTextOutput("npv"))),
+                   # fluidRow(column(12, verbatimTextOutput("nlc"))),
+                   # fluidRow(column(12, verbatimTextOutput("ec"))),
+                   # fluidRow(column(12, verbatimTextOutput("hp"))),
+                   # fluidRow(column(12, verbatimTextOutput("lr")))
             )
           )
         )
