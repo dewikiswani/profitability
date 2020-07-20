@@ -1,9 +1,5 @@
-komoditas <- read.csv("C:/dw/ICRAF/project R/theme 2/profitability/data/lusita 2.0/komoditas.csv",
-                      stringsAsFactors = F)
-templatePriceInput <- read.table("data/MONOKULTUR/KELAPA SAWIT/price template input.csv", header = T, sep = ",")
-templatePriceOutput <- read.table("data/MONOKULTUR/KELAPA SAWIT/price template output.csv", header = T, sep = ",")
-templateIOInput <- read.table("data/MONOKULTUR/KELAPA SAWIT/io template input.csv", header = T, sep = ",")
-templateIOOutput <- read.table("data/MONOKULTUR/KELAPA SAWIT/io template output.csv", header = T, sep = ",")
+komoditas <- read.csv("data/template/komoditas.csv", stringsAsFactors = F)
+
 
 
 
@@ -13,9 +9,10 @@ generalUI <- function(id){
     column(5,
            h2("Informasi umum",align = 'center'),
            br(),
-           selectInput(ns("sut"),"Sistem Usaha Tani",choices = c("MONOKULTUR","AGROFORESTRY")),
+           selectInput(ns("sut"),"Sistem Usaha Tani",choices = c("MONOKULTUR","AGROFORESTRI")),
            br(),
            selectInput(ns("kom"),"Komoditas",choices =sort(unique(komoditas$nama_komoditas))),
+           #selectInput(ns("kom"),"Komoditas",choices ="" ),
            br(),
            selectInput(ns("th"),"Tahun",choices = c(2001:2019)),
            br(),
@@ -57,15 +54,15 @@ buttonUI <- function(id) {
              h2("Asumsi Makro"),
              #tags$style(HTML("#big-heading{color: black;}")),
              br(),
-             sliderInput(ns("rate.p"), "Discount Rate Private", 7 ,min = 0, max = 15, step = 0.01),
+             sliderInput(ns("rate.p"), "Discount Rate Private", 7.41 ,min = 0, max = 15, step = 0.01),
              br(),
-             sliderInput(ns("rate.s"), "Discount Rate Social", 2 ,min = 0, max = 8, step = 0.01),
+             sliderInput(ns("rate.s"), "Discount Rate Social", 2.41 ,min = 0, max = 8, step = 0.01),
              br(),
-             sliderInput(ns("labor.p"), "Upah Buruh Privat", 80000 ,min = 40000, max = 200000, step = 1000),
-             br(),
-             sliderInput(ns("labor.s"), "Upah Buruh Sosial", 80000 ,min = 40000, max = 200000, step = 1000),
-             br(),
-             sliderInput(ns("nilai.tukar"), "Nilai Tukar Rupiah", 15000 ,min = 9000, max = 20000, step = 100),
+             # sliderInput(ns("labor.p"), "Upah Buruh Privat", 70000 ,min = 40000, max = 200000, step = 1000),
+             # br(),
+             # sliderInput(ns("labor.s"), "Upah Buruh Sosial", 60000 ,min = 40000, max = 200000, step = 1000),
+             # br(),
+             sliderInput(ns("nilai.tukar"), "Nilai Tukar Rupiah", 14831 ,min = 10000, max = 20000, step = 10),
       ),
       column(4,
              h2("Unggah File"),
@@ -86,7 +83,7 @@ buttonUI <- function(id) {
              h2(id="big-heading","Variable Input"),
              tags$style(HTML("#big-heading{color: white;}")),
              br(),
-             actionButton(ns("simulate"),"Jalankan Analisis!",icon("paper-plane"),style="color: white; 
+             actionButton(ns("run_button"),"Jalankan Analisis!",icon("paper-plane"),style="color: white; 
                          background-color: green;")   
       )
     )
@@ -94,11 +91,29 @@ buttonUI <- function(id) {
 
 resultUI <- function(id){
   ns <- NS(id)
-  fluidPage(column(12, verbatimTextOutput("npv")),
-            verbatimTextOutput("nlc"),
-            verbatimTextOutput("ec"),
-            verbatimTextOutput("hp"),
-            verbatimTextOutput("lr"))
+  fluidPage(
+    fluidRow(
+      column(4,
+             verbatimTextOutput(ns("npv"))
+      ),
+      column(4,
+             verbatimTextOutput(ns("nlc"))
+      ),
+      column(4,
+             verbatimTextOutput(ns("ec"))
+      )
+    ),
+    br(),
+    br(),
+    fluidRow(
+      column(8,
+             verbatimTextOutput(ns("hp"))
+      ),
+      column(4,
+             verbatimTextOutput(ns("lr"))
+      )
+    )
+  )
 }
 
 
@@ -132,37 +147,88 @@ buttonModule <- function(input, output, session) {
   # load the namespace
   ns <- session$ns
   
+  # observe({
+  #   print(input$sut)
+  #   
+  #   updateSelectInput(
+  #     session,
+  #     ns("kom"),
+  #     choices = komoditas %>%
+  #       filter(sut == input$sut) %>%
+  #       select(nama_komoditas) %>%
+  #       .[[1]]
+  #   )
+  #   
+  #   a <- komoditas %>%
+  #     filter(sut == input$sut) %>%
+  #     select(nama_komoditas) %>%
+  #     .[[1]]
+  #   print(a)
+  #   
+  #   print(ns("kom"))
+  #   
+  #   print("__")
+  #   
+  #   print(input$kom)
+  # })
+  
+  
   # Start template data ketika peneliti memulai skenario ------------------
+  # dataTemplate <- reactive({
+  #   ioInput <- NULL
+  #   ioOutput <- NULL
+  #   
+  #   priceInput <- NULL
+  #   priceOutput <- NULL
+  # 
+  #   capitalPrivate <- NULL
+  #   capitalSocial <- NULL
+  # 
+  #   combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
+  #                      priceInput=priceInput,priceOutput=priceOutput,
+  #                      capitalPrivate=capitalPrivate,
+  #                      capitalSocial=capitalSocial)
+  #   print("cek")
+  # 
+  #   combineDef
+  #   
+  # })
+  
   dataTemplate <- reactive({
-    ioInput <- NULL
-    ioOutput <- NULL
+    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
     
-    priceInput <- NULL
-    priceOutput <- NULL
-
+    ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
+    ioOutput <- read.table(paste0(datapath,"io template output.csv"), header = T, sep = ",")
+    
+    priceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
+    priceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
+    
     capitalPrivate <- NULL
     capitalSocial <- NULL
-
+    
     combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
                        priceInput=priceInput,priceOutput=priceOutput,
                        capitalPrivate=capitalPrivate,
                        capitalSocial=capitalSocial)
-    print("cek")
-
+    
+    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+    fileName <- paste0(datapath,"saveDataTemplate.rds")
+    saveRDS(combineDef,file = fileName)
+    
     combineDef
     
   })
   
-  observeEvent(input$modalIOButton,{
-    #browser()
-    
-    combineDef <- dataTemplate()
-    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
-    fileName <- paste0(datapath,"saveDataTemplate.rds")
-    print("cc")
-    saveRDS(combineDef,file = fileName)
-
-  })
+  # observeEvent(input$modalIOButton,{
+  #   #browser()
+  #   
+  #   combineDef <- dataTemplate()
+  #   datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+  #   fileName <- paste0(datapath,"saveDataTemplate.rds")
+  #   print("cc")
+  #   #saveRDS(combineDef,file = fileName)
+  # 
+  # })
   
   readDataTemplate <- eventReactive(input$modalPriceButton,{
     datapath <- paste0("data/", input$sut, "/",input$kom, "/")
@@ -291,8 +357,8 @@ buttonModule <- function(input, output, session) {
       tags$br(),
       tags$br(),
       tags$b('Sunting secara manual'),
-      tags$br(),
-      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      # tags$br(),
+      # tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
       tags$hr(),
       tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
       tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
@@ -315,11 +381,13 @@ buttonModule <- function(input, output, session) {
       dataAdd <- data.frame(matrix(data=0,nrow = indexRow - nrow(templateIOInput()) , ncol = as.numeric(input$ioYear_input)))
       colnames(dataAdd) <- paste0("Y",c(1:input$ioYear_input))
       reactData$tableIO1 <- dplyr::bind_rows(templateIOInput(),dataAdd)
+      reactData$tableIO1[is.na(reactData$tableIO1)] <- 0
       #reactData$tableIO1 <- reactData$tableIO1[1:indexRow,c(1:3,4:(indexCol))]
       reactData$tableIO1
     }else {
       reactData$tableIO1 <- templateIOInput()
       reactData$tableIO1 <- reactData$tableIO1[1:indexRow,c(1:3,4:(indexCol))]
+      reactData$tableIO1[is.na(reactData$tableIO1)] <- 0
       reactData$tableIO1
     }
     
@@ -367,8 +435,8 @@ buttonModule <- function(input, output, session) {
       tags$br(),
       tags$br(),
       tags$b('Sunting secara manual'),
-      tags$br(),
-      tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
+      # tags$br(),
+      # tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
       tags$hr(),
       tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
       tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
@@ -391,10 +459,12 @@ buttonModule <- function(input, output, session) {
       dataAdd <- data.frame(matrix(data=0,nrow = indexRow - nrow(templateIOOutput()) , ncol = as.numeric(input$ioYear_input)))
       colnames(dataAdd) <- paste0("Y",c(1:input$ioYear_input))
       reactData$tableIO2 <- dplyr::bind_rows(templateIOOutput(),dataAdd)
+      reactData$tableIO2[is.na(reactData$tableIO2)] <- 0
       reactData$tableIO2
     }else {
       reactData$tableIO2 <- templateIOOutput()
       reactData$tableIO2 <- reactData$tableIO2[1:indexRow,c(1:3,4:(indexCol))]
+      reactData$tableIO2[is.na(reactData$tableIO2)] <- 0
       reactData$tableIO2
     }
   })
@@ -586,7 +656,9 @@ buttonModule <- function(input, output, session) {
     reactData$tableP1 <- readDataTemplate()$ioInput[,1:2]
     no.id <- as.numeric(rownames(reactData$tableP1))
     reactData$tableP1 <- cbind(no.id,reactData$tableP1)
-    #reactData$tableP1 <- reactData$tableP1[1:indexRow,]
+    
+    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+    templatePriceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
     templatePrice <- (templatePriceInput[,-1])
     reactData$tableP1 <- merge(reactData$tableP1,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
     reactData$tableP1 <- reactData$tableP1[order(reactData$tableP1$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
@@ -655,6 +727,9 @@ buttonModule <- function(input, output, session) {
     reactData$tableP2 <- readDataTemplate()$ioOutput[,1:2]
     no.id <- as.numeric(rownames(reactData$tableP2))
     reactData$tableP2 <- cbind(no.id,reactData$tableP2)
+    
+    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+    templatePriceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
     templatePrice <- (templatePriceOutput[,-1])
     reactData$tableP2 <- merge(reactData$tableP2,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
     reactData$tableP2 <- reactData$tableP2[order(reactData$tableP2$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
@@ -680,7 +755,8 @@ buttonModule <- function(input, output, session) {
     editNew<-as.data.frame(hot_to_r(input$editPriceOutput))
     editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
     
-    fileName <- c("data/template/profitabilityAnalysis.rds")
+    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+    fileName <- paste0(datapath,"saveDataTemplate.rds")
     dataDefine <- readRDS(fileName)
     dataDefine$priceOutput <- editNew
     saveRDS(dataDefine,file = fileName)
@@ -691,30 +767,474 @@ buttonModule <- function(input, output, session) {
   })
 
 # Ending Price Output -----------------------------------------------------
-
-
+  
+  ################################################################################
+  #                                                                              #
+  #                                RESULT                                        #
+  #                                                                              #
+  ################################################################################
+  data.gab <- eventReactive(input$run_button,{
+    # aktifin dataTemplate
+    dataTemplate <- dataTemplate()
+    
+    datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+    fileName <- paste0(datapath,"saveDataTemplate.rds")
+    dataDefine <- readRDS(fileName)
+    
+    #### io  ####    
+    io.in <-  dataDefine$ioInput
+    io.in <- cbind(grup="input",io.in)
+    io.out <-  dataDefine$ioOutput
+    io.out <- cbind(grup="output",io.out)
+    
+    io.in[is.na(io.in)] <- 0 #NA replace with zero
+    io.out[is.na(io.out)] <- 0
+    io.all <- rbind(io.in,io.out) #combine all data input-output
+    io.all <- cbind(status="general", io.all) #add variable status
+    io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+    
+    
+    yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+    
+    #### price ####
+    price.in <-  dataDefine$priceInput
+    price.in <- cbind(grup="input",price.in)
+    price.out <-  dataDefine$priceOutput
+    price.out <- cbind(grup="output",price.out)
+    price.in[is.na(price.in)] <- 0
+    price.out[is.na(price.out)] <- 0
+    price.all <- rbind(price.in, price.out)
+    
+    p.price<-price.all[-6]
+    p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+    colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+    p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+    p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+    
+    s.price<-price.all[-5]
+    s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+    colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+    s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+    s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+    
+    price.all.year <- rbind(p.price, s.price)
+    
+    #colnames(price.all.year) <- tolower(colnames(price.all.year))
+    #colnames(io.all) <- tolower(colnames(io.all))
+    #### buat if else untuk modal kapital ####
+    
+    #### #####
+    data.gab <- rbind(io.all, price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+    data.gab
+  })
+  
+  hitung.npv<-eventReactive(input$run_button,{
+    #observeEvent(input$run_button,{
+    #perkalian antara general dan Private Price
+    dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+    dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
+    p.budget <- dataGeneral[-(1:5)] * dataPrivat[-c(1:5)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5
+    p.budget <- cbind(dataGeneral[1:5],p.budget) #memunculkan kembali variabel 1 sd 5
+    p.budget <- p.budget %>%
+      mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+    
+    #perkalian antara general dengan Social Price
+    dataSosial <- filter(data.gab(), status == c("harga.sosial")) #filter data social price
+    s.budget <- dataGeneral[-(1:5)] * dataSosial[-c(1:5)]
+    s.budget <- cbind(dataGeneral[1:5],s.budget)
+    s.budget <- s.budget %>%
+      mutate(status = case_when(status == "general" ~ "social budget"))
+    
+    ################ penghitungan NPV
+    p.cost.input <- p.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    s.cost.input <- s.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    p.sum.cost<- p.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.cost<- s.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    p.rev.output <- p.budget %>%
+      filter(str_detect(grup,"output"))
+    s.rev.output <- s.budget %>%
+      filter(str_detect(grup,"output"))
+    
+    p.sum.rev <- p.rev.output[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.rev <- s.rev.output[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    
+    p.profit <- p.sum.rev - p.sum.cost
+    s.profit <- s.sum.rev - s.sum.cost
+    profit0 <- 0
+    p.profit<-c(profit0,p.profit)
+    s.profit<-c(profit0,s.profit)
+    
+    npv.p<-npv(input$rate.p/100,p.profit)
+    npv.s<-npv(input$rate.s/100,s.profit)
+    
+    hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+    
+    npv.p.us<-npv.p/input$nilai.tukar
+    npv.s.us<-npv.s/input$nilai.tukar
+    npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+    hsl.npv<-rbind(hsl.npv,npv.us)
+    
+    #browser()
+    
+    rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
+    hsl.npv
+  })
+  
+  ##npv
+  output$npv<- renderPrint({
+    hasil<-t(hitung.npv())
+    hasil
+  })
+  
+  hitung.nlc<-eventReactive(input$run_button,{
+    #perkalian antara general dan Private Price
+    dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+    dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
+    p.budget <- dataGeneral[-(1:5)] * dataPrivat[-c(1:5)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5
+    p.budget <- cbind(dataGeneral[1:5],p.budget) #memunculkan kembali variabel 1 sd 5
+    p.budget <- p.budget %>%
+      mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+    
+    #perkalian antara general dengan Social Price
+    dataSosial <- filter(data.gab(), status == c("harga.sosial")) #filter data social price
+    s.budget <- dataGeneral[-(1:5)] * dataSosial[-c(1:5)]
+    s.budget <- cbind(dataGeneral[1:5],s.budget)
+    s.budget <- s.budget %>%
+      mutate(status = case_when(status == "general" ~ "social budget"))
+    
+    ################ penghitungan NPV
+    p.cost.input <- p.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    s.cost.input <- s.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    p.sum.cost<- p.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.cost<- s.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    p.tot.cost<- sum(p.sum.cost)
+    s.tot.cost<- sum(s.sum.cost)
+    
+    p.labor.input <- p.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+    s.labor.input <- s.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+    
+    p.sum.labor <- p.labor.input[,-(1:5)] %>%
+      sum(na.rm = T)
+    s.sum.labor <- s.labor.input[,-(1:5)] %>%
+      sum(na.rm = T)
+    
+    nlc.p <- (p.tot.cost - p.sum.labor)/1000000
+    nlc.s <- (s.tot.cost - s.sum.labor)/1000000
+    nlc<-data.frame(PRIVATE=nlc.p,SOCIAL=nlc.s)
+    rownames(nlc)<-c("Non Labor Cost (MRp/Ha)")
+    nlc
+    
+  })
+  
+  output$nlc<- renderPrint({
+    hasil<-t(hitung.nlc())
+    hasil
+  })
+  
+  hitung.ec<-eventReactive(input$run_button,{
+    #perkalian antara general dan Private Price
+    dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+    dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
+    p.budget <- dataGeneral[-(1:5)] * dataPrivat[-c(1:5)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5
+    p.budget <- cbind(dataGeneral[1:5],p.budget) #memunculkan kembali variabel 1 sd 5
+    p.budget <- p.budget %>%
+      mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+    
+    #perkalian antara general dengan Social Price
+    dataSosial <- filter(data.gab(), status == c("harga.sosial")) #filter data social price
+    s.budget <- dataGeneral[-(1:5)] * dataSosial[-c(1:5)]
+    s.budget <- cbind(dataGeneral[1:5],s.budget)
+    s.budget <- s.budget %>%
+      mutate(status = case_when(status == "general" ~ "social budget"))
+    
+    ################ penghitungan NPV
+    p.cost.input <- p.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    s.cost.input <- s.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    p.sum.cost<- p.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.cost<- s.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+      ############# PERHITUNGAN ESTABLISHMENT COST
+      p.ec <- p.sum.cost[[1]]/1000000
+      s.ec <- s.sum.cost[[1]]/1000000
+      ec <- data.frame(p.ec,s.ec)
+      ec<-data.frame(PRIVATE=p.ec,SOCIAL=s.ec)
+      rownames(ec)<-c("Establishment cost (1st year only, MRp/ha)")
+      ec
+  })
+  
+  output$ec<- renderPrint({
+    hasil<-t(hitung.ec())
+    hasil
+  })
+  
+  hitung.hp<-eventReactive(input$run_button,{
+    
+    dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+    
+    ############# PERHITUNGAN HARVESTING PRODUCT
+    fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
+    sum.prod <- fil.prod[,-(1:5)] %>%
+      colSums(na.rm = T)
+    tot.prod <- sum(sum.prod)
+    
+    fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+    sum.labor <- fil.labor[,-(1:5)] %>%
+      colSums(na.rm = T)
+    tot.labor <- sum(sum.labor)
+    
+    hp <- data.frame(tot.prod/tot.labor)/100
+    colnames(hp)<-c("Harvesting Product (ton/HOK) Labor Req for Est (1st year only)")
+    rownames(hp) <- c("Value")
+    hp
+  })
+  
+  output$hp<- renderPrint({
+    hasil<-hitung.hp()
+    hasil
+  })
+  
+  hitung.lr<-eventReactive(input$run_button,{
+  #observeEvent(input$run_button,{
+    dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+    
+    fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+    sum.labor <- fil.labor[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    ############# PERHITUNGAN LABOR REQ FOR EST
+    lr <- data.frame(sum.labor[[1]]) #pekerja pada tahun 1
+    colnames(lr)<-c("Labor Req for Est (1st year only)")
+    rownames(lr) <- c("Value")
+    lr
+    
+    #browser()
+  })
+  
+  output$lr<- renderPrint({
+    hasil<-hitung.lr()
+    hasil
+  })
+  
+  # hitung.all<-eventReactive(input$run_button,{
+  # #observeEvent(input$run_button,{
+  #   #browser()
+  #   
+  #   #### read file ####
+  #   datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+  #   fileName <- paste0(datapath,"saveDataTemplate.rds")
+  #   dataDefine <- readRDS(fileName)
+  #   
+  #   #### io  ####    
+  #   io.in <-  dataDefine$ioInput
+  #   io.in <- cbind(grup="input",io.in)
+  #   io.out <-  dataDefine$ioOutput
+  #   io.out <- cbind(grup="output",io.out)
   # 
-  # output$viewPrice <- renderRHandsontable({
-  #   rhandsontable(valP1(),
-  #                 rowHeaderWidth = 50,
-  #                 fixedColumnsLeft = 3,
-  #                 height = 500,
-  #   )
+  #   io.in[is.na(io.in)] <- 0 #NA replace with zero
+  #   io.out[is.na(io.out)] <- 0
+  #   io.all <- rbind(io.in,io.out) #combine all data input-output
+  #   io.all <- cbind(status="general", io.all) #add variable status
+  #   io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+  #   
+  #   
+  #   yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+  #   
+  #   #### price ####
+  #   price.in <-  dataDefine$priceInput
+  #   price.in <- cbind(grup="input",price.in)
+  #   price.out <-  dataDefine$priceOutput
+  #   price.out <- cbind(grup="output",price.out)
+  #   price.in[is.na(price.in)] <- 0
+  #   price.out[is.na(price.out)] <- 0
+  #   price.all <- rbind(price.in, price.out)
+  # 
+  #   p.price<-price.all[-6]
+  #   p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+  #   colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+  #   p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+  #   p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+  # 
+  #   s.price<-price.all[-5]
+  #   s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+  #   colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+  #   s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+  #   s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+  # 
+  #   price.all.year <- rbind(p.price, s.price)
+  #   
+  #   #colnames(price.all.year) <- tolower(colnames(price.all.year))
+  #   #colnames(io.all) <- tolower(colnames(io.all))
+  #   #### buat if else untuk modal kapital ####
+  #   
+  #   #### #####
+  #   data.gab <- rbind(io.all, price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+  #   
+  #   #perkalian antara general dan Private Price
+  #   dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+  #   dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+  #   p.budget <- dataGeneral[-(1:5)] * dataPrivat[-c(1:5)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5
+  #   p.budget <- cbind(dataGeneral[1:5],p.budget) #memunculkan kembali variabel 1 sd 5
+  #   p.budget <- p.budget %>%
+  #     mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+  # 
+  #   #perkalian antara general dengan Social Price
+  #   dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+  #   s.budget <- dataGeneral[-(1:5)] * dataSosial[-c(1:5)]
+  #   s.budget <- cbind(dataGeneral[1:5],s.budget)
+  #   s.budget <- s.budget %>%
+  #     mutate(status = case_when(status == "general" ~ "social budget"))
+  # 
+  #   #penggabungan dengan data capital
+  #   # p.cap <- filter(data.gab, status == c("private budget"))
+  #   # p.budget <- rbind(p.budget,p.cap)
+  #   # 
+  #   # s.cap <- filter(data.gab, status == c("social budget"))
+  #   # s.budget <- rbind(s.budget,s.cap)
+  # 
+  #   ################ penghitungan NPV
+  #   p.cost.input <- p.budget %>%
+  #     filter(str_detect(grup,"input"))
+  # 
+  #   s.cost.input <- s.budget %>%
+  #     filter(str_detect(grup,"input"))
+  # 
+  #   p.sum.cost<- p.cost.input[,-(1:5)] %>%
+  #     colSums(na.rm = T)
+  #   s.sum.cost<- s.cost.input[,-(1:5)] %>%
+  #     colSums(na.rm = T)
+  # 
+  #   p.rev.output <- p.budget %>%
+  #     filter(str_detect(grup,"output"))
+  #   s.rev.output <- s.budget %>%
+  #     filter(str_detect(grup,"output"))
+  # 
+  #   p.sum.rev <- p.rev.output[,-(1:5)] %>%
+  #     colSums(na.rm = T)
+  #   s.sum.rev <- s.rev.output[,-(1:5)] %>%
+  #     colSums(na.rm = T)
+  # 
+  # 
+  #   p.profit <- p.sum.rev - p.sum.cost
+  #   s.profit <- s.sum.rev - s.sum.cost
+  #   profit0 <- 0
+  #   p.profit<-c(profit0,p.profit)
+  #   s.profit<-c(profit0,s.profit)
+  # 
+  #   npv.p<-npv(input$rate.p/100,p.profit)
+  #   npv.s<-npv(input$rate.s/100,s.profit)
+  # 
+  #   hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+  # 
+  #   npv.p.us<-npv.p/input$nilai.tukar
+  #   npv.s.us<-npv.s/input$nilai.tukar
+  #   npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+  #   hsl.npv<-rbind(hsl.npv,npv.us)
+  #   rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
+  #   #hsl.npv
+  # 
+  #   p.tot.cost<- sum(p.sum.cost)
+  #   s.tot.cost<- sum(s.sum.cost)
+  # 
+  #   p.labor.input <- p.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+  #   s.labor.input <- s.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+  # 
+  #   p.sum.labor <- p.labor.input[,-(1:5)] %>%
+  #     sum(na.rm = T)
+  #   s.sum.labor <- s.labor.input[,-(1:5)] %>%
+  #     sum(na.rm = T)
+  # 
+  #   nlc.p <- (p.tot.cost - p.sum.labor)/1000000
+  #   nlc.s <- (s.tot.cost - s.sum.labor)/1000000
+  #   nlc<-data.frame(PRIVATE=nlc.p,SOCIAL=nlc.s)
+  #   rownames(nlc)<-c("Non Labor Cost (MRp/Ha)")
+  #   #nlc
+  # 
+  # 
+  #   ############# PERHITUNGAN ESTABLISHMENT COST
+  #   ec <- p.sum.cost[[1]]
+  # 
+  # 
+  #   ############# PERHITUNGAN HARVESTING PRODUCT
+  #   fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
+  #   sum.prod <- fil.prod[,-(1:5)] %>%
+  #     colSums(na.rm = T)
+  #   tot.prod <- sum(sum.prod)
+  # 
+  #   fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+  #   sum.labor <- fil.labor[,-(1:5)] %>%
+  #     colSums(na.rm = T)
+  #   tot.labor <- sum(sum.labor)
+  # 
+  #   hp <- tot.prod/tot.labor
+  # 
+  # 
+  #   ############# PERHITUNGAN LABOR REQ FOR EST
+  #   lr <- sum.labor[[1]] #pekerja pada tahun 1
+  # 
+  #   #### buat dataframe summary
+  #   summ.npv <- data.frame(hsl.npv[1,1],hsl.npv[1,2],hsl.npv[2,1],hsl.npv[2,2])
+  #   summ.nlc <- data.frame(nlc[1,1],nlc[1,2])
+  #   data.summary <- data.frame(summ.npv,
+  #                              summ.nlc,
+  #                              ec,hp,lr)
+  #   colnames(data.summary) <- c("NPV (Rp/Ha) Privat","NPV (Rp/Ha) Sosial",
+  #                               "NPV (US/Ha) Privat","NPV (US/Ha) Sosial",
+  #                               "Non Labor Cost (Juta Rp/Ha) Privat","Non Labor Cost (Juta Rp/Ha) Sosial",
+  #                               "Establishment Cost",
+  #                               "Harvesting Product",
+  #                               "Labor Req for Est")
+  #   rownames(data.summary) <- "value"
+  #   data.summary <- t(data.summary)
+  #   return(data.summary)
+  # 
+  # })
+  # 
+  # output$hasil<- renderPrint({
+  #   hitung.all()
   # })
   
+  
   output$viewPrice <- renderDataTable({
-    dataView <- rbind(valP1(),valP2())
-    dataView
-      # rhandsontable(valP1(),
-      #               rowHeaderWidth = 50,
-      #               fixedColumnsLeft = 3,
-      #               height = 500,
-      # )
+    if(!is.null(data.gab())){
+      dataView <- rbind(dataTemplate()$priceInput, dataTemplate()$priceOutput)
+      dataView    
+    }else if(!is.null(valP1()) | !is.null(valP2())){
+      dataView <- rbind(valP1(),valP2())
+      dataView}
   })
 
   output$viewIO <- renderDataTable({
-    dataView <- rbind(valIO1(),valIO2())
-    dataView
+
+    
+    if(!is.null(data.gab())){
+      dataView <- rbind(dataTemplate()$ioInput, dataTemplate()$ioOutput)
+      dataView    
+    }else if(!is.null(valP1()) | !is.null(valP2())){
+      dataView <- rbind(valIO1(),valIO2())
+      dataView}
   })
   
 }

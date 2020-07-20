@@ -23,12 +23,12 @@ argonSidebar <- argonDashSidebar(
     argonSidebarItem(
       tabName = "upload",
       icon = argonIcon(name = "bullet-list-67", color = "danger"),
-      "Unggah Skenario Baru"
+      "Unggah PAM Baru"
     ),
     argonSidebarItem(
       tabName = "analisis",
       icon = argonIcon(name = "atom", color = "danger"),
-      "Analisis Skenario"
+      "Kumpulan Analisis PAM"
     )
   ),
   argonSidebarDivider()

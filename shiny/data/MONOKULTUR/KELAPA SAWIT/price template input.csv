@@ -1,18 +1,17 @@
-komponen,keterangan,Unit,harga privat,harga sosial
-pupuk,urea,rp,2600,2600
-pupuk,sp,rp,2700,2700
-pupuk,round up,rp,80000,80000
-pupuk,formic acid,rp,6000,6000
-bahan tanam /bibit,padi,rp,4000,4000
-bahan tanam /bibit,karet,rp,2500,2500
-peralatan,Pisau sadap,rp,20000,20000
-peralatan,Mangkok penampung (latex cup),rp,500,200
-peralatan,Ember karet,rp,10000,10000
-peralatan,Cangkul,rp,50000,25000
-peralatan,Parang,rp,50000,50000
-peralatan,Bak penampung,rp,50000,50000
+komponen,keterangan,unit,harga privat,harga sosial
+pupuk,TSP,Rp/kg,5000,2000
+pupuk,NPK,Rp/kg,6000,4000
+pupuk,Organik,Rp/kg,1000,1000
+bahan kimia,Roundup,Rp/l,80000,80000
+bahan tanam /bibit,padi,Rp/kg,8000,4000
+bahan tanam /bibit,kelapa sawit,Rp/bibit,45000,15000
+peralatan,Dodos,Rp/unit,150000,150000
+peralatan,Egreg,Rp/unit,225000,225000
+peralatan,Angkong,Rp/unit,300000,300000
+peralatan,Sprayer,Rp/unit,250000,250000
+peralatan,Parang,Rp/unit,50000,50000
 tenaga kerja,tebas,rp,80000,80000
-tenaga kerja,tumbang,rp,80000,80000
+tenaga kerja,tumbang,rp,187500,187500
 tenaga kerja,bakar,rp,80000,80000
 tenaga kerja,pancang,rp,80000,80000
 tenaga kerja padi,penanaman,rp,80000,80000
@@ -20,8 +19,12 @@ tenaga kerja padi,penyiangan,rp,80000,80000
 tenaga kerja padi,bird and pig waching,rp,80000,80000
 tenaga kerja padi,pemanenan,rp,80000,80000
 tenaga kerja padi,pengeringan,rp,80000,80000
-tenaga kerja karet,penanaman,rp,80000,80000
-tenaga kerja karet,pembuatan lubang,rp,80000,80000
-tenaga kerja karet,penyiangan,rp,80000,80000
-tenaga kerja karet,pruning,rp,80000,80000
-tenaga kerja karet,penyadapan,rp,80000,80000
+tenaga kerja sawit,pembuatan lubang,rp,80000,80000
+tenaga kerja sawit,penanaman,rp,80000,80000
+tenaga kerja sawit,Pembersihan piringan,rp,80000,80000
+tenaga kerja sawit,Pruning,rp,80000,80000
+tenaga kerja sawit,Penyemprotan,rp,80000,80000
+tenaga kerja sawit,Pemupukan,rp,80000,80000
+tenaga kerja sawit,pemanenan,rp,80000,80000
+tenaga kerja sawit,pengangkutan,rp,50000,50000
+modal kapital,working capital,rp,1,1

@@ -1,0 +1,31 @@
+komponen,keterangan,unit,harga privat,harga sosial
+pupuk,Urea,rp,3000,3000
+pupuk,SP ,rp,5400,2500
+pupuk,KCL,rp,3000,3000
+pupuk,NPK,rp,10000,3000
+pupuk,basmilang,rp,45000,45000
+bahan tanam /bibit,padi,rp,6000,6000
+bahan tanam /bibit,kopi,rp,200,200
+peralatan,Karung,rp,5000,5000
+peralatan,Cangkul,rp,50000,50000
+peralatan,Parang,rp,25000,25000
+peralatan,Sprayer,rp,225000,225000
+tenaga kerja,tebas,rp,80000,80000
+tenaga kerja,tumbang,rp,80000,80000
+tenaga kerja,bakar,rp,80000,80000
+tenaga kerja padi,penanaman,rp,80000,80000
+tenaga kerja padi,penyiangan,rp,80000,80000
+tenaga kerja padi,bird and pig waching,rp,80000,80000
+tenaga kerja padi,pemanenan,rp,80000,80000
+tenaga kerja padi,pengeringan,rp,80000,80000
+tenaga kerja kopi,penanaman buah,rp,80000,80000
+tenaga kerja kopi,penanaman kopi,rp,80000,80000
+tenaga kerja kopi,Pruning,rp,80000,80000
+tenaga kerja kopi,Pemangkasan tunas/ranting,rp,80000,80000
+tenaga kerja kopi,Penyiangan,rp,80000,80000
+tenaga kerja kopi,Pemupukan,rp,80000,80000
+tenaga kerja kopi,Penyemprotan,rp,80000,80000
+pemanenan,transport,rp,1500,1500
+tenaga kerja kopi,pemanenan kopi,rp,80000,80000
+pasca panen,giling kopi,rp,600,600
+tenaga kerja kopi,penjemuran kopi,rp,80000,80000

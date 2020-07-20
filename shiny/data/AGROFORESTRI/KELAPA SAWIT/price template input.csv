@@ -1,0 +1,67 @@
+komponen,keterangan,unit,harga privat,harga sosial
+pupuk,Urea,Rp/kg,2273.472682,2273.472682
+pupuk,TSP,Rp/kg,3209.702243,3209.702243
+pupuk,RP,Rp/kg,1065,815.2883088
+pupuk,MOP,Rp/kg,7667,3097.47266
+pupuk,Dolomite,Rp/kg,420,310
+pupuk,CIRP,Rp/kg,580,580
+peralatan,Ajir,Rp/Lt,55000,55000
+peralatan,Ember,Rp/kg,432600,432600
+peralatan,Takaran pupuk,Rp/Lt,15000,15000
+bahan kimia,LINDOMIN,Rp/lt,36583.33333,36583.33333
+bahan kimia,ALLY,Rp/btg,100,100
+bahan kimia,AGRISTIK,Rp/bh,25000,25000
+bahan kimia,Roundup,Rp/bh,5000,5000
+bibit tanam,palm oil,Rp/seedling,35000,35000
+bibit tanam,LCC seed : C. mucunoides,Rp/kg,17000,17000
+bibit tanam,LCC seed : P. javanica,Rp/kg,70000,70000
+bibit tanam,LCC seed: C caeruleum,Rp/kg,50000,50000
+bahan bakar,Fuel,Rp/Lt,5281.445315,5825.467208
+bahan bakar,Lubricants,Rp/Lt,16440.83684,16440.83684
+bahan bakar,Grease,Rp/kg,34974.7,34974.7
+bahan bakar,Spareparts,Rp/unit/yr,180734000,180734000
+tradable kapital,grader komatsu 511A,Rp/unit,875192608.5,875192608.5
+tradable kapital,excavator komatsu pc200,Rp/unit,806629132.2,806629132.2
+tradable kapital,bulldozer komatsu,Rp/unit,188045416.5,188045416.5
+tradable kapital,Jeep Mitsubishi L200,Rp/unit,230000000,230000000
+tradable kapital,Sepeda motor,Rp/unit,19000000,19000000
+tradable kapital,Dumptruck Mitsubishi PS120,Rp/unit,450000000,450000000
+tenaga kerja skilled,Supervisor & Manager,Rp/thn,336000000,336000000
+tenaga kerja skilled,Staff,Rp/thn,995670000,995670000
+tenaga kerja skilled,forest demarcation,Rp/ha,52500,52500
+tenaga kerja skilled,micro survey for conversion,Rp/ha,26250,26250
+tenaga kerja skilled,pre survey,Rp/ha,21875,21875
+tenaga kerja skilled,feasibility study,Rp/ha,43750,43750
+tenaga kerja skilled,landuse planning,Rp/ha,245000,245000
+tenaga kerja unskilled,Site prep.,Rp/ha,7000000,7000000
+tenaga kerja unskilled,Drainage Prep.,Rp/ps-d,70000,70000
+tenaga kerja unskilled,Drainage maintenance,Rp/ps-d,70000,70000
+tenaga kerja unskilled,Hole Prep.,Rp/ps-d,70000,70000
+tenaga kerja unskilled,Cover crop planting,Rp/ps-d,70000,70000
+tenaga kerja unskilled,Cover crop care,Rp/ps-d,70000,70000
+tenaga kerja unskilled,Fertilizing,Rp/ps-d,70000,70000
+tenaga kerja unskilled,"Install ""ajir""/stick",Rp/ps-d,70000,70000
+tenaga kerja unskilled,Planting,Rp/ps-d,70000,70000
+tenaga kerja unskilled,enrichment,Rp/ps-d,70000,70000
+tenaga kerja unskilled,oil palm care,Rp/ps-d,70000,70000
+tenaga kerja unskilled,prunning,Rp/ps-d,70000,70000
+tenaga kerja unskilled,castration,Rp/ps-d,70000,70000
+tenaga kerja unskilled,2nd prunning,Rp/ps-d,70000,70000
+tenaga kerja unskilled,pests and desease control,Rp/ps-d,70000,70000
+tenaga kerja unskilled,harvesting,Rp/ps-d,105000,105000
+tenaga kerja unskilled,transporting FFB to mill,Rp/ton,0,0
+tenaga kerja unskilled,main road maintenance *),Rp/m,203000,203000
+tenaga kerja unskilled,Collector road maintainance*),Rp/m,211750,211750
+modal kapital,Working Capital,,,
+modal kapital,Building,,5650000000,5650000000
+modal kapital,Preparation,,,
+modal kapital,Proposal,Rp/ha,3500,3500
+modal kapital,FS,Rp/ha,6600,6600
+modal kapital,AMDAL,Rp/ha,35000,35000
+modal kapital,Mapping,Rp/ha,40000,40000
+modal kapital,Land sertification,Rp/ha,300000,300000
+modal kapital,Main road,Rp/m,15500,15500
+modal kapital,Collector road,Rp/m,13700,13700
+modal kapital,Lands & buildings (PBB),Rp/thn/ha,314343.8681,0
+modal kapital,Vehicle,Rp/thn,30000000,0
+modal kapital,Income taxes,Rp/thn,83383500,0
