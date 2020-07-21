@@ -9,15 +9,10 @@ argonSidebar <- argonDashSidebar(
   brand_logo = "https://pbs.twimg.com/profile_images/1191981430689144834/Em5N9JbQ_400x400.jpg",
   argonSidebarHeader(title = "Main Menu"),
   argonSidebarMenu(
-    argonSidebarItem(
-    tabName = "home",
-     icon = argonIcon(name = "tv-2", color = "info"),
-     "Home"
-    ),
     # argonSidebarItem(
-    #   tabName = "uploadModal",
-    #   icon = argonIcon(name = "bullet-list-67", color = "danger"),
-    #   "Profitability"
+    # tabName = "home",
+    #  icon = argonIcon(name = "tv-2", color = "info"),
+    #  "Home"
     # ),
 
     argonSidebarItem(
