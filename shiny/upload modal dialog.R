@@ -17,6 +17,7 @@ upload <- argonTabItem(
       gradient = FALSE, 
       floating = FALSE,
       
+      
       argonRow(
         argonColumn(
           width = 12,
@@ -36,7 +37,8 @@ upload <- argonTabItem(
                        br(),
                        selectInput(("user"),"Nama Peneliti",choices = c("A","B","C")),
                        br(),
-                       selectInput(("gambut"),"Tipe Lahan",choices = c("NON-GAMBUT","GAMBUT"))
+                       selectInput(("gambut"),"Tipe Lahan",choices = c("NON-GAMBUT","GAMBUT")),
+                       useShinyalert()
                 ),
                 column(5,
                        h2(id="big-heading","Variable Input"),

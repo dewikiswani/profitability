@@ -16,6 +16,7 @@ library(stringr)
 library(tidyverse)
 library(rhandsontable)
 library(shinyWidgets)
+library(shinyalert)
 
 
 # template
@@ -183,6 +184,7 @@ app <- shiny::shinyApp(
 
     
     dataTemplate <- reactive({
+    # observeEvent(input$kom,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       
       ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
@@ -191,29 +193,45 @@ app <- shiny::shinyApp(
       priceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
       priceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
       
-      capitalPrivate <- NULL
-      capitalSocial <- NULL
+      # case for modal kapital
+      if (input$checkKapital == F){
+        # capitalPrivate <- NULL
+        # capitalSocial <- NULL
+        capital <- NULL
+      } else if(input$checkKapital == T){
+        # capitalPrivate <- read.table(paste0(datapath,"kapital template privat.csv"), header = T, sep = ",")
+        # capitalSocial <- read.table(paste0(datapath,"kapital template sosial.csv"), header = T, sep = ",")
+        capital <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
+      }
       
       combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
-                         capitalPrivate=capitalPrivate,
-                         capitalSocial=capitalSocial)
+                         # capitalPrivate=capitalPrivate,
+                         # capitalSocial=capitalSocial,
+                         capital=capital)
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       saveRDS(combineDef,file = fileName)
       
+      print("pertama kali masuk/login. cek save data default")
       combineDef
       
     })
 
     
-    readDataTemplate <- eventReactive(input$modalPriceButton,{
+    # readDataTemplate <- eventReactive(input$modalIOButton,{
+    #   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+    #   fileName <- paste0(datapath,"saveDataTemplate.rds")
+    #   print("baca data hasil edit")
+    #   readRDS(fileName)
+    # })
+    
+    readDataLastEdited <- eventReactive(input$run_button,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
-      print("baca")
+      # print("data terakhir tersimpan di rds")
       readRDS(fileName)
-      
     })
     
     
@@ -380,7 +398,7 @@ app <- shiny::shinyApp(
     })
     
     observeEvent(input$saveIOInput,{
-      #browser()
+      # browser()
       removeUI(selector='#textTampil')
       
       editNew<-as.data.frame(hot_to_r(input$editIOInput))
@@ -389,7 +407,28 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      # replace data IO
       dataDefine$ioInput <- editNew
+      
+      
+      # replace data price
+      indexRow <- as.numeric(nrow(dataDefine$ioInput))
+      
+      reactData$tableP1 <- dataDefine$ioInput[,1:2]
+      no.id <- as.numeric(rownames(reactData$tableP1))
+      reactData$tableP1 <- cbind(no.id,reactData$tableP1)
+      
+      templatePriceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
+      templatePrice <- (templatePriceInput[,-1])
+      reactData$tableP1 <- merge(reactData$tableP1,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
+      reactData$tableP1 <- reactData$tableP1[order(reactData$tableP1$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+      rownames(reactData$tableP1) <- no.id
+      reactData$tableP1 <- reactData$tableP1[, c(3, 1, 4, 5,6)]
+      dataDefine$priceInput <- reactData$tableP1
+        
+      # save io (baru) dan price (default tanpa ada perubahan)  
       saveRDS(dataDefine,file = fileName)
       
       insertUI(selector='#teksIOInputSave',
@@ -464,7 +503,27 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      # replace data IO
       dataDefine$ioOutput <- editNew
+      
+      # replace data price
+      indexRow <- as.numeric(nrow(dataDefine$ioOutput))
+      
+      reactData$tableP2 <- dataDefine$ioOutput[,1:2]
+      no.id <- as.numeric(rownames(reactData$tableP2))
+      reactData$tableP2 <- cbind(no.id,reactData$tableP2)
+      
+      templatePriceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
+      templatePrice <- (templatePriceOutput[,-1])
+      reactData$tableP2 <- merge(reactData$tableP2,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
+      reactData$tableP2 <- reactData$tableP2[order(reactData$tableP2$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+      rownames(reactData$tableP2) <- no.id
+      reactData$tableP2 <- reactData$tableP2[, c(3, 1, 4, 5,6)]
+      dataDefine$priceOutput <- reactData$tableP2
+      
+      # save io (baru) dan price (default tanpa ada perubahan) 
       saveRDS(dataDefine,file = fileName)
       
       insertUI(selector='#teksIOOutputSave',
@@ -580,9 +639,9 @@ app <- shiny::shinyApp(
     
     valP1 <- eventReactive(input$priceInputHit,{
       #browser()
-      indexRow <- as.numeric(nrow(readDataTemplate()$ioInput))
+      indexRow <- as.numeric(nrow(readDataLastEdited()$ioInput))
       
-      reactData$tableP1 <- readDataTemplate()$ioInput[,1:2]
+      reactData$tableP1 <- readDataLastEdited()$ioInput[,1:2]
       no.id <- as.numeric(rownames(reactData$tableP1))
       reactData$tableP1 <- cbind(no.id,reactData$tableP1)
       
@@ -614,6 +673,9 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      # replace data price
       dataDefine$priceInput <- editNew
       saveRDS(dataDefine,file = fileName)
       
@@ -649,11 +711,11 @@ app <- shiny::shinyApp(
     })
     
     valP2 <- eventReactive(input$priceOutputHit,{
-      #browser()
+      # browser()
       #indexCol <- as.numeric(input$priceYear_output)+3
-      indexRow <- as.numeric(nrow(readDataTemplate()$ioOutput))
+      indexRow <- as.numeric(nrow(readDataLastEdited()$ioOutput))
       
-      reactData$tableP2 <- readDataTemplate()$ioOutput[,1:2]
+      reactData$tableP2 <- readDataLastEdited()$ioOutput[,1:2]
       no.id <- as.numeric(rownames(reactData$tableP2))
       reactData$tableP2 <- cbind(no.id,reactData$tableP2)
       
@@ -687,6 +749,9 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      # replace data price
       dataDefine$priceOutput <- editNew
       saveRDS(dataDefine,file = fileName)
       
@@ -704,57 +769,68 @@ app <- shiny::shinyApp(
     ################################################################################
     data.gab <- eventReactive(input$run_button,{
       # aktifin dataTemplate
+      # agar ketika run pertama kali yang terbaca tetap data default di excel
       dataTemplate <- dataTemplate()
       
+      #setelah dataTemplate(data default) aktif, 
+      # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
       
-      #### io  ####    
-      io.in <-  dataDefine$ioInput
-      io.in <- cbind(grup="input",io.in)
-      io.out <-  dataDefine$ioOutput
-      io.out <- cbind(grup="output",io.out)
+      # kasih case jika beda rownya walau sbenrnya sudah di tanggulangi saat save tabel io
+      if (nrow(dataDefine$ioInput) != nrow(dataDefine$priceInput) | nrow(dataDefine$ioOutput) != nrow(dataDefine$priceOutput)) {
+        shinyalert("Error!", "Silahkan tekan modal dialog untuk harga lalu simpan file yang sudah disesuaikan dengan komponen baru yang ditambahkan pada tabel I-O.", type = "error")
+      }else if (nrow(dataDefine$ioInput) == nrow(dataDefine$priceInput) & nrow(dataDefine$ioOutput) == nrow(dataDefine$priceOutput)){
+        
+        #### io  ####    
+        io.in <-  dataDefine$ioInput
+        io.in <- cbind(grup="input",io.in)
+        io.out <-  dataDefine$ioOutput
+        io.out <- cbind(grup="output",io.out)
+        
+        io.in[is.na(io.in)] <- 0 #NA replace with zero
+        io.out[is.na(io.out)] <- 0
+        io.all <- rbind(io.in,io.out) #combine all data input-output
+        io.all <- cbind(status="general", io.all) #add variable status
+        io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        
+        yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+        
+        #### price ####
+        price.in <-  dataDefine$priceInput
+        price.in <- cbind(grup="input",price.in)
+        price.out <-  dataDefine$priceOutput
+        price.out <- cbind(grup="output",price.out)
+        price.in[is.na(price.in)] <- 0
+        price.out[is.na(price.out)] <- 0
+        price.all <- rbind(price.in, price.out)
+        
+        p.price<-price.all[-6]
+        p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+        colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+        p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+        p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        s.price<-price.all[-5]
+        s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+        colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+        s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+        s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+        
+        price.all.year <- rbind(p.price, s.price)
+        
+        #colnames(price.all.year) <- tolower(colnames(price.all.year))
+        #colnames(io.all) <- tolower(colnames(io.all))
+        #### buat if else untuk modal kapital ####
+        
+        #### #####
+        data.gab <- rbind(io.all, price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+      }
       
-      io.in[is.na(io.in)] <- 0 #NA replace with zero
-      io.out[is.na(io.out)] <- 0
-      io.all <- rbind(io.in,io.out) #combine all data input-output
-      io.all <- cbind(status="general", io.all) #add variable status
-      io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
-      
-      
-      yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
-      
-      #### price ####
-      price.in <-  dataDefine$priceInput
-      price.in <- cbind(grup="input",price.in)
-      price.out <-  dataDefine$priceOutput
-      price.out <- cbind(grup="output",price.out)
-      price.in[is.na(price.in)] <- 0
-      price.out[is.na(price.out)] <- 0
-      price.all <- rbind(price.in, price.out)
-      
-      p.price<-price.all[-6]
-      p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
-      colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
-      p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
-      
-      s.price<-price.all[-5]
-      s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
-      colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
-      s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
-      
-      price.all.year <- rbind(p.price, s.price)
-      
-      #colnames(price.all.year) <- tolower(colnames(price.all.year))
-      #colnames(io.all) <- tolower(colnames(io.all))
-      #### buat if else untuk modal kapital ####
-      
-      #### #####
-      data.gab <- rbind(io.all, price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-      data.gab
     })
     
     hitung.npv<-eventReactive(input$run_button,{
@@ -823,6 +899,12 @@ app <- shiny::shinyApp(
     output$npv<- renderPrint({
       hasil<-t(hitung.npv())
       hasil
+      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("simpan tabel harga yang baru")
+      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
+      #   hasil<-t(hitung.npv())
+      #   hasil
+      # }
     })
     
     hitung.nlc<-eventReactive(input$run_button,{
@@ -882,6 +964,12 @@ app <- shiny::shinyApp(
     output$nlc<- renderPrint({
       hasil<-t(hitung.nlc())
       hasil
+      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("simpan tabel harga yang baru")
+      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
+      #   hasil<-t(hitung.nlc())
+      #   hasil
+      # }
     })
     
     hitung.ec<-eventReactive(input$run_button,{
@@ -924,11 +1012,17 @@ app <- shiny::shinyApp(
     output$ec<- renderPrint({
       hasil<-t(hitung.ec())
       hasil
+      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("simpan tabel harga yang baru")
+      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
+      #   hasil<-t(hitung.ec())
+      #   hasil
+      # }
     })
     
-    # hitung.hp<-eventReactive(input$run_button,{
-    observeEvent(input$run_button,{
-      browser()
+    hitung.hp<-eventReactive(input$run_button,{
+    # observeEvent(input$run_button,{
+      # browser()
       dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
       
       ############# PERHITUNGAN HARVESTING PRODUCT
@@ -952,6 +1046,13 @@ app <- shiny::shinyApp(
     output$hp<- renderPrint({
       hasil<-hitung.hp()
       hasil
+      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("simpan tabel harga yang baru")
+      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
+      #   
+      #   hasil<-hitung.hp()
+      #   hasil
+      # }
     })
     
     hitung.lr<-eventReactive(input$run_button,{
@@ -974,26 +1075,38 @@ app <- shiny::shinyApp(
     output$lr<- renderPrint({
       hasil<-hitung.lr()
       hasil
+      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("validasi dan simpan tabel harga yang baru")
+      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
+      #   hasil<-hitung.lr()
+      #   hasil
+      # }
     })
     
     output$viewPrice <- renderDataTable({
       if(!is.null(data.gab())){
-        dataView <- rbind(dataTemplate()$priceInput, dataTemplate()$priceOutput)
+        dataView <- rbind(readDataLastEdited()$priceInput, readDataLastEdited()$priceOutput)
         dataView    
       }else if(!is.null(valP1()) | !is.null(valP2())){
         dataView <- rbind(valP1(),valP2())
-        dataView}
+        dataView
+      }
+      # else if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("validasi dan simpan tabel harga yang baru (jumlah baris komponen i-o tidak sama dengan komponen harga)")
+      # }
     })
     
     output$viewIO <- renderDataTable({
-      
-      
       if(!is.null(data.gab())){
-        dataView <- rbind(dataTemplate()$ioInput, dataTemplate()$ioOutput)
+        dataView <- rbind(readDataLastEdited()$ioInput, readDataLastEdited()$ioOutput)
         dataView    
       }else if(!is.null(valP1()) | !is.null(valP2())){
         dataView <- rbind(valIO1(),valIO2())
-        dataView}
+        dataView
+      }
+      # else if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
+      #   print("validasi dan simpan tabel harga yang baru (jumlah baris komponen i-o tidak sama dengan komponen harga)")
+      # }
     })
     
   }
