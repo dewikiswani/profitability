@@ -38,7 +38,7 @@ upload <- argonTabItem(
                        selectInput(("user"),"Nama Peneliti",choices = c("A","B","C")),
                        br(),
                        selectInput(("gambut"),"Tipe Lahan",choices = c("NON-GAMBUT","GAMBUT")),
-                       useShinyalert()
+                       # useShinyalert()
                 ),
                 column(5,
                        h2(id="big-heading","Variable Input"),
@@ -93,9 +93,12 @@ upload <- argonTabItem(
                        br(),
                        actionButton(("modalCapitalButton"),'Modal Kapital'),
                        br(),
+                       h5("Status Modal Kapital:"),
+                       # br(),
                        checkboxInput(("checkKapital"),'modal kapital dimasukkan kedalam perhitungan'),
-                       br(),
-                       br(),
+                       # br(),
+                       tags$div(id='teksStatusCapital'),
+                       
                 ),
                 column(4,
                        h2(id="big-heading","Variable Input"),
@@ -177,7 +180,7 @@ upload <- argonTabItem(
       circle = FALSE,
       size = "sm",
       width = 12,
-      iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
+      iconList = lapply(X = 1:3, FUN = argonIcon, name = "atom"),
       argonTab(
         tabName = "Tabel Harga",
         active = T,
@@ -188,6 +191,12 @@ upload <- argonTabItem(
         tabName = "Tabel Input-Output",
         active = F,
         dataTableOutput(("viewIO")),
+        style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+      ),
+      argonTab(
+        tabName = "Tabel Modal Kapital",
+        active = F,
+        dataTableOutput(("viewKapital")),
         style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
       )
     )

@@ -1,4 +1,5 @@
 #setwd("C:/dw/ICRAF/profitability/shiny")
+# C:/dw/ICRAF/project R/theme 2/profitability/shiny/data/template
 
 library(shiny)
 library(argonR)
@@ -182,9 +183,10 @@ app <- shiny::shinyApp(
       )
     })
 
-    
+    # Start template data ---------------------------------------------------- 
     dataTemplate <- reactive({
-    # observeEvent(input$kom,{
+      removeUI(selector='#statusCapital')
+      
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       
       ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
@@ -194,14 +196,29 @@ app <- shiny::shinyApp(
       priceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
       
       # case for modal kapital
-      if (input$checkKapital == F){
-        # capitalPrivate <- NULL
-        # capitalSocial <- NULL
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
+      #  case ketika datanya ada dan tidak di ceklis hrusnya di awal munculin html utk div bahwa ada modal kapital dan tdknya
+      
+      if (cekCapital == T & input$checkKapital == F ){
         capital <- NULL
-      } else if(input$checkKapital == T){
-        # capitalPrivate <- read.table(paste0(datapath,"kapital template privat.csv"), header = T, sep = ",")
-        # capitalSocial <- read.table(paste0(datapath,"kapital template sosial.csv"), header = T, sep = ",")
+        insertUI(selector='#teksStatusCapital',
+                 where = 'afterEnd',
+                 ui = tags$div(id="statusCapital","Terdapat tabel modal kapital (tidak dimasukkan ke dalam perhitungan)"))
+      } else if(cekCapital == T & input$checkKapital == T){
         capital <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
+        insertUI(selector='#teksStatusCapital',
+                 where = 'afterEnd',
+                 ui = tags$div(id="statusCapital","Terdapat tabel modal kapital (dimasukkan kedalam perhitungan)"))
+      } else if (cekCapital == F & input$checkKapital == F){
+        capital <- NULL
+        insertUI(selector='#teksStatusCapital',
+                 where = 'afterEnd',
+                 ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
+      } else if(cekCapital == F & input$checkKapital == T){
+        capital <- NULL
+        insertUI(selector='#teksStatusCapital',
+                 where = 'afterEnd',
+                 ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
       }
       
       combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
@@ -247,7 +264,27 @@ app <- shiny::shinyApp(
       print(datapath)
       readData <- read.table(paste0(datapath,"io template output.csv"), header = T, sep = ",")
       readData
+    }) 
+    
+    templateCapital <- reactive({
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      print(datapath)
+      readData <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
+      readData
     })
+    
+    
+    reactData <- reactiveValues(
+      tableP1 = NULL, #price input
+      tableP2 = NULL, #price output
+      tableIO1 = NULL, #io input
+      tableIO2 = NULL, #io output
+      tableCapP = NULL, #capital privat
+      tableCapS = NULL #capital sosial
+    )
+    
+    # Ending template data ----------------------------------------------------
+    
     
     ################################################################################
     #                                                                              #
@@ -281,12 +318,12 @@ app <- shiny::shinyApp(
                       column(6,
                              selectInput(("ioYear_input"),
                                          "pilih tahun skenario:",
-                                         choices = c(1:30),selected = 30)
+                                         choices = c(30),selected = 30) # pilihannnya masih 30 tahun sesuai default
                       ),
                       column(6,
                              selectInput(("ioComp_input"),
                                          "banyaknya komponen:",
-                                         choices = c(1:50),selected = nrow(templateIOInput()))
+                                         choices = c(nrow(templateIOInput()):50),selected = nrow(templateIOInput())) #tidak bisa kurang dari default, jika mau kurang 0 kan sluaruh io nya
                       )
                     )
                   ),
@@ -310,12 +347,12 @@ app <- shiny::shinyApp(
                       column(6,
                              selectInput(("ioYear_output"),
                                          "pilih tahun skenario:",
-                                         choices = c(2:30),selected = 30)
+                                         choices = c(30),selected = 30) # pilihannnya masih 30 tahun sesuai default
                       ),
                       column(6,
                              selectInput(("ioComp_output"),
                                          "banyaknya komponen:",
-                                         choices = c(1:10),selected = nrow(templateIOOutput()))
+                                         choices = c(nrow(templateIOOutput()):10),selected = nrow(templateIOOutput()))#tidak bisa kurang dari default, jika mau kurang 0 kan sluaruh io nya
                       )
                     )
                   ),
@@ -600,17 +637,6 @@ app <- shiny::shinyApp(
     
     
     
-    reactData <- reactiveValues(
-      tableP1 = NULL, #price input
-      tableP2 = NULL, #price output
-      tableIO1 = NULL, #io input
-      tableIO2 = NULL, #io output
-      tableCapP = NULL, #capital privat
-      tableCapS = NULL #capital sosial
-    )
-    
-    # Ending template data ----------------------------------------------------
-    
     
     # START Price Input ----------------------------------------------------------
     observeEvent(input$priceInputHit, {
@@ -764,10 +790,120 @@ app <- shiny::shinyApp(
     
     ################################################################################
     #                                                                              #
+    #                          BUTTON MODAL KAPITAL                                #
+    #                                                                              #
+    ################################################################################
+    observeEvent(input$modalCapitalButton,{
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            actionButton(("closeCapitalButton"), "Tutup")
+          ),
+          argonTabSet(
+            id = "tabCapital",
+            card_wrapper = TRUE,
+            horizontal = TRUE,
+            circle = FALSE,
+            size = "sm",
+            width = 12,
+            iconList = lapply(X = 1:1, FUN = argonIcon, name = "atom"),
+            argonTab(
+              tabName = "Sunting Harga pada Tabel Modal Kapital",
+              active = T,
+              sidebarLayout(
+                sidebarPanel(
+                  fluidPage(
+                    h5("Jika komponen tidak digunakan pada perhitungan, sunting harga menjadi bernilai 0"),
+                    tags$br(),
+                  ),
+                  width=12
+                ),
+                mainPanel(
+                  rHandsontableOutput(('editCapital')),
+                  tags$br(),
+                  actionButton(('saveCapital'), 'simpan tabel'), 
+                  tags$br(), 
+                  tags$br(),
+                  tags$div(id='teksCapitalSave'),
+                  width=12
+                  )
+              )
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+    })
+    
+    observeEvent(input$closeCapitalButton,{
+      removeModal()
+    })
+    
+    valCap <- eventReactive(input$modalCapitalButton,{
+      # case for modal kapital
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
+      #  case ketika datanya ada dan tidak di ceklis hrusnya di awal munculin html utk div bahwa ada modal kapital dan tdknya
+      
+      if (cekCapital == T){ # klo kapital templatenya ada mau di ceklis atau engga ttp dimunculin
+        reactData$tableCap <- templateCapital()
+      } else if (cekCapital == F & input$checkKapital == F){
+        reactData$tableCap <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
+        colnames(reactData$tableCap) <- "Keterangan"
+        reactData$tableCap
+      } else if(cekCapital == F & input$checkKapital == T){
+        reactData$tableCap <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
+        colnames(reactData$tableCap) <- "Keterangan"
+        reactData$tableCap
+      }
+    })
+
+    output$editCapital <- renderRHandsontable({
+      rhandsontable(valCap(),
+                    rowHeaderWidth = 50,
+                    fixedColumnsLeft = 2,
+                    height = 500,
+      )
+    })
+    
+    observeEvent(input$saveCapital,{
+      # browser()
+      removeUI(selector='#textTampil')
+      
+      editNew<-as.data.frame(hot_to_r(input$editCapital))
+      editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      if(!is.null(dataDefine$capital)){
+        # replace data capital
+        dataDefine$capital <- editNew
+        
+        # save CAPITAL BARU
+        saveRDS(dataDefine,file = fileName)
+        
+        insertUI(selector='#teksCapitalSave',
+                 where = 'afterEnd',
+                 ui = tags$div(id="textTampil","tabel di atas sudah tersimpan"))
+      }else if(is.null(dataDefine$capital)){
+        insertUI(selector='#teksCapitalSave',
+                 where = 'afterEnd',
+                 ui = tags$div(id="textTampil","komoditas ini tidak memiliki tabel default untuk modal kapital"))
+      }
+    })
+    
+    ################################################################################
+    #                                                                              #
     #                                RESULT                                        #
     #                                                                              #
     ################################################################################
     data.gab <- eventReactive(input$run_button,{
+    # observeEvent(input$run_button,{
+    #   browser()
+      
       # aktifin dataTemplate
       # agar ketika run pertama kali yang terbaca tetap data default di excel
       dataTemplate <- dataTemplate()
@@ -779,58 +915,73 @@ app <- shiny::shinyApp(
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
-      # kasih case jika beda rownya walau sbenrnya sudah di tanggulangi saat save tabel io
-      if (nrow(dataDefine$ioInput) != nrow(dataDefine$priceInput) | nrow(dataDefine$ioOutput) != nrow(dataDefine$priceOutput)) {
-        shinyalert("Error!", "Silahkan tekan modal dialog untuk harga lalu simpan file yang sudah disesuaikan dengan komponen baru yang ditambahkan pada tabel I-O.", type = "error")
-      }else if (nrow(dataDefine$ioInput) == nrow(dataDefine$priceInput) & nrow(dataDefine$ioOutput) == nrow(dataDefine$priceOutput)){
         
-        #### io  ####    
-        io.in <-  dataDefine$ioInput
-        io.in <- cbind(grup="input",io.in)
-        io.out <-  dataDefine$ioOutput
-        io.out <- cbind(grup="output",io.out)
+      #### io  ####    
+      io.in <-  dataDefine$ioInput
+      io.in <- cbind(grup="input",io.in)
+      io.out <-  dataDefine$ioOutput
+      io.out <- cbind(grup="output",io.out)
+      
+      io.in[is.na(io.in)] <- 0 #NA replace with zero
+      io.out[is.na(io.out)] <- 0
+      io.all <- rbind(io.in,io.out) #combine all data input-output
+      io.all <- cbind(status="general", io.all) #add variable status
+      io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      
+      yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+      
+      #### price ####
+      price.in <-  dataDefine$priceInput
+      price.in <- cbind(grup="input",price.in)
+      price.out <-  dataDefine$priceOutput
+      price.out <- cbind(grup="output",price.out)
+      price.in[is.na(price.in)] <- 0
+      price.out[is.na(price.out)] <- 0
+      price.all <- rbind(price.in, price.out)
+      
+      p.price<-price.all[-6]
+      p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+      colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+      p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      s.price<-price.all[-5]
+      s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+      colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+      s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+      
+      price.all.year <- rbind(p.price, s.price)
+      
+      #### buat if else untuk modal kapital ####
+      if (is.null(dataDefine$capital)){
+        # capital = NULL
+        data.gab <- rbind(io.all,
+                          price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
         
-        io.in[is.na(io.in)] <- 0 #NA replace with zero
-        io.out[is.na(io.out)] <- 0
-        io.all <- rbind(io.in,io.out) #combine all data input-output
-        io.all <- cbind(status="general", io.all) #add variable status
-        io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+      }else{
+        capital <- cbind(grup="input",dataDefine$capital)
+        
+        # menambahkan pada tabel io matrix bernilai 1
+        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
+        # modal kapital sosialnya diwakili oleh momdal kapital privat
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
         
         
-        yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
-        
-        #### price ####
-        price.in <-  dataDefine$priceInput
-        price.in <- cbind(grup="input",price.in)
-        price.out <-  dataDefine$priceOutput
-        price.out <- cbind(grup="output",price.out)
-        price.in[is.na(price.in)] <- 0
-        price.out[is.na(price.out)] <- 0
-        price.all <- rbind(price.in, price.out)
-        
-        p.price<-price.all[-6]
-        p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
-        colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
-        p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
-        
-        s.price<-price.all[-5]
-        s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
-        colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
-        s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
-        
-        price.all.year <- rbind(p.price, s.price)
-        
-        #colnames(price.all.year) <- tolower(colnames(price.all.year))
-        #colnames(io.all) <- tolower(colnames(io.all))
-        #### buat if else untuk modal kapital ####
-        
-        #### #####
-        data.gab <- rbind(io.all, price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
+        kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
+        kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
+        data.gab <- rbind(io.all, ioKapital,
+                          price.all.year, 
+                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
         data.gab
       }
-      
     })
     
     hitung.npv<-eventReactive(input$run_button,{
@@ -1075,12 +1226,6 @@ app <- shiny::shinyApp(
     output$lr<- renderPrint({
       hasil<-hitung.lr()
       hasil
-      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("validasi dan simpan tabel harga yang baru")
-      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
-      #   hasil<-hitung.lr()
-      #   hasil
-      # }
     })
     
     output$viewPrice <- renderDataTable({
@@ -1091,9 +1236,6 @@ app <- shiny::shinyApp(
         dataView <- rbind(valP1(),valP2())
         dataView
       }
-      # else if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("validasi dan simpan tabel harga yang baru (jumlah baris komponen i-o tidak sama dengan komponen harga)")
-      # }
     })
     
     output$viewIO <- renderDataTable({
@@ -1104,9 +1246,28 @@ app <- shiny::shinyApp(
         dataView <- rbind(valIO1(),valIO2())
         dataView
       }
-      # else if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("validasi dan simpan tabel harga yang baru (jumlah baris komponen i-o tidak sama dengan komponen harga)")
-      # }
+    })
+    
+    output$viewKapital <- renderDataTable({
+      # case for modal kapital
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
+      
+      if(cekCapital == T & input$checkKapital == T){
+        # dataView <- data.frame(matrix(1,nrow=3,ncol=3))
+        dataView <- readDataLastEdited()$capital
+        dataView    
+      }else if(cekCapital == T & input$checkKapital == F){
+        dataView <- data.frame(matrix("terdapat default tabel modal kapital, tapi tidak dimasukkan kedalam perhitungan",nrow=1,ncol=1))
+        colnames(dataView) <- "Keterangan"
+        dataView
+      }
+      else if(cekCapital == F){
+        # dataView <- data.frame(matrix(0,nrow=3,ncol=3))
+        dataView <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
+        colnames(dataView) <- "Keterangan"
+        dataView
+      }
     })
     
   }
