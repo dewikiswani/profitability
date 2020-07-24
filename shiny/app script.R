@@ -1,3 +1,4 @@
+
 #setwd("C:/dw/ICRAF/profitability/shiny")
 # C:/dw/ICRAF/project R/theme 2/profitability/shiny/data/template
 
@@ -64,72 +65,8 @@ app <- shiny::shinyApp(
       }
       return(data) 
     }
-  
-    
-    # # Section 1 -- Upload File ----------------------------------------------
-    #browser()
-    #data price
-    # data.1 <- eventReactive(input$simulate,{
-    #   read.csv("data/template/oilpalm_price_in.csv", header = T, sep = ",")
-    #   # inFile <- input$file.1
-    #   # if (is.null(inFile)){
-    #   #   stop("Harga Input harus dimasukkan") 
-    #   # }else{
-    #   #   read.csv(inFile$datapath)#ganti read.csv jika delimiter excelnya ,
-    #   # }
-    # })
-    # 
-    # data.2 <- eventReactive(input$simulate,{
-    #   read.csv("data/template/oilpalm_price_out.csv", header = T, sep = ",")
-    #   # inFile <- input$file.2
-    #   # if (is.null(inFile)){
-    #   #   stop("Harga Output harus dimasukkan") 
-    #   # }else{
-    #   #   read.csv(inFile$datapath)#ganti read.csv jika delimiter excelnya ,
-    #   # }
-    # })
-    # 
-    # #data io
-    # data.3 <- eventReactive(input$simulate,{
-    #   read.csv("data/template/oilpalm_io_in.csv", header = T, sep = ",")
-    #   # inFile <- input$file.3
-    #   # if (is.null(inFile)){
-    #   #   stop("I-O Input harus dimasukkan") 
-    #   # }else{
-    #   #   read.csv(inFile$datapath) #ganti read.csv jika delimiter excelnya ,
-    #   # }
-    # })
-    # 
-    # data.4 <- eventReactive(input$simulate,{
-    #   read.csv("data/template/oilpalm_io_out.csv", header = T, sep = ",")
-    #   # inFile <- input$file.4
-    #   # if (is.null(inFile)){
-    #   #   stop("IO-Output harus dimasukkan") 
-    #   # }else{
-    #   #   read.csv(inFile$datapath) #ganti read.csv jika delimiter excelnya ,
-    #   # }
-    # })
-    # 
-    # #data capital
-    # data.5 <- eventReactive(input$simulate,{
-    #   read.csv("data/template/oilpalm_capital_p.csv", header = T, sep = ",")
-    #   # inFile <- input$file.5
-    #   # if (is.null(inFile)) return(NULL)
-    #   # read.csv(inFile$datapath)
-    # })
-    # 
-    # data.6 <- eventReactive(input$simulate,{
-    #   read.csv("data/template/oilpalm_capital_s.csv", header = T, sep = ",")
-    #   # inFile <- input$file.6
-    #   # if (is.null(inFile)) return(NULL)
-    #   # read.csv(inFile$datapath)
-    # })
-    
     
     # Section 2 -- variabel input ---------------------------------------------
-
-    
-    
     observe({
       updateSelectInput(
         session,
@@ -141,15 +78,15 @@ app <- shiny::shinyApp(
       )
     })
     
-
+    
     
     observe({
       updateSelectInput(session,
                         "selected_provinsi",
                         choices =sort(unique(indonesia$provinsi)))
     })
-
-
+    
+    
     observe({
       updateSelectInput(
         session,
@@ -160,7 +97,7 @@ app <- shiny::shinyApp(
           .[[1]]
       )
     })
-
+    
     observe({
       updateSelectInput(
         session,
@@ -171,7 +108,7 @@ app <- shiny::shinyApp(
           .[[1]]
       )
     })
-
+    
     observe({
       updateSelectInput(
         session,
@@ -182,7 +119,7 @@ app <- shiny::shinyApp(
           .[[1]]
       )
     })
-
+    
     # Start template data ---------------------------------------------------- 
     dataTemplate <- reactive({
       removeUI(selector='#statusCapital')
@@ -197,7 +134,6 @@ app <- shiny::shinyApp(
       
       # case for modal kapital
       cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
-      #  case ketika datanya ada dan tidak di ceklis hrusnya di awal munculin html utk div bahwa ada modal kapital dan tdknya
       
       if (cekCapital == T & input$checkKapital == F ){
         capital <- NULL
@@ -235,14 +171,7 @@ app <- shiny::shinyApp(
       combineDef
       
     })
-
     
-    # readDataTemplate <- eventReactive(input$modalIOButton,{
-    #   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-    #   fileName <- paste0(datapath,"saveDataTemplate.rds")
-    #   print("baca data hasil edit")
-    #   readRDS(fileName)
-    # })
     
     readDataLastEdited <- eventReactive(input$run_button,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -464,7 +393,7 @@ app <- shiny::shinyApp(
       rownames(reactData$tableP1) <- no.id
       reactData$tableP1 <- reactData$tableP1[, c(3, 1, 4, 5,6)]
       dataDefine$priceInput <- reactData$tableP1
-        
+      
       # save io (baru) dan price (default tanpa ada perubahan)  
       saveRDS(dataDefine,file = fileName)
       
@@ -489,8 +418,6 @@ app <- shiny::shinyApp(
         tags$br(),
         tags$br(),
         tags$b('Sunting secara manual'),
-        # tags$br(),
-        # tags$b('(hasil salin dari file Ms.Excel pastikan berformat huruf kecil/lowcase)'),
         tags$hr(),
         tags$h5("untuk memilih tipe komponen, keterangan dan unit disediakan menu dropdown pada kolom 1, 2 dan 3"),
         tags$h5("(pastikan komponen, keterangan dan unit sesuai dengan daftar yang disediakan pada menu dropdown)"),
@@ -575,6 +502,7 @@ app <- shiny::shinyApp(
     #                                 BUTTON HARGA                                 #
     #                                                                              #
     ################################################################################
+    
     observeEvent(input$modalPriceButton,{
       showModal(
         modalDialog( 
@@ -598,30 +526,42 @@ app <- shiny::shinyApp(
                 sidebarPanel(
                   fluidPage(
                     h2("Sunting Harga Input"),
+                    tags$b('Sunting secara manual'),
+                    tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
                   ),
                   tags$br(),
-                  actionButton(("priceInputHit"),"tampilkan tabel"),
                   width=12
                 ),
                 mainPanel(
-                  tags$div(id = ('priceInputPlaceholder')),
+                  rHandsontableOutput(('editPriceInput')),
+                  tags$br(),
+                  actionButton(('savePriceInput'), 'simpan tabel'),
+                  tags$br(),
+                  tags$br(),
+                  tags$div(id='teksPriceInputSave'),
                   width=12)
               )
             ),
             argonTab(
               tabName = "Output",
-              #active = T,
               sidebarLayout(
                 sidebarPanel(
                   fluidPage(
                     h2("Sunting Harga Output"),
+                    tags$b('Sunting secara manual'),
+                    tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
+                    
                   ),
                   tags$br(),
-                  actionButton(("priceOutputHit"),"tampilkan tabel"),
                   width=12
                 ),
                 mainPanel(
-                  tags$div(id = ('priceOutputPlaceholder')),
+                  rHandsontableOutput(('editPriceOutput')),
+                  tags$br(),
+                  actionButton(('savePriceOutput'), 'simpan tabel'), 
+                  tags$br(), 
+                  tags$br(),
+                  tags$div(id='teksPriceOutputSave'),
                   width=12)
               )
             ))
@@ -639,39 +579,17 @@ app <- shiny::shinyApp(
     
     
     # START Price Input ----------------------------------------------------------
-    observeEvent(input$priceInputHit, {
-      insertUI(selector= paste0("#", ("priceInputPlaceholder")),
-               where='afterEnd',
-               ui= uiOutput(('priceInputUI'))
-      )
-    })
-    
-    output$priceInputUI<- renderUI({
+    valP1 <-eventReactive(input$modalPriceButton,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      dataDefine <- readRDS(fileName)
       
-      tagList(
-        #tags$br(),
-        tags$hr(),
-        tags$b('Sunting secara manual'),
-        tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
-        tags$br(),
-        rHandsontableOutput(('editPriceInput')),
-        tags$br(),
-        actionButton(('savePriceInput'), 'simpan tabel'),
-        tags$br(),
-        tags$br(),
-        tags$div(id='teksPriceInputSave')
-      )
-    })
-    
-    valP1 <- eventReactive(input$priceInputHit,{
-      #browser()
-      indexRow <- as.numeric(nrow(readDataLastEdited()$ioInput))
+      indexRow <- as.numeric(nrow(dataDefine$ioInput))
       
-      reactData$tableP1 <- readDataLastEdited()$ioInput[,1:2]
+      reactData$tableP1 <- dataDefine$ioInput[,1:2]
       no.id <- as.numeric(rownames(reactData$tableP1))
       reactData$tableP1 <- cbind(no.id,reactData$tableP1)
       
-      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       templatePriceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
       templatePrice <- (templatePriceInput[,-1])
       reactData$tableP1 <- merge(reactData$tableP1,unique(templatePrice), by.x = "keterangan",by.y = "keterangan", all.x = T)
@@ -699,7 +617,6 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveDataTemplate.rds")
       dataDefine <- readRDS(fileName)
-      # dataDefine <- readDataLastEdited()
       
       # replace data price
       dataDefine$priceInput <- editNew
@@ -713,35 +630,14 @@ app <- shiny::shinyApp(
     
     
     # Start Price Output ------------------------------------------------------
-    observeEvent(input$priceOutputHit, {
-      insertUI(selector= paste0("#", ("priceOutputPlaceholder")),
-               where='afterEnd',
-               ui= uiOutput(('priceOutputUI'))
-      )
-    })
-    
-    output$priceOutputUI<- renderUI({
+    valP2 <- eventReactive(input$modalPriceButton,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      dataDefine <- readRDS(fileName)
       
-      tagList(
-        tags$hr(),
-        tags$b('Sunting secara manual'),
-        tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
-        tags$br(),
-        rHandsontableOutput(('editPriceOutput')),
-        tags$br(),
-        actionButton(('savePriceOutput'), 'simpan tabel'), 
-        tags$br(), 
-        tags$br(),
-        tags$div(id='teksPriceOutputSave')
-      )
-    })
-    
-    valP2 <- eventReactive(input$priceOutputHit,{
-      # browser()
-      #indexCol <- as.numeric(input$priceYear_output)+3
-      indexRow <- as.numeric(nrow(readDataLastEdited()$ioOutput))
+      indexRow <- as.numeric(nrow(dataDefine$ioOutput))
       
-      reactData$tableP2 <- readDataLastEdited()$ioOutput[,1:2]
+      reactData$tableP2 <- dataDefine$ioOutput[,1:2]
       no.id <- as.numeric(rownames(reactData$tableP2))
       reactData$tableP2 <- cbind(no.id,reactData$tableP2)
       
@@ -826,7 +722,7 @@ app <- shiny::shinyApp(
                   tags$br(),
                   tags$div(id='teksCapitalSave'),
                   width=12
-                  )
+                )
               )
             ))
           ,
@@ -857,7 +753,7 @@ app <- shiny::shinyApp(
         reactData$tableCap
       }
     })
-
+    
     output$editCapital <- renderRHandsontable({
       rhandsontable(valCap(),
                     rowHeaderWidth = 50,
@@ -901,8 +797,8 @@ app <- shiny::shinyApp(
     #                                                                              #
     ################################################################################
     data.gab <- eventReactive(input$run_button,{
-    # observeEvent(input$run_button,{
-    #   browser()
+      # observeEvent(input$run_button,{
+      #   browser()
       
       # aktifin dataTemplate
       # agar ketika run pertama kali yang terbaca tetap data default di excel
@@ -915,7 +811,7 @@ app <- shiny::shinyApp(
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
-        
+      
       #### io  ####    
       io.in <-  dataDefine$ioInput
       io.in <- cbind(grup="input",io.in)
@@ -1050,12 +946,6 @@ app <- shiny::shinyApp(
     output$npv<- renderPrint({
       hasil<-t(hitung.npv())
       hasil
-      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("simpan tabel harga yang baru")
-      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
-      #   hasil<-t(hitung.npv())
-      #   hasil
-      # }
     })
     
     hitung.nlc<-eventReactive(input$run_button,{
@@ -1092,11 +982,6 @@ app <- shiny::shinyApp(
       p.labor.input <- p.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
       s.labor.input <- s.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
       
-      # p.sum.labor <- p.labor.input[,-(1:5)] %>%
-      #   colSums(na.rm = T)
-      # s.sum.labor <- s.labor.input[,-(1:5)] %>%
-      #   colSums(na.rm = T)
-      
       p.sum.labor <- p.labor.input[,-(1:5)] %>%
         sum(na.rm = T)
       s.sum.labor <- s.labor.input[,-(1:5)] %>%
@@ -1115,12 +1000,6 @@ app <- shiny::shinyApp(
     output$nlc<- renderPrint({
       hasil<-t(hitung.nlc())
       hasil
-      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("simpan tabel harga yang baru")
-      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
-      #   hasil<-t(hitung.nlc())
-      #   hasil
-      # }
     })
     
     hitung.ec<-eventReactive(input$run_button,{
@@ -1163,16 +1042,10 @@ app <- shiny::shinyApp(
     output$ec<- renderPrint({
       hasil<-t(hitung.ec())
       hasil
-      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("simpan tabel harga yang baru")
-      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
-      #   hasil<-t(hitung.ec())
-      #   hasil
-      # }
     })
     
     hitung.hp<-eventReactive(input$run_button,{
-    # observeEvent(input$run_button,{
+      # observeEvent(input$run_button,{
       # browser()
       dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
       
@@ -1197,13 +1070,6 @@ app <- shiny::shinyApp(
     output$hp<- renderPrint({
       hasil<-hitung.hp()
       hasil
-      # if (nrow(readDataLastEdited()$ioInput) != nrow(readDataLastEdited()$priceInput) | nrow(readDataLastEdited()$ioOutput) != nrow(readDataLastEdited()$priceOutput)) {
-      #   print("simpan tabel harga yang baru")
-      # }else if (nrow(readDataLastEdited()$ioInput) == nrow(readDataLastEdited()$priceInput) & nrow(readDataLastEdited()$ioOutput) == nrow(readDataLastEdited()$priceOutput)){
-      #   
-      #   hasil<-hitung.hp()
-      #   hasil
-      # }
     })
     
     hitung.lr<-eventReactive(input$run_button,{
