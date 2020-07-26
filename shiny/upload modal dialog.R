@@ -33,7 +33,7 @@ upload <- argonTabItem(
                        #selectInput(("kom"),"Komoditas",choices =sort(unique(komoditas$nama_komoditas))),
                        selectInput("kom","Komoditas",choices = "" ),
                        br(),
-                       selectInput(("th"),"Tahun",choices = c(2001:2019)),
+                       selectInput(("th"),"Tahun",choices = c(2020:2021)),
                        br(),
                        selectInput(("user"),"Nama Peneliti",choices = c("A","B","C")),
                        br(),
@@ -134,10 +134,14 @@ upload <- argonTabItem(
           width = 12,
           fluidRow(
             column(10,
-                   h1("Hasil Analisis"),
-                   br(),
-                   #resultUI("profit")
                    fluidPage(
+                     fluidRow(
+                       column(4,
+                              h1("Hasil Analisis"),
+                              br(),
+                       )
+                     ),
+                     br(),
                      fluidRow(
                        column(4,
                               verbatimTextOutput(("npv"))
@@ -158,7 +162,9 @@ upload <- argonTabItem(
                        column(4,
                               verbatimTextOutput(("lr"))
                        )
-                     )
+                     ),
+                     actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white; 
+                         background-color: green;"),
                    )
             )
           )

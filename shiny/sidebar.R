@@ -21,7 +21,7 @@ argonSidebar <- argonDashSidebar(
       "Unggah PAM Baru"
     ),
     argonSidebarItem(
-      tabName = "analisis",
+      tabName = "deskriptifPlot",
       icon = argonIcon(name = "atom", color = "danger"),
       "Kumpulan Analisis PAM"
     )

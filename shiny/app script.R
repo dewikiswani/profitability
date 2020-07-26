@@ -50,7 +50,7 @@ app <- shiny::shinyApp(
       argonTabItems(
         #home,
         upload,
-        analisis
+        deskriptifPlot
       )
     ),
     footer = argonFooter
@@ -133,7 +133,7 @@ app <- shiny::shinyApp(
       priceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
       
       # case for modal kapital
-      cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
       
       if (cekCapital == T & input$checkKapital == F ){
         capital <- NULL
@@ -157,15 +157,42 @@ app <- shiny::shinyApp(
                  ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
       }
       
+      npv <- NULL
+      nlc <- NULL
+      ec <- NULL
+      hp <- NULL
+      lr <- NULL
+      
+      rate.p <- input$rate.p
+      rate.s <- input$rate.s
+      nilai.tukar <- input$nilai.tukar
+      sut <- input$sut
+      kom <- input$kom
+      th <- input$th
+      
+      
       combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
-                         # capitalPrivate=capitalPrivate,
-                         # capitalSocial=capitalSocial,
-                         capital=capital)
+                         capital=capital,
+                         npv=npv,
+                         nlc=nlc,
+                         ec=ec,
+                         hp=hp,
+                         lr=lr,
+                         rate.p=rate.p,
+                         rate.s=rate.s,
+                         nilai.tukar=nilai.tukar,
+                         sut=sut,
+                         kom=kom,
+                         th=th
+                         )
       
+      # save data untuk setiap perubahan
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       saveRDS(combineDef,file = fileName)
+      
+
       
       print("pertama kali masuk/login. cek save data default")
       combineDef
@@ -173,9 +200,263 @@ app <- shiny::shinyApp(
     })
     
     
+    ################################################################################
+    #                                                                              #
+    #                          RESULT DATA DEFAULT                                 #
+    #                                                                              #
+    ################################################################################
+    resultTemplate <- reactive({
+      
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"resultDefault","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      
+      ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
+      ioOutput <- read.table(paste0(datapath,"io template output.csv"), header = T, sep = ",")
+      
+      priceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
+      priceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
+      
+      # case for modal kapital
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+      
+      if(cekCapital == T){
+        capital <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
+      } else if (cekCapital == F){
+        capital <- NULL
+      }
+      
+
+      
+      
+      dataDefine <- list(ioInput=ioInput,ioOutput=ioOutput,
+                         priceInput=priceInput,priceOutput=priceOutput,
+                         capital=capital
+                         )
+      
+      
+      #### io  ####    
+      io.in <-  dataDefine$ioInput
+      io.in <- cbind(grup="input",io.in)
+      io.out <-  dataDefine$ioOutput
+      io.out <- cbind(grup="output",io.out)
+      
+      io.in[is.na(io.in)] <- 0 #NA replace with zero
+      io.out[is.na(io.out)] <- 0
+      io.all <- rbind(io.in,io.out) #combine all data input-output
+      io.all <- cbind(status="general", io.all) #add variable status
+      io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      
+      yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+      
+      #### price ####
+      price.in <-  dataDefine$priceInput
+      price.in <- cbind(grup="input",price.in)
+      price.out <-  dataDefine$priceOutput
+      price.out <- cbind(grup="output",price.out)
+      price.in[is.na(price.in)] <- 0
+      price.out[is.na(price.out)] <- 0
+      price.all <- rbind(price.in, price.out)
+      
+      p.price<-price.all[-6]
+      p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+      colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+      p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      s.price<-price.all[-5]
+      s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+      colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+      s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+      
+      price.all.year <- rbind(p.price, s.price)
+      
+      #### buat if else untuk modal kapital ####
+      if (is.null(dataDefine$capital)){
+        # capital = NULL
+        data.gab <- rbind(io.all,
+                          price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+        
+      }else{
+        capital <- cbind(grup="input",dataDefine$capital)
+        
+        # menambahkan pada tabel io matrix bernilai 1
+        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
+        # modal kapital sosialnya diwakili oleh momdal kapital privat
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        
+        kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
+        kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
+        kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
+        data.gab <- rbind(io.all, ioKapital,
+                          price.all.year, 
+                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+      }
+      
+      # hitung npv --------------------------------------------------------------
+      dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+      dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+      p.budget <- dataGeneral[-(1:5)] * dataPrivat[-c(1:5)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5
+      p.budget <- cbind(dataGeneral[1:5],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- p.budget %>%
+        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+      
+      #perkalian antara general dengan Social Price
+      dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+      s.budget <- dataGeneral[-(1:5)] * dataSosial[-c(1:5)]
+      s.budget <- cbind(dataGeneral[1:5],s.budget)
+      s.budget <- s.budget %>%
+        mutate(status = case_when(status == "general" ~ "social budget"))
+      
+      ################ penghitungan NPV
+      p.cost.input <- p.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      s.cost.input <- s.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      p.sum.cost<- p.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.cost<- s.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      p.rev.output <- p.budget %>%
+        filter(str_detect(grup,"output"))
+      s.rev.output <- s.budget %>%
+        filter(str_detect(grup,"output"))
+      
+      p.sum.rev <- p.rev.output[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.rev <- s.rev.output[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      
+      p.profit <- p.sum.rev - p.sum.cost
+      s.profit <- s.sum.rev - s.sum.cost
+      profit0 <- 0
+      p.profit<-c(profit0,p.profit)
+      s.profit<-c(profit0,s.profit)
+      
+      npv.p<-npv(input$rate.p/100,p.profit)
+      npv.s<-npv(input$rate.s/100,s.profit)
+      
+      hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+      
+      npv.p.us<-npv.p/input$nilai.tukar
+      npv.s.us<-npv.s/input$nilai.tukar
+      npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+      hsl.npv<-rbind(hsl.npv,npv.us)
+      
+      #browser()
+      
+      rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
+      hsl.npv
+      # ending  npv --------------------------------------------------------------
+      
+      
+      
+      # hitung nlc --------------------------------------------------------------
+      
+      ################ penghitungan NLC
+      
+      p.tot.cost<- sum(p.sum.cost)
+      s.tot.cost<- sum(s.sum.cost)
+      
+      p.labor.input <- p.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+      s.labor.input <- s.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+      
+      p.sum.labor <- p.labor.input[,-(1:5)] %>%
+        sum(na.rm = T)
+      s.sum.labor <- s.labor.input[,-(1:5)] %>%
+        sum(na.rm = T)
+      
+      
+      
+      nlc.p <- (p.tot.cost - p.sum.labor)/1000000
+      nlc.s <- (s.tot.cost - s.sum.labor)/1000000
+      nlc<-data.frame(PRIVATE=nlc.p,SOCIAL=nlc.s)
+      rownames(nlc)<-c("Non Labor Cost (MRp/Ha)")
+      nlc
+      # ending  nlc ------------------------------------------------------- 
+      
+      # hitung EC --------------------------------------------------------------
+      ############# PERHITUNGAN ESTABLISHMENT COST
+      p.ec <- p.sum.cost[[1]]/1000000
+      s.ec <- s.sum.cost[[1]]/1000000
+      ec <- data.frame(p.ec,s.ec)
+      ec<-data.frame(PRIVATE=p.ec,SOCIAL=s.ec)
+      rownames(ec)<-c("Establishment cost (1st year only, MRp/ha)")
+      ec
+      
+      # ending  EC ------------------------------------------------------- 
+      
+      # hitung hp --------------------------------------------------------------
+      ############# PERHITUNGAN HARVESTING PRODUCT
+      fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
+      fil.prod <- fil.prod %>%  filter(str_detect(komponen,"utama"))
+      sum.prod <- fil.prod[,-(1:5)] %>%
+        colSums(na.rm = T)
+      tot.prod <- sum(sum.prod)
+      
+      fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      sum.labor <- fil.labor[,-(1:5)] %>%
+        colSums(na.rm = T)
+      tot.labor <- sum(sum.labor)
+      
+      hp <- data.frame(tot.prod/tot.labor)/1000 # karena ton jadi di bagi 1000
+      colnames(hp)<-c("Harvesting Product (ton/HOK) Labor Req for Est (1st year only)")
+      rownames(hp) <- c("Value")
+      hp
+      # ending  hp ------------------------------------------------------- 
+      
+      # hitung lr --------------------------------------------------------------
+      ############# PERHITUNGAN LABOR REQ FOR EST
+      lr <- data.frame(sum.labor[[1]]) #pekerja pada tahun 1
+      colnames(lr)<-c("Labor Req for Est (1st year only)")
+      rownames(lr) <- c("Value")
+      lr
+      
+      # ending  lr ------------------------------------------------------- 
+      
+      ##### save data dafault
+      
+      # replace data price
+      dataDefine$npv <- hsl.npv
+      dataDefine$nlc <- nlc
+      dataDefine$ec <- ec
+      dataDefine$hp <- hp
+      dataDefine$lr <- lr
+      
+      dataDefine$rate.p <- input$rate.p
+      dataDefine$rate.s <- input$rate.s
+      dataDefine$nilai.tukar <- input$nilai.tukar
+      
+
+      dataDefine$sut <- input$sut
+      dataDefine$kom <- input$kom
+      dataDefine$th <- input$th
+      
+      print("save result default untuk klik pertama run_button")
+      saveRDS(dataDefine,file = fileName)
+      
+      
+      ##### ending save data default
+      
+      
+    })
+    
+    
     readDataLastEdited <- eventReactive(input$run_button,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       # print("data terakhir tersimpan di rds")
       readRDS(fileName)
     })
@@ -371,7 +652,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -465,7 +746,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -581,7 +862,7 @@ app <- shiny::shinyApp(
     # START Price Input ----------------------------------------------------------
     valP1 <-eventReactive(input$modalPriceButton,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       indexRow <- as.numeric(nrow(dataDefine$ioInput))
@@ -615,7 +896,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       # replace data price
@@ -632,7 +913,7 @@ app <- shiny::shinyApp(
     # Start Price Output ------------------------------------------------------
     valP2 <- eventReactive(input$modalPriceButton,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       indexRow <- as.numeric(nrow(dataDefine$ioOutput))
@@ -669,7 +950,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -738,7 +1019,7 @@ app <- shiny::shinyApp(
     valCap <- eventReactive(input$modalCapitalButton,{
       # case for modal kapital
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
       #  case ketika datanya ada dan tidak di ceklis hrusnya di awal munculin html utk div bahwa ada modal kapital dan tdknya
       
       if (cekCapital == T){ # klo kapital templatenya ada mau di ceklis atau engga ttp dimunculin
@@ -770,7 +1051,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -802,12 +1083,14 @@ app <- shiny::shinyApp(
       
       # aktifin dataTemplate
       # agar ketika run pertama kali yang terbaca tetap data default di excel
-      dataTemplate <- dataTemplate()
+      
+      resultTemplate()
+      dataTemplate()
       
       #setelah dataTemplate(data default) aktif, 
       # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveDataTemplate.rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -1094,6 +1377,35 @@ app <- shiny::shinyApp(
       hasil
     })
     
+    observeEvent(input$saveNewPAM,{
+      # browser()
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      # replace data 
+      dataDefine$npv <- t(hitung.npv())
+      dataDefine$nlc <- t(hitung.nlc())
+      dataDefine$ec <- t(hitung.ec())
+      dataDefine$hp <- hitung.hp()
+      dataDefine$lr <- hitung.lr()
+      
+      dataDefine$rate.p <- input$rate.p
+      dataDefine$rate.s <- input$rate.s
+      dataDefine$nilai.tukar <- input$nilai.tukar
+      
+      # id save data
+      waktuDefine<-Sys.time()
+      simpanDefine<-gsub(" ","_",waktuDefine,fixed = TRUE)
+      simpanDefine<-gsub(":","-",simpanDefine,fixed = TRUE)
+      namaSken <- paste0(input$selected_provinsi,"_",input$sut,"_",input$kom,"_",input$th,"_",input$petani)
+      namafileDefine<-paste0("PAMbaru","_",namaSken,"_",simpanDefine)
+      print("save result sesuai inputan terakhir, yg membedakan ketika ada modal kapital tp tdk di ceklis, jk defaulnya ada maka ttp dihitung untuk resultTemplate nya")
+      saveRDS(dataDefine, file = paste0(datapath,"/",namafileDefine))
+      
+    })
+    
+
     output$viewPrice <- renderDataTable({
       if(!is.null(data.gab())){
         dataView <- rbind(readDataLastEdited()$priceInput, readDataLastEdited()$priceOutput)
@@ -1117,7 +1429,7 @@ app <- shiny::shinyApp(
     output$viewKapital <- renderDataTable({
       # case for modal kapital
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      cekCapital <- file.exists(paste0(datapath,"kapital template.csv"), header = T, sep = ",") #cek keberadaan file ini ada atau engga
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
       
       if(cekCapital == T & input$checkKapital == T){
         # dataView <- data.frame(matrix(1,nrow=3,ncol=3))
@@ -1136,6 +1448,106 @@ app <- shiny::shinyApp(
       }
     })
     
+    
+    ################################################################################
+    #                                                                              #
+    #                          deskriptifPlot                                      #
+    #                                                                              #
+    ################################################################################
+    loadRDSAll <- reactive({
+      ##### step 1 filter yang ada pattern resultDefault
+      folderSut <- c("MONOKULTUR","AGROFORESTRI")
+      folderKom <- c("KELAPA SAWIT","KELAPA SAWIT AF","COKLAT")
+      nameFiles <- list.files(path = paste0("shiny/data/",folderSut,"/",folderKom,"/"),pattern = paste0("resultDefault"))
+      
+      kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
+      dirFile <- paste0("shiny/data/",kombinasiFolder)
+      
+      kombinasiFile <- as.vector(outer(dirFile, nameFiles, paste, sep="/"))
+      
+      cekFile <- file.exists(kombinasiFile) #cek keberadaan file ini ada atau engga
+      
+      # remove index yang cekFilenya == F, munculin yang cekFilenya == T aja
+      indexFileTrue <- which(cekFile == T)
+      kombinasiFile <- kombinasiFile[which(cekFile == T)]
+      
+      funcFile <- function(x){
+        a <- readRDS(x)
+        b <- c(x,a)
+        b}
+      
+      
+      ##### step 2 filter yang ada pattern input$provDeskriptif ex: (_ACEH)
+      # cek dari vector kombinasiFile yang sudah di cek T or F nya
+      provFile <- kombinasiFile %>% 
+        str_subset(pattern = paste0("_",input$provDeskriptif))
+      
+      
+      ##### step 3 filter yang ada pattern input$provTahunDeskriptif ex: (_2020)
+      tahunFile <- provFile %>% 
+        str_subset(pattern = paste0("_",input$provTahunDeskriptif))
+      tahunFile
+      
+      patternAll <- lapply(tahunFile, funcFile)
+      patternAll
+      
+      
+      # # npv.p.rp <- unlist(lapply(patternAll, function(x)x[[7]][1,1]))
+      # provFile <- kombinasiFile %>% 
+      #   str_subset(pattern = paste0("_",1991))
+      # ##### step 3 filter yang ada pattern input$provTahunDeskriptif ex: (_2020)
+      # tahunFile <- provFile %>% 
+      #   str_subset(pattern = paste0("_","JABAR"))
+      # tahunFile
+      # 
+      # patternAll <- lapply(tahunFile, funcFile)
+      # patternAll
+      
+    })
+    
+    
+    pamDefault <- eventReactive(input$provShowDeskriptifHit,{
+      # browser()
+      # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+
+      if(length(loadRDSAll())==0){
+        data.frame(
+          Sistem.Usaha.Tani =  "file tidak tersedia",
+          Komoditas = "file tidak tersedia",
+          Tahun = "file tidak tersedia",
+          NPV.Privat.RP = "file tidak tersedia",
+          NPV.Sosial.RP = "file tidak tersedia"
+        )
+      } else {
+        data.frame(
+          Sistem.Usaha.Tani =  unlist(lapply(loadRDSAll(), function(x)x[[15]])),
+          Komoditas = unlist(lapply(loadRDSAll(), function(x)x[[16]])),
+          Tahun = unlist(lapply(loadRDSAll(), function(x)x[[17]])),
+          NPV.Privat.RP = unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1])),
+          NPV.Sosial.RP = unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2])), #nama file dr listValDef ada di index terakhir = 6
+          Discount.Rate.Private =  unlist(lapply(loadRDSAll(), function(x)x[[12]])),
+          Discount.Rate.Social =  unlist(lapply(loadRDSAll(), function(x)x[[13]])),
+          Nilai.Tukar =  unlist(lapply(loadRDSAll(), function(x)x[[14]]))
+        )
+      }
+      
+      
+    })
+    
+    
+    output$ListPamDefault <- renderDataTable({
+      pamDefault()
+    }, escape = FALSE)
+    
+    
+    observeEvent(input$provShowDeskriptifHit, {
+      insertUI(selector= "#teksListPamDefault",
+               where='afterEnd',
+               ui = tags$h2("Daftar PAM Default")
+      )
+    })
+    
+     
   }
 )
 
