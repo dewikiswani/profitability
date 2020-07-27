@@ -1,47 +1,44 @@
 # baca resultDefault rds di 1 provinsi
 
 loadRDSAll <- reactive({
-  ##### step 1 filter yang ada pattern resultDefault
-  folderSut <- c("MONOKULTUR","AGROFORESTRI")
-  folderKom <- c("KELAPA SAWIT","KELAPA SAWIT AF","COKLAT")
-  nameFiles <- list.files(path = paste0("shiny/data/",folderSut,"/",folderKom,"/"),pattern = paste0("resultDefault"))
-  
-  kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
-  dirFile <- paste0("shiny/data/",kombinasiFolder)
-  
-  kombinasiFile <- as.vector(outer(dirFile, nameFiles, paste, sep="/"))
-  
-  cekFile <- file.exists(kombinasiFile) #cek keberadaan file ini ada atau engga
-  
-  # remove index yang cekFilenya == F, munculin yang cekFilenya == T aja
-  indexFileTrue <- which(cekFile == T)
-  kombinasiFile <- kombinasiFile[which(cekFile == T)]
-  
-  funcFile <- function(x){
-    a <- readRDS(x)
-    b <- c(x,a)
-    b}
-  
-  
-  ##### step 2 filter yang ada pattern input$provDeskriptif ex: (_ACEH)
-  # cek dari vector kombinasiFile yang sudah di cek T or F nya
-  provFile <- kombinasiFile %>% 
-    str_subset(pattern = paste0("_",input$provDeskriptif))
-  
-  
-  ##### step 3 filter yang ada pattern input$provTahunDeskriptif ex: (_2020)
-  tahunFile <- provFile %>% 
-    str_subset(pattern = paste0("_",input$provTahunDeskriptif))
-  tahunFile
-  
-  patternAll <- lapply(tahunFile, funcFile)
-  
-  
-  
-  # npv.p.rp <- unlist(lapply(patternAll, function(x)x[[7]][1,1]))
-  
-  
-})
+      ##### step 1 filter yang ada pattern resultDefault
+      folderSut <- sort(unique(komoditas$sut))
+      folderKom <- sort(unique(komoditas$nama_komoditas))
+      
+      kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
+      dirFile <- paste0("shiny/data/",kombinasiFolder)
+      
+      nameFiles <- list.files(path = paste0(dirFile,"/"),pattern = paste0("resultDefault"))
+      kombinasiFile <- as.vector(outer(dirFile, nameFiles, paste, sep="/"))
+      cekFile <- file.exists(kombinasiFile) #cek keberadaan file ini ada atau engga
+      
+      # remove index yang cekFilenya == F, munculin yang cekFilenya == T aja
+      indexFileTrue <- which(cekFile == T)
+      kombinasiFile <- kombinasiFile[which(cekFile == T)]
+      
+      funcFile <- function(x){
+        a <- readRDS(x)
+        b <- c(x,a)
+        b}
+      
+      
+      ##### step 2 filter yang ada pattern input$provDeskriptif ex: (_ACEH)
+      # cek dari vector kombinasiFile yang sudah di cek T or F nya
+      provFile <- kombinasiFile %>% 
+        str_subset(pattern = paste0("_",input$provDeskriptif))
+      
+      
+      ##### step 3 filter yang ada pattern input$provTahunDeskriptif ex: (_2020)
+      tahunFile <- provFile %>% 
+        str_subset(pattern = paste0("_",input$provTahunDeskriptif))
+      tahunFile
+      
+      patternAll <- lapply(tahunFile, funcFile)
+      patternAll
+      
+      
+    })
+    
 
 ####### baca PAMbaru di seluruh provinsi
 

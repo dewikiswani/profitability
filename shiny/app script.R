@@ -6,7 +6,6 @@ library(shiny)
 library(argonR)
 library(argonDash)
 library(magrittr)
-library(shiny)
 
 #package function npv
 library(FinCal)
@@ -19,6 +18,9 @@ library(tidyverse)
 library(rhandsontable)
 library(shinyWidgets)
 library(shinyalert)
+library(ggplot2)
+library(cowplot) #ggplot2 white theme 
+library(plotly)
 
 
 # template
@@ -1456,15 +1458,14 @@ app <- shiny::shinyApp(
     ################################################################################
     loadRDSAll <- reactive({
       ##### step 1 filter yang ada pattern resultDefault
-      folderSut <- c("MONOKULTUR","AGROFORESTRI")
-      folderKom <- c("KELAPA SAWIT","KELAPA SAWIT AF","COKLAT")
-      nameFiles <- list.files(path = paste0("shiny/data/",folderSut,"/",folderKom,"/"),pattern = paste0("resultDefault"))
+      folderSut <- sort(unique(komoditas$sut))
+      folderKom <- sort(unique(komoditas$nama_komoditas))
       
       kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
       dirFile <- paste0("shiny/data/",kombinasiFolder)
       
+      nameFiles <- list.files(path = paste0(dirFile,"/"),pattern = paste0("resultDefault"))
       kombinasiFile <- as.vector(outer(dirFile, nameFiles, paste, sep="/"))
-      
       cekFile <- file.exists(kombinasiFile) #cek keberadaan file ini ada atau engga
       
       # remove index yang cekFilenya == F, munculin yang cekFilenya == T aja
@@ -1490,64 +1491,171 @@ app <- shiny::shinyApp(
       
       patternAll <- lapply(tahunFile, funcFile)
       patternAll
-      
-      
-      # # npv.p.rp <- unlist(lapply(patternAll, function(x)x[[7]][1,1]))
-      # provFile <- kombinasiFile %>% 
-      #   str_subset(pattern = paste0("_",1991))
-      # ##### step 3 filter yang ada pattern input$provTahunDeskriptif ex: (_2020)
-      # tahunFile <- provFile %>% 
-      #   str_subset(pattern = paste0("_","JABAR"))
-      # tahunFile
-      # 
-      # patternAll <- lapply(tahunFile, funcFile)
-      # patternAll
-      
     })
     
     
-    pamDefault <- eventReactive(input$provShowDeskriptifHit,{
-      # browser()
-      # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+    vals<-reactiveValues(
+        Sistem.Usaha.Tani =  NULL,
+        Komoditas = NULL,
+        Tahun = NULL,
+        NPV.Privat.RP = NULL,
+        NPV.Sosial.RP = NULL,
+        Discount.Rate.Private =  NULL,
+        Discount.Rate.Social =  NULL,
+        Nilai.Tukar =  NULL
+    )
+    
 
-      if(length(loadRDSAll())==0){
-        data.frame(
-          Sistem.Usaha.Tani =  "file tidak tersedia",
-          Komoditas = "file tidak tersedia",
-          Tahun = "file tidak tersedia",
-          NPV.Privat.RP = "file tidak tersedia",
-          NPV.Sosial.RP = "file tidak tersedia"
-        )
-      } else {
-        data.frame(
-          Sistem.Usaha.Tani =  unlist(lapply(loadRDSAll(), function(x)x[[15]])),
-          Komoditas = unlist(lapply(loadRDSAll(), function(x)x[[16]])),
-          Tahun = unlist(lapply(loadRDSAll(), function(x)x[[17]])),
-          NPV.Privat.RP = unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1])),
-          NPV.Sosial.RP = unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2])), #nama file dr listValDef ada di index terakhir = 6
-          Discount.Rate.Private =  unlist(lapply(loadRDSAll(), function(x)x[[12]])),
-          Discount.Rate.Social =  unlist(lapply(loadRDSAll(), function(x)x[[13]])),
-          Nilai.Tukar =  unlist(lapply(loadRDSAll(), function(x)x[[14]]))
-        )
-      }
-      
-      
-    })
-    
-    
-    output$ListPamDefault <- renderDataTable({
-      pamDefault()
-    }, escape = FALSE)
-    
-    
     observeEvent(input$provShowDeskriptifHit, {
-      insertUI(selector= "#teksListPamDefault",
+      insertUI(selector='#uiListPamDefault',
                where='afterEnd',
-               ui = tags$h2("Daftar PAM Default")
+               ui= uiOutput('SuntingUITableDefault')
+      )
+    }) 
+    
+    observeEvent(c(input$provDeskriptif,input$provTahunDeskriptif), {
+      removeUI(selector='#SuntingUITableDefault')
+    }) 
+    
+    
+    output$SuntingUITableDefault<- renderUI({
+      fluidPage(
+        box(width=12,
+            h3(strong("Daftar PAM Default"),align="center"),
+            hr(),
+            column(6,offset = 6,
+                   HTML('<div class="btn-group" role="group" aria-label="Basic example">'),
+                   
+                   HTML('</div>')
+            ),
+            
+            column(12,dataTableOutput("Main_tableDefault")),
+            tags$script(HTML('$(document).on("click", "input", function () {
+  var checkboxes = document.getElementsByName("row_selected");
+  var checkboxesChecked = [];
+  for (var i=0; i<checkboxes.length; i++) {
+     if (checkboxes[i].checked) {
+        checkboxesChecked.push(checkboxes[i].value);
+     }
+  }
+  Shiny.onInputChange("checked_rows",checkboxesChecked);
+      })')),
+            br(),
+            fluidRow(
+              column(10,
+                     h6(" ")
+              ),
+              column(2,
+                     actionButton(inputId = "buttonPlot",label = "Tampilan Plot")
+                     )
+            ),
+            br(),
+            br(),
+            tags$div(id = 'showPlot'),
+        )
       )
     })
     
-     
+
+    
+    output$Main_tableDefault<-renderDataTable({
+        if(length(loadRDSAll())==0){
+          vals$Sistem.Usaha.Tani <-  "file tidak tersedia"
+          vals$Komoditas <- "file tidak tersedia"
+          vals$Tahun  <-  "file tidak tersedia"
+          vals$NPV.Privat.RP  <-  "file tidak tersedia"
+          vals$NPV.Sosial.RP  <-  "file tidak tersedia"
+          vals$Discount.Rate.Private  <-   "file tidak tersedia"
+          vals$Discount.Rate.Social  <-   "file tidak tersedia"
+          vals$Nilai.Tukar  <-   "file tidak tersedia"
+          vals[["Select"]] <-  "file tidak tersedia"
+        } else {
+          vals$Sistem.Usaha.Tani  <-   unlist(lapply(loadRDSAll(), function(x)x[[15]]))
+          vals$Komoditas  <-  unlist(lapply(loadRDSAll(), function(x)x[[16]]))
+          vals$Tahun  <-  unlist(lapply(loadRDSAll(), function(x)x[[17]]))
+          vals$NPV.Privat.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1]))
+          vals$NPV.Sosial.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2]))#nama file dr listValDef ada di index terakhir = 6
+          vals$Discount.Rate.Private  <-   unlist(lapply(loadRDSAll(), function(x)x[[12]]))
+          vals$Discount.Rate.Social  <-   unlist(lapply(loadRDSAll(), function(x)x[[13]]))
+          vals$Nilai.Tukar  <-   unlist(lapply(loadRDSAll(), function(x)x[[14]]))
+          vals[["Select"]]<-paste0('<input type="checkbox" name="row_selected" value="Row',1:length(vals$Komoditas),'"><br>')
+        }
+      
+      datatable(data.frame(
+        Sistem.Usaha.Tani =  vals$Sistem.Usaha.Tani,
+        Komoditas = vals$Komoditas,
+        Tahun = vals$Tahun,
+        NPV.Privat.RP = vals$NPV.Privat.RP,
+        NPV.Sosial.RP = vals$NPV.Sosial.RP ,
+        Discount.Rate.Private =  vals$Discount.Rate.Private,
+        Discount.Rate.Social =  vals$Nilai.Tukar,
+        Nilai.Tukar =  vals$Nilai.Tukar ,
+        Pilih.File = vals[["Select"]]
+      ),escape = F)
+      }
+    )
+
+    observeEvent(input$buttonPlot, {
+      # browser()
+      insertUI(selector='#showPlot',
+               where='afterEnd',
+               ui= uiOutput('showPlotAll'))
+      
+
+    }) 
+    
+    output$showPlotAll <- renderUI({
+      row_to_select=as.numeric(gsub("Row","",input$checked_rows))
+      
+      if(identical(row_to_select,numeric(0))){
+
+        box(width=12,
+            hr(),
+            br(),
+            br(),
+            h3("Belum ada data PAM yang terpilih",align="center"),
+            br(),
+            br(),
+            hr(),
+            )
+        
+      }else{
+        hr()
+        plotlyOutput(('allPlot'))
+      }
+              
+    })
+    
+    
+    
+    preparePlot <- eventReactive(input$buttonPlot,{
+      
+      # observeEvent(input$buttonPlot,{
+      #   browser()
+      row_to_select=as.numeric(gsub("Row","",input$checked_rows))
+      
+      
+      dataCheck <- loadRDSAll()
+      dataCheck <- dataCheck[row_to_select]
+      
+      sut <- unlist(lapply(dataCheck, function(x)x[[15]]))
+      komoditas <- unlist(lapply(dataCheck, function(x)x[[16]]))
+      NPV.Privat.RP <- unlist(lapply(dataCheck, function(x)x[[7]][1,1]))
+      
+      dataPlot <- data.frame(sut=sut,
+                             komoditas=komoditas,
+                             NPV.Privat.RP=NPV.Privat.RP)
+      
+      dataPlot %>%
+        group_by(sut) %>%
+        plot_ly(x = ~komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~sut)
+    })
+    
+    output$allPlot <- renderPlotly({
+      preparePlot()
+    })
+    
+    
   }
 )
 

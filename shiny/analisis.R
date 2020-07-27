@@ -53,7 +53,7 @@ deskriptifPlot <- argonTabItem(
               argonColumn(
                 width = 12,
                 fluidRow(
-                  column(4,
+                  column(5,
                          selectInput(("provDeskriptif"),
                                      label="Provinsi",
                                      choices = sort(unique(indonesia$provinsi)))
@@ -63,35 +63,24 @@ deskriptifPlot <- argonTabItem(
                          #             choices=c("alfa","beta","gamma"),options = list(`actions-box` = TRUE),multiple = T)
                   ),
                   
-                  column(4,
+                  column(5,
                          selectInput(("provTahunDeskriptif"),
                                      label="Tahun",
                                      choices=c(2020:2030))
                   ),
-                  column(4,
+                  column(2,
                          br(),
                          actionButton(("provShowDeskriptifHit"),"Tampilkan tabel")
                   )))))
           ),
               argonColumn(
                 width = 12,
-                br(),
-                # h4("area list PAM Default"),
-                tags$div(id='teksListPamDefault'),
-                br(),
-                dataTableOutput("ListPamDefault")),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-        # br(),
-      
-        
+                # br(),
+                # tags$div(id='teksListPamDefault'),
+                # br(),
+                tags$div(id = 'uiListPamDefault')
+                ),
+                
         # argonRow(
         #   argonCard(
         #     width = 12,

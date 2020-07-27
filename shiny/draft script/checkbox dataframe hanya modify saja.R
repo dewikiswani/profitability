@@ -16,12 +16,12 @@ app <- shiny::shinyApp(
   
   ,
   server = shinyServer(function(input, output) {
-    vals<-reactiveValues()
+
     
-    vals$Data<-data.table(
-      Brands=paste0("Brand",1:10),
-      Contact=paste0("Brand",1:10,"@email.com")
-    )
+    # vals <- reactiveValues(
+    #   Brands=NULL,
+    #   Contact=NULL
+    # )
     
     output$MainBody<-renderUI({
       fluidPage(
@@ -51,11 +51,28 @@ app <- shiny::shinyApp(
       )
     })
     
+    vals<-reactiveValues()
+    
+    vals$Data<-data.table(
+      Brands=paste0("Brand",1:10),
+      Contact=paste0("Brand",1:10,"@email.com")
+    )
+    
     output$Main_table<-renderDataTable({
+      # observeEvent(input$provShowDeskriptifHit, {
+        # data.table(data.frame(
+        # 
+        #   vals$Brands <-paste0("Brand",20:30),
+        #   vals$Contact <- paste0("Brand",1:10,"@email.com"),
+        #   vals$Select <-paste0('<input type="checkbox" name="row_selected" value="Row',1:nrow(vals$Data),'"><br>')
+        # ), escape =F)
+      # })
+
       DT=vals$Data
       DT[["Select"]]<-paste0('<input type="checkbox" name="row_selected" value="Row',1:nrow(vals$Data),'"><br>')
       datatable(DT,
-                escape=F)}
+                escape=F)
+      }
     )
     
     ###Brand visualisation 
