@@ -1522,6 +1522,8 @@ app <- shiny::shinyApp(
       namaSken <- paste0(input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$petani)
       namafileDefine<-paste0("PAMBARU","_",namaSken,"_",simpanDefine)
       print("save result sesuai inputan terakhir, yg membedakan ketika ada modal kapital tp tdk di ceklis, jk defaulnya ada maka ttp dihitung untuk resultTemplate nya")
+      
+      dataDefine$waktu.save <- simpanDefine
       saveRDS(dataDefine, file = paste0(datapath,"/",namafileDefine))
       
       insertUI(selector='#teksNewPamSave',
@@ -1537,6 +1539,8 @@ app <- shiny::shinyApp(
     ################################################################################
     
     observeEvent(input$provShowDeskriptifHit, {
+      # removeUI(selector='#showPlotAll') #spy plotnya terrefresh
+      
       insertUI(selector='#uiListPamDefault',
                where='afterEnd',
                ui= uiOutput('showTable')
@@ -1564,7 +1568,7 @@ app <- shiny::shinyApp(
             column(12,dataTableOutput("Main_tableDefault")),
             
             h3(strong("Daftar PAM Baru"),align="center"),
-            h5(strong("daftar telah diurutkan berdasarkan nilai NPV Privat"),align="center"),
+            h5(strong("daftar telah diurutkan berdasarkan waktu tabel PAM baru disimpan"),align="center"),
             hr(),
             column(12,dataTableOutput("Main_tableNewPam")),
             tags$script(HTML('$(document).on("click", "input", function () {
@@ -1701,9 +1705,10 @@ app <- shiny::shinyApp(
         Pilih.File = vals$Data$ceklis
       )
       
-
-      
-      dataView <- datatable(dataView[with(dataView,order(-dataView$NPV.Privat.RP)),],escape = F)
+      No <- as.numeric(rownames(dataView))
+      dataView <- dataView[with(dataView,order(dataView$NPV.Privat.RP,decreasing = T)),]
+      rownames(dataView) <- No
+      dataView <- datatable(dataView,escape = F)
       dataView  %>% 
         formatCurrency('NPV.Privat.RP',currency = "", interval = 3, mark = ",",digits = 1) %>%  
         formatCurrency('NPV.Sosial.RP',currency = "", interval = 3, mark = ",",digits = 1)%>%  
@@ -1756,6 +1761,7 @@ app <- shiny::shinyApp(
     valsNewPam<-reactiveValues()
     
     valsNewPam$Data<-data.table(
+      Waktu.PAM.disimpan = NULL,
       Sistem.Usaha.Tani =  NULL,
       Komoditas = NULL,
       Tahun = NULL,
@@ -1771,6 +1777,7 @@ app <- shiny::shinyApp(
     
     output$Main_tableNewPam<-renderDataTable({
       if(length(loadRDSAllNewPam())==0){
+        valsNewPam$Data$Waktu.PAM.disimpan <- "file tidak tersedia"
         valsNewPam$Data$Sistem.Usaha.Tani <-  "file tidak tersedia"
         valsNewPam$Data$Komoditas <- "file tidak tersedia"
         valsNewPam$Data$Tahun  <-  "file tidak tersedia"
@@ -1782,6 +1789,7 @@ app <- shiny::shinyApp(
         valsNewPam$Data$ceklis <-  "file tidak tersedia"
         valsNewPam$Data$del <- "file tidak tersedia"
       } else {
+        valsNewPam$Data$Waktu.PAM.disimpan <- unlist(lapply(loadRDSAllNewPam(), function(x)x[[18]]))
         valsNewPam$Data$Sistem.Usaha.Tani  <-   unlist(lapply(loadRDSAllNewPam(), function(x)x[[15]]))
         valsNewPam$Data$Komoditas  <-  unlist(lapply(loadRDSAllNewPam(), function(x)x[[16]]))
         valsNewPam$Data$Tahun  <-  unlist(lapply(loadRDSAllNewPam(), function(x)x[[17]]))
@@ -1799,7 +1807,10 @@ app <- shiny::shinyApp(
              ')
       }
       
+      
+      
       dataView <-  data.frame(
+        Waktu.PAM.disimpan = valsNewPam$Data$Waktu.PAM.disimpan,
         Sistem.Usaha.Tani =  valsNewPam$Data$Sistem.Usaha.Tani,
         Komoditas = valsNewPam$Data$Komoditas,
         Tahun = valsNewPam$Data$Tahun,
@@ -1812,9 +1823,10 @@ app <- shiny::shinyApp(
         Hapus.File = valsNewPam$Data$del
       )
       
-      
-      
-      dataView <- datatable(dataView[with(dataView,order(-dataView$NPV.Privat.RP)),],escape = F)
+      No <- as.numeric(rownames(dataView))
+      dataView <- dataView[with(dataView,order(dataView$Waktu.PAM.disimpan,decreasing = T)),]
+      rownames(dataView) <- No
+      dataView <- datatable(dataView,escape = F)
       dataView  %>% 
         formatCurrency('NPV.Privat.RP',currency = "", interval = 3, mark = ",",digits = 1) %>%  
         formatCurrency('NPV.Sosial.RP',currency = "", interval = 3, mark = ",",digits = 1)%>%  
@@ -1855,15 +1867,11 @@ app <- shiny::shinyApp(
     # ENDING SHOW TABLE NEW PAM  -----------------------------------------------
     
     
-    
-    
-    
-    
-    
-    
-    
     observeEvent(input$buttonPlot, {
-      # browser()
+      browser()
+      
+      # removeUI(selector='#showPlotAll') 
+      
       insertUI(selector='#showPlot',
                where='afterEnd',
                ui= uiOutput('showPlotAll'))
@@ -1874,11 +1882,9 @@ app <- shiny::shinyApp(
     output$showPlotAll <- renderUI({
       row_to_select=as.numeric(gsub("Row","",input$checked_rows))
       row_to_select_newPam = as.numeric(gsub("Row","",input$checked_rows_newPam))
-        
-      numberRow=length(row_to_select)
       
-      if(identical(row_to_select,numeric(0))){
-        
+      
+      if(identical(row_to_select,numeric(0)) & identical(row_to_select_newPam,numeric(0))){
         box(width=12,
             hr(),
             br(),
@@ -1886,8 +1892,7 @@ app <- shiny::shinyApp(
             h3("Belum ada data PAM yang terpilih",align="center"),
             br(),
             br(),
-            hr(),
-        )
+            hr())
         
       }else {
         hr()
@@ -1905,18 +1910,28 @@ app <- shiny::shinyApp(
       # data default
       dataCheck <- loadRDSAll()
       dataCheck <- dataCheck[row_to_select]
-      
-      # data Pam baru
-      dataCheckNewPam <- loadRDSAllNewPam()
-      
-      
       sut <- unlist(lapply(dataCheck, function(x)x[[15]]))
       komoditas <- unlist(lapply(dataCheck, function(x)x[[16]]))
       NPV.Privat.RP <- unlist(lapply(dataCheck, function(x)x[[7]][1,1]))
       
-      dataPlot <- data.frame(sut=sut,
+      dataPlotDefault <- data.frame(sut=sut,
                              komoditas=komoditas,
                              NPV.Privat.RP=NPV.Privat.RP)
+      
+      # data Pam baru
+      dataCheckNewPam <- loadRDSAllNewPam()
+      dataCheckNewPam <- dataCheckNewPam[row_to_select_newPam]
+      sut <- unlist(lapply(dataCheckNewPam, function(x)x[[15]]))
+      sut<-paste0("PAM BARU ",sut)
+      komoditas <- unlist(lapply(dataCheckNewPam, function(x)x[[16]]))
+      komoditas<-paste0("PAM BARU ",komoditas) # supaya barchartnya terpisah dari setiap komoditas
+      NPV.Privat.RP <- unlist(lapply(dataCheckNewPam, function(x)x[[7]][1,1]))
+      
+      dataPlotNewPam <- data.frame(sut=sut,
+                             komoditas=komoditas,
+                             NPV.Privat.RP=NPV.Privat.RP)
+      dataPlot <- rbind(dataPlotDefault,dataPlotNewPam)
+
       
       dataPlot %>%
         group_by(sut) %>%
