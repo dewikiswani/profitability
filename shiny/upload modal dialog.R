@@ -23,14 +23,15 @@ upload <- argonTabItem(
           width = 12,
           sidebarLayout(
             sidebarPanel(
-              #generalUI("profit")
+              fluidRow(
+                column(10,
+                       h2("Informasi umum",align = 'center')
+                )
+              ),
               fluidRow(
                 column(5,
-                       h2("Informasi umum",align = 'center'),
-                       br(),
                        selectInput(("sut"),"Sistem Usaha Tani",choices = c("MONOKULTUR","AGROFORESTRI")),
                        br(),
-                       #selectInput(("kom"),"Komoditas",choices =sort(unique(komoditas$nama_komoditas))),
                        selectInput("kom","Komoditas",choices = "" ),
                        br(),
                        selectInput(("th"),"Tahun",choices = c(2020:2021)),
@@ -38,12 +39,8 @@ upload <- argonTabItem(
                        selectInput(("user"),"Nama Peneliti",choices = c("A","B","C")),
                        br(),
                        selectInput(("gambut"),"Tipe Lahan",choices = c("NON-GAMBUT","GAMBUT")),
-                       # useShinyalert()
                 ),
                 column(5,
-                       h2(id="big-heading","Variable Input"),
-                       tags$style(HTML("#big-heading{color: white;}")),
-                       br(),
                        selectInput(("selected_provinsi"),
                                    "Pilih Provinsi:",
                                    choices = ""),
@@ -66,24 +63,18 @@ upload <- argonTabItem(
               )
             ),
             mainPanel(
-              #buttonUI("profit")
               fluidRow(
                 column(4,
-                       h2("Asumsi Makro"),
-                       #tags$style(HTML("#big-heading{color: black;}")),
+                       h2("Asumsi Makro",align = 'center'),
                        br(),
                        sliderInput(("rate.p"), "Discount Rate Private", 7.4 ,min = 0, max = 15, step = 0.01),
                        br(),
                        sliderInput(("rate.s"), "Discount Rate Social", 2.4 ,min = 0, max = 8, step = 0.01),
                        br(),
-                       # sliderInput(("labor.p"), "Upah Buruh Privat", 70000 ,min = 40000, max = 200000, step = 1000),
-                       # br(),
-                       # sliderInput(("labor.s"), "Upah Buruh Sosial", 60000 ,min = 40000, max = 200000, step = 1000),
-                       # br(),
                        sliderInput(("nilai.tukar"), "Nilai Tukar Rupiah", 14831 ,min = 10000, max = 20000, step = 10),
                 ),
                 column(4,
-                       h2("Unggah File"),
+                       h2("Unggah File",align = 'center'),
                        br(),
                        actionButton(("modalIOButton"),'Input-Output'),
                        br(),
@@ -93,10 +84,9 @@ upload <- argonTabItem(
                        br(),
                        actionButton(("modalCapitalButton"),'Modal Kapital'),
                        br(),
+                       br(),
                        h5("Status Modal Kapital:"),
-                       # br(),
                        checkboxInput(("checkKapital"),'modal kapital dimasukkan kedalam perhitungan'),
-                       # br(),
                        tags$div(id='teksStatusCapital'),
                        
                 ),
@@ -133,7 +123,7 @@ upload <- argonTabItem(
         argonColumn(
           width = 12,
           fluidRow(
-            column(10,
+            column(12,
                    tags$div(id = 'uiShowResult')
             )
           )
@@ -147,7 +137,6 @@ upload <- argonTabItem(
   argonColumn(
     width = 12,
     argonH1("Tabel", display = 4),
-    #viewTableUI("profit")
     argonTabSet(
       id = "tab-1",
       card_wrapper = TRUE,

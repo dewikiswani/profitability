@@ -70,7 +70,8 @@ deskriptifPlot <- argonTabItem(
                   ),
                   column(2,
                          br(),
-                         actionButton(("provShowDeskriptifHit"),"Tampilkan tabel")
+                         actionButton(("provShowDeskriptifHit"),"Tampilkan tabel",style="color: white; 
+                         background-color: green;")
                   )))))
           ),
               argonColumn(
