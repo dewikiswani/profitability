@@ -17,7 +17,12 @@ library(stringr)
 library(tidyverse)
 library(rhandsontable)
 library(shinyWidgets)
-library(shinyalert)
+
+# untuk tab analisis
+library(shinydashboard)
+library(data.table)
+library(DT)
+
 library(ggplot2)
 library(cowplot) #ggplot2 white theme 
 library(plotly)
@@ -187,14 +192,14 @@ app <- shiny::shinyApp(
                          sut=sut,
                          kom=kom,
                          th=th
-                         )
+      )
       
       # save data untuk setiap perubahan
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       saveRDS(combineDef,file = fileName)
       
-
+      
       
       print("pertama kali masuk/login. cek save data default")
       combineDef
@@ -210,7 +215,7 @@ app <- shiny::shinyApp(
     resultTemplate <- reactive({
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"resultDefault","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"resultDefault","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       
       ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
       ioOutput <- read.table(paste0(datapath,"io template output.csv"), header = T, sep = ",")
@@ -227,13 +232,13 @@ app <- shiny::shinyApp(
         capital <- NULL
       }
       
-
+      
       
       
       dataDefine <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
                          capital=capital
-                         )
+      )
       
       
       #### io  ####    
@@ -441,7 +446,7 @@ app <- shiny::shinyApp(
       dataDefine$rate.s <- input$rate.s
       dataDefine$nilai.tukar <- input$nilai.tukar
       
-
+      
       dataDefine$sut <- input$sut
       dataDefine$kom <- input$kom
       dataDefine$th <- input$th
@@ -458,7 +463,7 @@ app <- shiny::shinyApp(
     
     readDataLastEdited <- eventReactive(input$run_button,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       # print("data terakhir tersimpan di rds")
       readRDS(fileName)
     })
@@ -654,7 +659,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -748,7 +753,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -864,7 +869,7 @@ app <- shiny::shinyApp(
     # START Price Input ----------------------------------------------------------
     valP1 <-eventReactive(input$modalPriceButton,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       indexRow <- as.numeric(nrow(dataDefine$ioInput))
@@ -898,7 +903,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       # replace data price
@@ -915,7 +920,7 @@ app <- shiny::shinyApp(
     # Start Price Output ------------------------------------------------------
     valP2 <- eventReactive(input$modalPriceButton,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       indexRow <- as.numeric(nrow(dataDefine$ioOutput))
@@ -952,7 +957,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -1053,7 +1058,7 @@ app <- shiny::shinyApp(
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -1092,7 +1097,7 @@ app <- shiny::shinyApp(
       #setelah dataTemplate(data default) aktif, 
       # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       # dataDefine <- readDataLastEdited()
       
@@ -1166,7 +1171,8 @@ app <- shiny::shinyApp(
     })
     
     hitung.npv<-eventReactive(input$run_button,{
-      #observeEvent(input$run_button,{
+      # observeEvent(input$run_button,{
+      #   browser()
       #perkalian antara general dan Private Price
       dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
       dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
@@ -1379,10 +1385,63 @@ app <- shiny::shinyApp(
       hasil
     })
     
+    
+    
+    # Start uiShowResult ------------------------------------------------------
+    observeEvent(input$run_button, {
+      # browser()
+      insertUI(selector='#uiShowResult',
+               where='afterEnd',
+               ui= uiOutput('showResult'))
+      
+      
+    }) 
+    
+    output$showResult <- renderUI({
+      fluidPage(
+        fluidRow(
+          column(4,
+                 h1("Hasil Analisis"),
+                 br(),
+          )
+        ),
+        br(),
+        fluidRow(
+          column(4,
+                 verbatimTextOutput(("npv"))
+          ),
+          column(4,
+                 verbatimTextOutput(("nlc"))
+          ),
+          column(4,
+                 verbatimTextOutput(("ec"))
+          )
+        ),
+        br(),
+        br(),
+        fluidRow(
+          column(8,
+                 verbatimTextOutput(("hp"))
+          ),
+          column(4,
+                 verbatimTextOutput(("lr"))
+          )
+        ),
+        actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;
+            background-color: green;"),
+      )
+      
+    })
+    
+    
+    # ending uiShowResult ------------------------------------------------------
+    
+    
+    
     observeEvent(input$saveNewPAM,{
       # browser()
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$kom,"_",input$selected_provinsi,".rds")
+      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       dataDefine <- readRDS(fileName)
       
       # replace data 
@@ -1400,14 +1459,14 @@ app <- shiny::shinyApp(
       waktuDefine<-Sys.time()
       simpanDefine<-gsub(" ","_",waktuDefine,fixed = TRUE)
       simpanDefine<-gsub(":","-",simpanDefine,fixed = TRUE)
-      namaSken <- paste0(input$selected_provinsi,"_",input$sut,"_",input$kom,"_",input$th,"_",input$petani)
-      namafileDefine<-paste0("PAMbaru","_",namaSken,"_",simpanDefine)
+      namaSken <- paste0(input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$petani)
+      namafileDefine<-paste0("PAMBARU","_",namaSken,"_",simpanDefine)
       print("save result sesuai inputan terakhir, yg membedakan ketika ada modal kapital tp tdk di ceklis, jk defaulnya ada maka ttp dihitung untuk resultTemplate nya")
       saveRDS(dataDefine, file = paste0(datapath,"/",namafileDefine))
       
     })
     
-
+    
     output$viewPrice <- renderDataTable({
       if(!is.null(data.gab())){
         dataView <- rbind(readDataLastEdited()$priceInput, readDataLastEdited()$priceOutput)
@@ -1457,6 +1516,8 @@ app <- shiny::shinyApp(
     #                                                                              #
     ################################################################################
     loadRDSAll <- reactive({
+      # observeEvent(input$provShowDeskriptifHit, {
+      #   browser()
       ##### step 1 filter yang ada pattern resultDefault
       folderSut <- sort(unique(komoditas$sut))
       folderKom <- sort(unique(komoditas$nama_komoditas))
@@ -1495,17 +1556,17 @@ app <- shiny::shinyApp(
     
     
     vals<-reactiveValues(
-        Sistem.Usaha.Tani =  NULL,
-        Komoditas = NULL,
-        Tahun = NULL,
-        NPV.Privat.RP = NULL,
-        NPV.Sosial.RP = NULL,
-        Discount.Rate.Private =  NULL,
-        Discount.Rate.Social =  NULL,
-        Nilai.Tukar =  NULL
+      Sistem.Usaha.Tani =  NULL,
+      Komoditas = NULL,
+      Tahun = NULL,
+      NPV.Privat.RP = NULL,
+      NPV.Sosial.RP = NULL,
+      Discount.Rate.Private =  NULL,
+      Discount.Rate.Social =  NULL,
+      Nilai.Tukar =  NULL
     )
     
-
+    
     observeEvent(input$provShowDeskriptifHit, {
       insertUI(selector='#uiListPamDefault',
                where='afterEnd',
@@ -1522,6 +1583,7 @@ app <- shiny::shinyApp(
       fluidPage(
         box(width=12,
             h3(strong("Daftar PAM Default"),align="center"),
+            h5(strong("daftar telah diurutkan berdasarkan nilai NPV Privat"),align="center"),
             hr(),
             column(6,offset = 6,
                    HTML('<div class="btn-group" role="group" aria-label="Basic example">'),
@@ -1547,7 +1609,7 @@ app <- shiny::shinyApp(
               ),
               column(2,
                      actionButton(inputId = "buttonPlot",label = "Tampilan Plot")
-                     )
+              )
             ),
             br(),
             br(),
@@ -1556,59 +1618,69 @@ app <- shiny::shinyApp(
       )
     })
     
-
+    
     
     output$Main_tableDefault<-renderDataTable({
-        if(length(loadRDSAll())==0){
-          vals$Sistem.Usaha.Tani <-  "file tidak tersedia"
-          vals$Komoditas <- "file tidak tersedia"
-          vals$Tahun  <-  "file tidak tersedia"
-          vals$NPV.Privat.RP  <-  "file tidak tersedia"
-          vals$NPV.Sosial.RP  <-  "file tidak tersedia"
-          vals$Discount.Rate.Private  <-   "file tidak tersedia"
-          vals$Discount.Rate.Social  <-   "file tidak tersedia"
-          vals$Nilai.Tukar  <-   "file tidak tersedia"
-          vals[["Select"]] <-  "file tidak tersedia"
-        } else {
-          vals$Sistem.Usaha.Tani  <-   unlist(lapply(loadRDSAll(), function(x)x[[15]]))
-          vals$Komoditas  <-  unlist(lapply(loadRDSAll(), function(x)x[[16]]))
-          vals$Tahun  <-  unlist(lapply(loadRDSAll(), function(x)x[[17]]))
-          vals$NPV.Privat.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1]))
-          vals$NPV.Sosial.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2]))#nama file dr listValDef ada di index terakhir = 6
-          vals$Discount.Rate.Private  <-   unlist(lapply(loadRDSAll(), function(x)x[[12]]))
-          vals$Discount.Rate.Social  <-   unlist(lapply(loadRDSAll(), function(x)x[[13]]))
-          vals$Nilai.Tukar  <-   unlist(lapply(loadRDSAll(), function(x)x[[14]]))
-          vals[["Select"]]<-paste0('<input type="checkbox" name="row_selected" value="Row',1:length(vals$Komoditas),'"><br>')
-        }
+      # observeEvent(input$provShowDeskriptifHit, {
+      #   browser()
+      if(length(loadRDSAll())==0){
+        vals$Sistem.Usaha.Tani <-  "file tidak tersedia"
+        vals$Komoditas <- "file tidak tersedia"
+        vals$Tahun  <-  "file tidak tersedia"
+        vals$NPV.Privat.RP  <-  "file tidak tersedia"
+        vals$NPV.Sosial.RP  <-  "file tidak tersedia"
+        vals$Discount.Rate.Private  <-   "file tidak tersedia"
+        vals$Discount.Rate.Social  <-   "file tidak tersedia"
+        vals$Nilai.Tukar  <-   "file tidak tersedia"
+        vals[["Select"]] <-  "file tidak tersedia"
+      } else {
+        vals$Sistem.Usaha.Tani  <-   unlist(lapply(loadRDSAll(), function(x)x[[15]]))
+        vals$Komoditas  <-  unlist(lapply(loadRDSAll(), function(x)x[[16]]))
+        vals$Tahun  <-  unlist(lapply(loadRDSAll(), function(x)x[[17]]))
+        vals$NPV.Privat.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1]))
+        vals$NPV.Sosial.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2]))#nama file dr listValDef ada di index terakhir = 6
+        vals$Discount.Rate.Private  <-   unlist(lapply(loadRDSAll(), function(x)x[[12]]))
+        vals$Discount.Rate.Social  <-   unlist(lapply(loadRDSAll(), function(x)x[[13]]))
+        vals$Nilai.Tukar  <-   unlist(lapply(loadRDSAll(), function(x)x[[14]]))
+        vals[["Select"]]<-paste0('<input type="checkbox" name="row_selected" value="Row',1:length(vals$Komoditas),'"><br>')
+      }
       
-      datatable(data.frame(
+      dataView <-  data.frame(
         Sistem.Usaha.Tani =  vals$Sistem.Usaha.Tani,
         Komoditas = vals$Komoditas,
         Tahun = vals$Tahun,
         NPV.Privat.RP = vals$NPV.Privat.RP,
         NPV.Sosial.RP = vals$NPV.Sosial.RP ,
-        Discount.Rate.Private =  vals$Discount.Rate.Private,
-        Discount.Rate.Social =  vals$Nilai.Tukar,
+        Discount.Rate.P =  vals$Discount.Rate.Private,
+        Discount.Rate.S =  vals$Discount.Rate.Social,
         Nilai.Tukar =  vals$Nilai.Tukar ,
         Pilih.File = vals[["Select"]]
-      ),escape = F)
-      }
-    )
+      )
+      
 
+      
+      dataView <- datatable(dataView[with(dataView,order(-dataView$NPV.Privat.RP)),],escape = F)
+      dataView  %>% 
+        formatCurrency('NPV.Privat.RP',currency = "", interval = 3, mark = ",",digits = 1) %>%  
+        formatCurrency('NPV.Sosial.RP',currency = "", interval = 3, mark = ",",digits = 1)%>%  
+        formatCurrency('Nilai.Tukar',currency = "", interval = 3, mark = ",",digits = 0)
+    }
+    )
+    
     observeEvent(input$buttonPlot, {
       # browser()
       insertUI(selector='#showPlot',
                where='afterEnd',
                ui= uiOutput('showPlotAll'))
       
-
+      
     }) 
     
     output$showPlotAll <- renderUI({
       row_to_select=as.numeric(gsub("Row","",input$checked_rows))
       
       if(identical(row_to_select,numeric(0))){
-
+        
         box(width=12,
             hr(),
             br(),
@@ -1617,13 +1689,13 @@ app <- shiny::shinyApp(
             br(),
             br(),
             hr(),
-            )
+        )
         
       }else{
         hr()
         plotlyOutput(('allPlot'))
       }
-              
+      
     })
     
     

@@ -72,9 +72,9 @@ upload <- argonTabItem(
                        h2("Asumsi Makro"),
                        #tags$style(HTML("#big-heading{color: black;}")),
                        br(),
-                       sliderInput(("rate.p"), "Discount Rate Private", 7.41 ,min = 0, max = 15, step = 0.01),
+                       sliderInput(("rate.p"), "Discount Rate Private", 7.4 ,min = 0, max = 15, step = 0.01),
                        br(),
-                       sliderInput(("rate.s"), "Discount Rate Social", 2.41 ,min = 0, max = 8, step = 0.01),
+                       sliderInput(("rate.s"), "Discount Rate Social", 2.4 ,min = 0, max = 8, step = 0.01),
                        br(),
                        # sliderInput(("labor.p"), "Upah Buruh Privat", 70000 ,min = 40000, max = 200000, step = 1000),
                        # br(),
@@ -134,38 +134,7 @@ upload <- argonTabItem(
           width = 12,
           fluidRow(
             column(10,
-                   fluidPage(
-                     fluidRow(
-                       column(4,
-                              h1("Hasil Analisis"),
-                              br(),
-                       )
-                     ),
-                     br(),
-                     fluidRow(
-                       column(4,
-                              verbatimTextOutput(("npv"))
-                       ),
-                       column(4,
-                              verbatimTextOutput(("nlc"))
-                       ),
-                       column(4,
-                              verbatimTextOutput(("ec"))
-                       )
-                     ),
-                     br(),
-                     br(),
-                     fluidRow(
-                       column(8,
-                              verbatimTextOutput(("hp"))
-                       ),
-                       column(4,
-                              verbatimTextOutput(("lr"))
-                       )
-                     ),
-                     actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white; 
-                         background-color: green;"),
-                   )
+                   tags$div(id = 'uiShowResult')
             )
           )
         )
