@@ -31,6 +31,7 @@ app <- shiny::shinyApp(
             column(6,offset = 6,
                    HTML('<div class="btn-group" role="group" aria-label="Basic example">'),
                    actionButton(inputId = "Compare_row_head",label = "Compare selected rows"),
+                   actionButton(inputId = "Del_row_head",label = "Delete selected rows"),
                    HTML('</div>')
             ),
             
@@ -45,6 +46,10 @@ app <- shiny::shinyApp(
   }
   Shiny.onInputChange("checked_rows",checkboxesChecked);
       })')),
+            tags$script("$(document).on('click', '#Main_table button', function () {
+                    Shiny.onInputChange('lastClickId',this.id);
+                    Shiny.onInputChange('lastClick', Math.random())
+  });")
 
             
         )
@@ -70,6 +75,14 @@ app <- shiny::shinyApp(
 
       DT=vals$Data
       DT[["Select"]]<-paste0('<input type="checkbox" name="row_selected" value="Row',1:nrow(vals$Data),'"><br>')
+      DT[["Actions"]]<-
+        paste0('
+             <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary delete" id=delete_',1:nrow(vals$Data),'>Delete</button>
+                <button type="button" class="btn btn-secondary modify"id=modify_',1:nrow(vals$Data),'>Modify</button>
+             </div>
+             
+             ')
       datatable(DT,
                 escape=F)
       }
@@ -103,6 +116,21 @@ app <- shiny::shinyApp(
       require(ggplot2)
       ggplot(vals$fake_sales,aes(x=month,y=sales,color=Brands))+geom_line()
     })
+    
+    observeEvent(input$lastClick,{
+                   
+                   browser()
+                   if (input$lastClickId%like%"delete")
+                   {
+                     row_to_del=as.numeric(gsub("delete_","",input$lastClickId))
+                     vals$Data=vals$Data[-row_to_del]
+                   }
+                   else if (input$lastClickId%like%"modify")
+                   {
+                     showModal(modal_modify)
+                   }
+                 }
+    )
     
   })
   

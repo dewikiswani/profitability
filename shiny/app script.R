@@ -1515,7 +1515,12 @@ app <- shiny::shinyApp(
     #                          deskriptifPlot                                      #
     #                                                                              #
     ################################################################################
-    loadRDSAll <- reactive({
+    
+    
+    
+    
+    # loadRDSAll <- eventReactive(c(input$provDeskriptif,input$provTahunDeskriptif),{
+      loadRDSAll <- reactive({
       # observeEvent(input$provShowDeskriptifHit, {
       #   browser()
       ##### step 1 filter yang ada pattern resultDefault
@@ -1555,7 +1560,9 @@ app <- shiny::shinyApp(
     })
     
     
-    vals<-reactiveValues(
+    vals<-reactiveValues()
+    
+    vals$Data<-data.table(
       Sistem.Usaha.Tani =  NULL,
       Komoditas = NULL,
       Tahun = NULL,
@@ -1563,23 +1570,25 @@ app <- shiny::shinyApp(
       NPV.Sosial.RP = NULL,
       Discount.Rate.Private =  NULL,
       Discount.Rate.Social =  NULL,
-      Nilai.Tukar =  NULL
+      Nilai.Tukar =  NULL,
+      ceklis = NULL,
+      del = NULL
     )
     
     
     observeEvent(input$provShowDeskriptifHit, {
       insertUI(selector='#uiListPamDefault',
                where='afterEnd',
-               ui= uiOutput('SuntingUITableDefault')
+               ui= uiOutput('showTable')
       )
     }) 
     
     observeEvent(c(input$provDeskriptif,input$provTahunDeskriptif), {
-      removeUI(selector='#SuntingUITableDefault')
+      removeUI(selector='#showTable')
     }) 
     
     
-    output$SuntingUITableDefault<- renderUI({
+    output$showTable<- renderUI({
       fluidPage(
         box(width=12,
             h3(strong("Daftar PAM Default"),align="center"),
@@ -1602,6 +1611,11 @@ app <- shiny::shinyApp(
   }
   Shiny.onInputChange("checked_rows",checkboxesChecked);
       })')),
+            tags$script("$(document).on('click', '#Main_tableDefault button', function () {
+                    Shiny.onInputChange('lastClickId',this.id);
+                    Shiny.onInputChange('lastClick', Math.random())
+  });"),
+            
             br(),
             fluidRow(
               column(10,
@@ -1618,43 +1632,57 @@ app <- shiny::shinyApp(
       )
     })
     
-    
-    
+
+    # START SHOW TABLE DEFAULT ------------------------------------------------------
+
     output$Main_tableDefault<-renderDataTable({
       # observeEvent(input$provShowDeskriptifHit, {
       #   browser()
+      
+      
+      
+      
       if(length(loadRDSAll())==0){
-        vals$Sistem.Usaha.Tani <-  "file tidak tersedia"
-        vals$Komoditas <- "file tidak tersedia"
-        vals$Tahun  <-  "file tidak tersedia"
-        vals$NPV.Privat.RP  <-  "file tidak tersedia"
-        vals$NPV.Sosial.RP  <-  "file tidak tersedia"
-        vals$Discount.Rate.Private  <-   "file tidak tersedia"
-        vals$Discount.Rate.Social  <-   "file tidak tersedia"
-        vals$Nilai.Tukar  <-   "file tidak tersedia"
-        vals[["Select"]] <-  "file tidak tersedia"
+        vals$Data$Sistem.Usaha.Tani <-  "file tidak tersedia"
+        vals$Data$Komoditas <- "file tidak tersedia"
+        vals$Data$Tahun  <-  "file tidak tersedia"
+        vals$Data$NPV.Privat.RP  <-  "file tidak tersedia"
+        vals$Data$NPV.Sosial.RP  <-  "file tidak tersedia"
+        vals$Data$Discount.Rate.Private  <-   "file tidak tersedia"
+        vals$Data$Discount.Rate.Social  <-   "file tidak tersedia"
+        vals$Data$Nilai.Tukar  <-   "file tidak tersedia"
+        vals$Data$ceklis <-  "file tidak tersedia"
+        vals$Data$del <- "file tidak tersedia"
       } else {
-        vals$Sistem.Usaha.Tani  <-   unlist(lapply(loadRDSAll(), function(x)x[[15]]))
-        vals$Komoditas  <-  unlist(lapply(loadRDSAll(), function(x)x[[16]]))
-        vals$Tahun  <-  unlist(lapply(loadRDSAll(), function(x)x[[17]]))
-        vals$NPV.Privat.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1]))
-        vals$NPV.Sosial.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2]))#nama file dr listValDef ada di index terakhir = 6
-        vals$Discount.Rate.Private  <-   unlist(lapply(loadRDSAll(), function(x)x[[12]]))
-        vals$Discount.Rate.Social  <-   unlist(lapply(loadRDSAll(), function(x)x[[13]]))
-        vals$Nilai.Tukar  <-   unlist(lapply(loadRDSAll(), function(x)x[[14]]))
-        vals[["Select"]]<-paste0('<input type="checkbox" name="row_selected" value="Row',1:length(vals$Komoditas),'"><br>')
+        vals$Data$Sistem.Usaha.Tani  <-   unlist(lapply(loadRDSAll(), function(x)x[[15]]))
+        vals$Data$Komoditas  <-  unlist(lapply(loadRDSAll(), function(x)x[[16]]))
+        vals$Data$Tahun  <-  unlist(lapply(loadRDSAll(), function(x)x[[17]]))
+        vals$Data$NPV.Privat.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,1]))
+        vals$Data$NPV.Sosial.RP  <-  unlist(lapply(loadRDSAll(), function(x)x[[7]][1,2]))#nama file dr listValDef ada di index terakhir = 6
+        vals$Data$Discount.Rate.Private  <-   unlist(lapply(loadRDSAll(), function(x)x[[12]]))
+        vals$Data$Discount.Rate.Social  <-   unlist(lapply(loadRDSAll(), function(x)x[[13]]))
+        vals$Data$Nilai.Tukar  <-   unlist(lapply(loadRDSAll(), function(x)x[[14]]))
+        vals$Data$ceklis<-paste0('<input type="checkbox" name="row_selected" value="Row',1:length(vals$Data$Komoditas),'"><br>')
+        vals$Data$del<-
+          paste0('
+             <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary delete" id=delete_',1:length(vals$Data$Komoditas),'>Delete</button>
+             </div>
+             
+             ')
       }
       
       dataView <-  data.frame(
-        Sistem.Usaha.Tani =  vals$Sistem.Usaha.Tani,
-        Komoditas = vals$Komoditas,
-        Tahun = vals$Tahun,
-        NPV.Privat.RP = vals$NPV.Privat.RP,
-        NPV.Sosial.RP = vals$NPV.Sosial.RP ,
-        Discount.Rate.P =  vals$Discount.Rate.Private,
-        Discount.Rate.S =  vals$Discount.Rate.Social,
-        Nilai.Tukar =  vals$Nilai.Tukar ,
-        Pilih.File = vals[["Select"]]
+        Sistem.Usaha.Tani =  vals$Data$Sistem.Usaha.Tani,
+        Komoditas = vals$Data$Komoditas,
+        Tahun = vals$Data$Tahun,
+        NPV.Privat.RP = vals$Data$NPV.Privat.RP,
+        NPV.Sosial.RP = vals$Data$NPV.Sosial.RP ,
+        Discount.Rate.P =  vals$Data$Discount.Rate.Private,
+        Discount.Rate.S =  vals$Data$Discount.Rate.Social,
+        Nilai.Tukar =  vals$Data$Nilai.Tukar ,
+        Pilih.File = vals$Data$ceklis,
+        Hapus.File = vals$Data$del
       )
       
 
@@ -1666,6 +1694,56 @@ app <- shiny::shinyApp(
         formatCurrency('Nilai.Tukar',currency = "", interval = 3, mark = ",",digits = 0)
     }
     )
+    
+    
+    observeEvent(input$lastClick,{
+      # browser()
+      if (input$lastClickId%like%"delete")
+      {
+        row_to_del=as.numeric(gsub("delete_","",input$lastClickId))
+        vals$Data=vals$Data[-row_to_del]
+        listFileName <- unlist(lapply(loadRDSAll(), function(x)x[[1]]))
+        fileNameSelected <- listFileName[row_to_del]
+        file.remove(fileNameSelected)
+        
+        
+        vals$Data$Sistem.Usaha.Tani <-  NULL
+        vals$Data$Komoditas <- NULL
+        vals$Data$Tahun  <-  NULL
+        vals$Data$NPV.Privat.RP  <-  NULL
+        vals$Data$NPV.Sosial.RP  <-  NULL
+        vals$Data$Discount.Rate.Private  <-   NULL
+        vals$Data$Discount.Rate.Social  <-   NULL
+        vals$Data$Nilai.Tukar  <-   NULL
+        vals$Data$ceklis <-  NULL
+        vals$Data$del <- NULL
+        
+        vals$Data <- NULL
+        # reactLoadRdsAll <-  loadRDSAll()[-row_to_del]
+        
+        
+        
+      }
+      
+    })
+    
+    
+    
+    # ENDING SHOW TABLE DEFAULT -----------------------------------------------
+    
+
+    # START SHOW TABLE NEW PAM -----------------------------------------------
+    
+
+    # ENDING SHOW TABLE NEW PAM  -----------------------------------------------
+    
+    
+    
+    
+    
+    
+    
+    
     
     observeEvent(input$buttonPlot, {
       # browser()
