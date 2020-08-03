@@ -1539,8 +1539,20 @@ app <- shiny::shinyApp(
     ################################################################################
     
     observeEvent(input$provShowDeskriptifHit, {
-      # removeUI(selector='#showPlotAll') #spy plotnya terrefresh
+      removeUI(selector='#showPlotAll') #spy plotnya terrefresh
+      valsNewPam$Data$Waktu.PAM.disimpan <- NULL
+      valsNewPam$Data$Sistem.Usaha.Tani <-  NULL
+      valsNewPam$Data$Komoditas <- NULL
+      valsNewPam$Data$Tahun  <-  NULL
+      valsNewPam$Data$NPV.Privat.RP  <-  NULL
+      valsNewPam$Data$NPV.Sosial.RP  <-  NULL
+      valsNewPam$Data$Discount.Rate.Private  <-   NULL
+      valsNewPam$Data$Discount.Rate.Social  <-   NULL
+      valsNewPam$Data$Nilai.Tukar  <-   NULL
+      valsNewPam$Data$ceklis <-  NULL
+      valsNewPam$Data$del <- NULL
       
+      valsNewPam$Data <- NULL
       insertUI(selector='#uiListPamDefault',
                where='afterEnd',
                ui= uiOutput('showTable')
@@ -1845,7 +1857,7 @@ app <- shiny::shinyApp(
         fileNameSelected <- listFileName[row_to_del]
         file.remove(fileNameSelected)
         
-        
+        valsNewPam$Data$Waktu.PAM.disimpan <- NULL
         valsNewPam$Data$Sistem.Usaha.Tani <-  NULL
         valsNewPam$Data$Komoditas <- NULL
         valsNewPam$Data$Tahun  <-  NULL
@@ -1860,6 +1872,7 @@ app <- shiny::shinyApp(
         valsNewPam$Data <- NULL
       }
       
+      removeUI(selector='#showPlotAll') 
       removeUI(selector='#showTable')
       
     })
@@ -1868,9 +1881,9 @@ app <- shiny::shinyApp(
     
     
     observeEvent(input$buttonPlot, {
-      browser()
+      # browser()
       
-      # removeUI(selector='#showPlotAll') 
+      removeUI(selector='#showPlotAll')
       
       insertUI(selector='#showPlot',
                where='afterEnd',
