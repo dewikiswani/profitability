@@ -1,6 +1,6 @@
-upload <- argonTabItem(
-  tabName = "upload",
-  argonH1("PROFITABILITY", display = 4),
+pamBaru <- argonTabItem(
+  tabName = "pamBaru",
+  argonH1("Membuat PAM Baru", display = 4),
   argonRow(
     argonCard(
       width = 12,
@@ -24,40 +24,24 @@ upload <- argonTabItem(
           sidebarLayout(
             sidebarPanel(
               fluidRow(
-                column(10,
+                column(12,
                        h2("Informasi umum",align = 'center')
                 )
               ),
               fluidRow(
-                column(5,
+                column(6,
                        selectInput(("sut"),"Sistem Usaha Tani",choices = c("MONOKULTUR","AGROFORESTRI")),
                        br(),
                        selectInput("kom","Komoditas",choices = "" ),
                        br(),
-                       selectInput(("th"),"Tahun",choices = c(2020:2021)),
-                       br(),
-                       selectInput(("user"),"Nama Peneliti",choices = c("A","B","C")),
-                       br(),
-                       selectInput(("gambut"),"Tipe Lahan",choices = c("NON-GAMBUT","GAMBUT")),
-                ),
-                column(5,
-                       selectInput(("selected_provinsi"),
+                       selectInput("selected_provinsi",
                                    "Pilih Provinsi:",
                                    choices = ""),
+                ),
+                column(6,
+                       selectInput(("th"),"Tahun",choices = c(2020:2021)),
                        br(),
-                       selectInput("selected_kota",
-                                   "Pilih Kota/Kabupaten:",
-                                   choices = ""),
-                       br(),
-                       selectInput("selected_kec",
-                                   "Pilih Kecamatan:",
-                                   choices = ""),
-                       br(),
-                       selectInput("selected_desa",
-                                   "Pilih Desa:",
-                                   choices = ""),
-                       br(),
-                       textInput("petani", "Nama Petani")
+                       selectInput(("gambut"),"Tipe Lahan",choices = c("NON-GAMBUT","GAMBUT")),
                        
                 )
               )

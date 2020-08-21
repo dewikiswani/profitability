@@ -29,7 +29,7 @@ library(plotly)
 
 
 # template
-source("shiny/sidebar.R")
+source("shiny/2_sidebar.R")
 source("shiny/navbar.R")
 source("shiny/header.R")
 source("shiny/footer.R")
@@ -39,9 +39,9 @@ komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
 indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
 
 # elements
-source("shiny/home.R")
+source("shiny/2_verifikasi.R")
 source("shiny/pambaru_modul2.R")
-source("shiny/analisis.R")
+# source("shiny/analisis.R")
 
 
 # App
@@ -56,10 +56,10 @@ app <- shiny::shinyApp(
     body = argonDashBody(
       argonTabItems(
         #home,
-        # verifikasi,
+        verifikasi,
         pamBaru
-        ,
-        deskriptifPlot
+        # ,
+        # deskriptifPlot
       )
     ),
     footer = argonFooter

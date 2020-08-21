@@ -1,0 +1,31 @@
+komponen,keterangan,unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
+pupuk,Urea,kg,,,,,,,100,,,,,,,100,,,,,,,,,,,,,,,,
+pupuk,SP ,kg,,,,,,,50,,,,,,,50,,,,,,,,,,,,,,,,
+pupuk,KCL,kg,,,,,,,50,,,,,,,50,,,,,,,,,,,,,,,,
+pupuk,NPK,kg,,,,,,,50,,,,,,,50,,,,,,,,,,,,,,,,
+pupuk,basmilang,liter,,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
+bahan tanam /bibit,padi,kg,50,50,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+bahan tanam /bibit,kopi,batang,3000,300,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+peralatan,Karung,unit,,2.4,30,30,18,18,18,30,30,12,12,12,12,12,18,18,12,12,12,12,12,12,12,12,12,12,12,12,12,12
+peralatan,Cangkul,unit,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,
+peralatan,Parang,unit,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
+peralatan,Sprayer,unit,1,,,,,,,,,1,,,,,,,,,,1,,,,,,,,,,1
+tenaga kerja,tebas,hok,30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja,tumbang,hok,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja,bakar,hok,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja padi,penanaman,hok,25,25,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja padi,penyiangan,hok,6,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja padi,bird and pig waching,hok,15,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja padi,pemanenan,hok,20,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja padi,pengeringan,hok,5,5,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja kopi,penanaman buah,hok,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja kopi,penanaman kopi,hok,8,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja kopi,Pruning,hok,,5,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+tenaga kerja kopi,Pemangkasan tunas/ranting,hok,,,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+tenaga kerja kopi,Penyiangan,hok,,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+tenaga kerja kopi,Pemupukan,hok,,,,,,,4,,,,,,,4,,,,,,,,,,,,,,,,
+tenaga kerja kopi,Penyemprotan,hok,,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18
+pemanenan,transport,kg,,120,1500,1500,900,900,900,1500,1500,600,600,600,600,600,900,900,600,600,600,600,600,600,600,600,600,600,600,600,600,600
+tenaga kerja kopi,pemanenan kopi,hok,,,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103,103
+pasca panen,giling kopi,kg,,120,1500,1500,900,900,900,1500,1500,600,600,600,600,600,900,900,600,600,600,600,600,600,600,600,600,600,600,600,600,600
+tenaga kerja kopi,penjemuran kopi,hok,,,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3

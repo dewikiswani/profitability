@@ -14,21 +14,21 @@ argonSidebar <- argonDashSidebar(
     #  icon = argonIcon(name = "tv-2", color = "info"),
     #  "Home"
     # ),
-    # argonSidebarItem(
-    #   tabName = "verifikasi",
-    #   icon = argonIcon(name = "atom", color = "danger"),
-    #   "Verifikasi Perhitungan"
-    # ),
+    argonSidebarItem(
+      tabName = "template",
+      icon = argonIcon(name = "atom", color = "danger"),
+      "Membangun PAM dari Data Template"
+    ),
     argonSidebarItem(
       tabName = "pamBaru",
       icon = argonIcon(name = "bullet-list-67", color = "danger"),
       "Membuat PAM Baru"
     ),
-    argonSidebarItem(
-      tabName = "deskriptifPlot",
-      icon = argonIcon(name = "atom", color = "danger"),
-      "Kumpulan Analisis PAM"
-    )
+    # argonSidebarItem(
+    #   tabName = "deskriptifPlot",
+    #   icon = argonIcon(name = "atom", color = "danger"),
+    #   "Kumpulan Analisis PAM"
+    # )
   ),
   argonSidebarDivider()
   #argonSidebarHeader(title = "Other Items")
