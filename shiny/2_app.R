@@ -36,7 +36,7 @@ source("shiny/footer.R")
 
 # input file
 komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
-indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
+# indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
 
 # elements
 source("shiny/2_verifikasi.R")
@@ -122,149 +122,91 @@ app <- shiny::shinyApp(
     
     # End - Section informasi umum ---------------------------------------------
     
-    # Section asumsi makro ---------------------------------------------
-    observeEvent(input$run_button, {
-      # removeUI(selector='#showTable')
-      # removeUI(selector='#showMakro')
-      
-      insertUI(selector='#uiShowMakro',
-               where='afterEnd',
-               ui= uiOutput('showMakro'))
-      
-      
-    }) 
     
-    output$showMakro <- renderUI({
-      argonRow(
-      argonColumn(
-        width = 12,
-        argonH1("Asumsi Makro", display = 4),
-        h5("langkah 2: menentukan asumsi makro untuk data PAM yang dibangun"),
-        br(),
-        fluidRow(
-        column(3,
-               sliderInput(("rate.p"), "Discount Rate Private", 7.4 ,min = 0, max = 15, step = 0.01)
-        ),
-        column(3,
-               sliderInput(("rate.s"), "Discount Rate Social", 2.4 ,min = 0, max = 8, step = 0.01)
-        ),
-        column(4,
-               sliderInput(("nilai.tukar"), "Nilai Tukar Rupiah", 14831 ,min = 10000, max = 20000, step = 10)
-        ),
-        column(2,
-               br(),
-               actionButton(("tampilkanTabel_button"),"Tampilkan Tabel PAM",icon("paper-plane"),style="color: white; 
-                         background-color: green;")
-        )
-      )
-      )
-      )
-    })
-    # End - Section asumsi makro ---------------------------------------------
     
-    # Section tampilkan tabel---------------------------------------------
-    observeEvent(input$tampilkanTabel_button, {
-      insertUI(selector='#uiShowTable',
-               where='afterEnd',
-               ui= uiOutput('showTable'))
+    # Section preparation data ---------
+    dataTemplate <- reactive({
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      
+      readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      inputData <- filter(readDataTemplate,faktor == c("input"))
+      ioInput <- inputData[,c(2:4,8:37)] #menghilangkan kolom harga
+      priceInput <- inputData[,c(2,3,5,6,7)] #mengambil kolom harga
+      
+      outputData <- filter(readDataTemplate,faktor == c("output"))
+      ioOutput <- outputData[,c(2:4,8:37)] #menghilangkan kolom harga
+      priceOutput <- outputData[,c(2,3,5,6,7)] #mengambil kolom harga
       
       
-    }) 
-    
-    output$showTable <- renderUI({
-      argonRow(
-      argonColumn(
-        width = 12,
-        argonH1("Tabel", display = 4),
-        h5("langkah 3: menampilkan Tabel PAM yang terpilih"),
-        argonTabSet(
-          id = "tab-1",
-          card_wrapper = TRUE,
-          horizontal = TRUE,
-          circle = FALSE,
-          size = "sm",
-          width = 12,
-          iconList = lapply(X = 1:3, FUN = argonIcon, name = "atom"),
-          argonTab(
-            tabName = "Tabel Harga",
-            active = T,
-            dataTableOutput(("viewPrice")),
-            style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
-          ),
-          argonTab(
-            tabName = "Tabel Input-Output",
-            active = F,
-            dataTableOutput(("viewIO")),
-            style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
-          ),
-          argonTab(
-            tabName = "Tabel Modal Kapital",
-            active = F,
-            dataTableOutput(("viewKapital")),
-            style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
-          )
-        )
-        
-      )
-      # ,
-      # br(),
-      # argonRow(
-      # argonColumn(
-      # width = 12,
-      #     h5("langkah 4: Membangun tabel PAM dengan menyunting atau menggunakan data template", align = "center"),
-      #     fluidRow(
-      #       column(5,
-      #              actionButton("coba_button","coba Modal")
-      #       ),
-      #       column(7,
-      #              actionButton("buatPAM_button","Membangun PAM",icon("paper-plane"),style="color: white; 
-      #                    background-color: green;")
-      #       )
-      #     )
-      # )
-      # )
-      )
+      # case for modal kapital
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+      capital <- NULL
+      
+      
+      # if (cekCapital == T & input$checkKapital == F ){
+      #   capital <- NULL
+      #   insertUI(selector='#teksStatusCapital',
+      #            where = 'afterEnd',
+      #            ui = tags$div(id="statusCapital","Terdapat tabel modal kapital (tidak dimasukkan ke dalam perhitungan)"))
+      # } else if(cekCapital == T & input$checkKapital == T){
+      #   capital <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
+      #   insertUI(selector='#teksStatusCapital',
+      #            where = 'afterEnd',
+      #            ui = tags$div(id="statusCapital","Terdapat tabel modal kapital (dimasukkan kedalam perhitungan)"))
+      # } else if (cekCapital == F & input$checkKapital == F){
+      #   capital <- NULL
+      #   insertUI(selector='#teksStatusCapital',
+      #            where = 'afterEnd',
+      #            ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
+      # } else if(cekCapital == F & input$checkKapital == T){
+      #   capital <- NULL
+      #   insertUI(selector='#teksStatusCapital',
+      #            where = 'afterEnd',
+      #            ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
+      # }
+      
+      # informasi umum
+      sut <- input$sut
+      kom <- input$kom
+      provinsi <- input$selected_provinsi
+      th <- input$th
+      tipeLahan <- input$tipeLahan
+      
+      
+      combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
+                         priceInput=priceInput,priceOutput=priceOutput,
+                         capital=capital,
+                         sut=sut,
+                         kom=kom,
+                         provinsi = provinsi,
+                         th=th,
+                         tipeLahan = tipeLahan)
+      
+      # save data untuk setiap perubahan
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      saveRDS(combineDef,file = fileName)
+      
+      
+      
+      print("pertama kali masuk/login. cek save data default")
+      combineDef
       
     })
-    
-    observeEvent(input$tampilkanTabel_button, {
-      insertUI(selector='#uiShowButton',
-               where='afterEnd',
-               ui= uiOutput('showButton'))
-      
-      
-    }) 
-    
-    output$showButton <- renderUI({
-      argonRow(
-        argonColumn(
-        width = 12,
-            h5("langkah 4: Membangun tabel PAM dengan menyunting atau menggunakan data template", align = "center"),
-            fluidRow(
-              column(5,
-                     actionButton("coba_button","coba Modal")
-              ),
-              column(7,
-                     actionButton("buatPAM_button","Membangun PAM",icon("paper-plane"),style="color: white;
-                           background-color: green;")
-              )
-            )
-        )
-      )
-      
-    })
-    
     
     resultTemplate <- reactive({
-      
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"resultDefault","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       
-      ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
-      ioOutput <- read.table(paste0(datapath,"io template output.csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      inputData <- filter(readDataTemplate,faktor == c("input"))
+      ioInput <- inputData[,c(2:4,8:37)] #menghilangkan kolom harga
+      priceInput <- inputData[,c(2,3,5,6,7)] #mengambil kolom harga
       
-      priceInput <- read.table(paste0(datapath,"price template input.csv"), header = T, sep = ",")
-      priceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
+      outputData <- filter(readDataTemplate,faktor == c("output"))
+      ioOutput <- outputData[,c(2:4,8:37)] #menghilangkan kolom harga
+      priceOutput <- outputData[,c(2,3,5,6,7)] #mengambil kolom harga
       
       # case for modal kapital
       cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
@@ -275,13 +217,28 @@ app <- shiny::shinyApp(
         capital <- NULL
       }
       
+      # Asumsi makro
+      readDataAsumsiMakro <- read.table(paste0("shiny/data/template/asumsi makro",".csv"), header = T, sep = ",")
+      asumsiMakroTemplate <- filter(readDataAsumsiMakro,tahun == input$th)
       
+      rate.p <- asumsiMakroTemplate$rate.p
+      rate.s <- asumsiMakroTemplate$rate.s
+      nilai.tukar <- asumsiMakroTemplate$nilai.tukar
       
-      
+      # memmbuat list gabungan dataDefine
       dataDefine <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
-                         capital=capital
-      )
+                         capital=capital,
+                         rate.p = rate.p,
+                         rate.s = rate.s,
+                         nilai.tukar=nilai.tukar)
+      
+      #informasi umum
+      dataDefine$sut <- input$sut
+      dataDefine$kom <- input$kom
+      dataDefine$provinsi <- input$selected_provinsi
+      dataDefine$th <- input$th
+      dataDefine$tipeLahan <- input$tipeLahan
       
       
       #### io  ####    
@@ -325,8 +282,8 @@ app <- shiny::shinyApp(
       #### buat if else untuk modal kapital ####
       if (is.null(dataDefine$capital)){
         # capital = NULL
-        data.gab <- rbind(io.all,
-                          price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab <- bind_rows(io.all,
+                              price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
         data.gab
         
       }else{
@@ -354,15 +311,15 @@ app <- shiny::shinyApp(
       # hitung npv --------------------------------------------------------------
       dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
       dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-      p.budget <- dataGeneral[-(1:5)] * dataPrivat[-c(1:5)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5
-      p.budget <- cbind(dataGeneral[1:5],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+      p.budget <- cbind(dataGeneral[c(1:4,36)],p.budget) #memunculkan kembali variabel 1 sd 5
       p.budget <- p.budget %>%
         mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
       
       #perkalian antara general dengan Social Price
       dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-      s.budget <- dataGeneral[-(1:5)] * dataSosial[-c(1:5)]
-      s.budget <- cbind(dataGeneral[1:5],s.budget)
+      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+      s.budget <- cbind(dataGeneral[c(1:4,36)],s.budget)
       s.budget <- s.budget %>%
         mutate(status = case_when(status == "general" ~ "social budget"))
       
@@ -395,13 +352,13 @@ app <- shiny::shinyApp(
       p.profit<-c(profit0,p.profit)
       s.profit<-c(profit0,s.profit)
       
-      npv.p<-npv(input$rate.p/100,p.profit)
-      npv.s<-npv(input$rate.s/100,s.profit)
+      npv.p<-npv(dataDefine$rate.p/100,p.profit)
+      npv.s<-npv(dataDefine$rate.s/100,s.profit)
       
       hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
       
-      npv.p.us<-npv.p/input$nilai.tukar
-      npv.s.us<-npv.s/input$nilai.tukar
+      npv.p.us<-npv.p/dataDefine$nilai.tukar
+      npv.s.us<-npv.s/dataDefine$nilai.tukar
       npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
       hsl.npv<-rbind(hsl.npv,npv.us)
       
@@ -452,12 +409,12 @@ app <- shiny::shinyApp(
       ############# PERHITUNGAN HARVESTING PRODUCT
       fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
       fil.prod <- fil.prod %>%  filter(str_detect(komponen,"utama"))
-      sum.prod <- fil.prod[,-(1:5)] %>%
+      sum.prod <- fil.prod[,-c(1:5,36)] %>%
         colSums(na.rm = T)
       tot.prod <- sum(sum.prod)
       
       fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
-      sum.labor <- fil.labor[,-(1:5)] %>%
+      sum.labor <- fil.labor[,-c(1:5,36)] %>%
         colSums(na.rm = T)
       tot.labor <- sum(sum.labor)
       
@@ -476,142 +433,246 @@ app <- shiny::shinyApp(
       
       # ending  lr ------------------------------------------------------- 
       
-      ##### save data dafault
+      ##### save data template
       
-      # replace data price
+      # RESULT 
       dataDefine$npv <- hsl.npv
       dataDefine$nlc <- nlc
       dataDefine$ec <- ec
       dataDefine$hp <- hp
       dataDefine$lr <- lr
       
-      dataDefine$rate.p <- input$rate.p
-      dataDefine$rate.s <- input$rate.s
-      dataDefine$nilai.tukar <- input$nilai.tukar
       
+      print("save result template untuk klik pertama asumsiMakro_button")
       
-      dataDefine$sut <- input$sut
-      dataDefine$kom <- input$kom
-      dataDefine$th <- input$th
-      
-      print("save result default untuk klik pertama run_button")
+      fileName <- paste0(datapath,"resultTemplate","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
       saveRDS(dataDefine,file = fileName)
       
       
-      ##### ending save data default
+      ##### ending save data template
       
       
     })
     
-    data.gab <- eventReactive(input$run_button,{
-      # aktifin dataTemplate
-      # agar ketika run pertama kali yang terbaca tetap data default di excel
-      
+    # end - Section preparation data --------
+    
+    
+    
+    # Section asumsi makro ---------------------------------------------
+    observeEvent(input$asumsiMakro_button, {
+      # removeUI(selector='#showTable')
+      # removeUI(selector='#showMakro')
+      # browser()
+      dataTemplate()
       resultTemplate()
-      # dataTemplate()
       
-      #setelah dataTemplate(data default) aktif, 
-      # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
-      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
-      dataDefine <- readRDS(fileName)
-      # dataDefine <- readDataLastEdited()
+      insertUI(selector='#uiShowMakro',
+               where='afterEnd',
+               ui= uiOutput('showMakro'))
       
       
-      #### io  ####    
-      io.in <-  dataDefine$ioInput
-      io.in <- cbind(grup="input",io.in)
-      io.out <-  dataDefine$ioOutput
-      io.out <- cbind(grup="output",io.out)
-      
-      io.in[is.na(io.in)] <- 0 #NA replace with zero
-      io.out[is.na(io.out)] <- 0
-      io.all <- rbind(io.in,io.out) #combine all data input-output
-      io.all <- cbind(status="general", io.all) #add variable status
-      io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
-      
-      
-      yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
-      
-      #### price ####
-      price.in <-  dataDefine$priceInput
-      price.in <- cbind(grup="input",price.in)
-      price.out <-  dataDefine$priceOutput
-      price.out <- cbind(grup="output",price.out)
-      price.in[is.na(price.in)] <- 0
-      price.out[is.na(price.out)] <- 0
-      price.all <- rbind(price.in, price.out)
-      
-      p.price<-price.all[-6]
-      p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
-      colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
-      p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
-      
-      s.price<-price.all[-5]
-      s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
-      colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
-      s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
-      
-      price.all.year <- rbind(p.price, s.price)
-      
-      #### buat if else untuk modal kapital ####
-      if (is.null(dataDefine$capital)){
-        # capital = NULL
-        data.gab <- rbind(io.all,
-                          price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
+    }) 
+    
+    output$showMakro <- renderUI({
+      argonRow(
+      argonColumn(
+        width = 12,
+        argonH1("Asumsi Makro", display = 4),
+        h5("Langkah 2: menentukan asumsi makro untuk data PAM yang dibangun"),
+        br(),
+        fluidRow(
+        column(3,
+               sliderInput(("rate.p"), "Discount Rate Private", 7.4 ,min = 0, max = 15, step = 0.01)
+        ),
+        column(3,
+               sliderInput(("rate.s"), "Discount Rate Social", 2.4 ,min = 0, max = 8, step = 0.01)
+        ),
+        column(4,
+               sliderInput(("nilai.tukar"), "Nilai Tukar Rupiah", 14831 ,min = 10000, max = 20000, step = 10)
+        ),
+        column(2,
+               br(),
+               actionButton(("tampilkanTabel_button"),"Tampilkan Tabel PAM",icon("paper-plane"),style="color: white; 
+                         background-color: green;")
+        )
+      )
+      )
+      )
+    })
+    # End - Section asumsi makro ---------------------------------------------
+
+    # Section tampilkan tabel---------------------------------------------
+    observeEvent(input$tampilkanTabel_button, {
+      dataTemplate()
+      resultTemplate()
+      insertUI(selector='#uiShowTable',
+               where='afterEnd',
+               ui= uiOutput('showTable'))
+      }) 
+    
+    output$showTable <- renderUI({
+      argonRow(
+      argonColumn(
+        width = 12,
+        argonH1("Tabel", display = 4),
+        h5("Langkah 3: menampilkan Tabel PAM yang terpilih"),
         
-      }else{
-        capital <- cbind(grup="input",dataDefine$capital)
+        # ga bisa pakai dataTableOutput krn action button dibawah tabset ini tdk bisa jadi input buttton utk showmodal berikutnya
+        argonTabSet(
+          id = "tab-1",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "sm",
+          width = 12,
+          iconList = lapply(X = 1:3, FUN = argonIcon, name = "atom"),
+          argonTab(
+            tabName = "Tabel Harga",
+            active = T,
+            # tableOutput("cekTable"),
+            dataTableOutput("showTablePrice"),
+            style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+          ),
+          argonTab(
+            tabName = "Tabel Kuantitas",
+            active = F,
+            dataTableOutput(("showTableKuantitas")),
+            style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+          ),
+          argonTab(
+            tabName = "Tabel Modal Kapital",
+            active = F,
+            dataTableOutput(("showTableKapital")),
+            style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+          )
+        ),
         
-        # menambahkan pada tabel io matrix bernilai 1
-        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
-        # modal kapital sosialnya diwakili oleh momdal kapital privat
-        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
-        colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
-        ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
         
-        
-        kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
-        kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
-        kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
-        kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
-        data.gab <- rbind(io.all, ioKapital,
-                          price.all.year, 
-                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
-      }
+      )
+      )
+      
     })
     
+    observeEvent(input$tampilkanTabel_button, {
+      insertUI(selector='#uiShowButton',
+               where='afterEnd',
+               ui= uiOutput('showButton'))
+
+
+    })
+
+    output$showButton <- renderUI({
+      argonRow(
+        argonColumn(
+        width = 12,
+            h5("Langkah 4: Membangun tabel PAM dengan menyunting atau menggunakan data template", align = "center"),
+            fluidRow(
+              column(5,
+                     
+              ),
+              column(7,
+                     actionButton("buatPAM_button","Membangun PAM",icon("paper-plane"),style="color: white;
+                           background-color: green;")
+              )
+            )
+        )
+      )
+
+    })
+
+
+
     
+    output$showTablePrice <- renderDataTable({
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      # print("data terakhir tersimpan di rds")
+      readDataLastEdited <- readRDS(fileName)
+      dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
+      dataView[is.na(dataView)] <- 0 #NA replace with zero
+      dataView
+      
+      # CONDITION IF ELSE NYA DI UBAH
+      # if(!is.null(valP1()) | !is.null(valP2())){
+      #   dataView <- rbind(valP1(),valP2())
+      #   dataView
+      # }else{
+      #   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      #   fileName <- paste0(datapath,"saveData","_",
+      #                      # input$sut,"_",input$kom,"_",
+      #                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      #   # print("data terakhir tersimpan di rds")
+      #   readDataLastEdited <- readRDS(fileName)
+      #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
+      #   dataView
+      # }
+      
+      # if(!is.null(data.gab())){
+      #   dataView <- rbind(readDataLastEdited()$priceInput, readDataLastEdited()$priceOutput)
+      #   dataView
+      # }else if(!is.null(valP1()) | !is.null(valP2())){
+      #   dataView <- rbind(valP1(),valP2())
+      #   dataView
+      # }
+    })
     
-    output$viewPrice <- renderDataTable({
-      if(!is.null(data.gab())){
-        dataView <- rbind(readDataLastEdited()$priceInput, readDataLastEdited()$priceOutput)
+    output$showTableKuantitas <- renderDataTable({
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      # print("data terakhir tersimpan di rds")
+      readDataLastEdited <- readRDS(fileName)
+      dataView <- rbind(readDataLastEdited$ioInput, readDataLastEdited$ioOutput)
+      dataView[is.na(dataView)] <- 0 #NA replace with zero
+      dataView
+      
+    })
+    
+    output$showTableKapital <- renderDataTable({
+      # case for modal kapital
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+      
+      if(cekCapital == T){
+        datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+        fileName <- paste0(datapath,"saveData","_",
+                           # input$sut,"_",input$kom,"_",
+                           input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+        # print("data terakhir tersimpan di rds")
+        readDataLastEdited <- readRDS(fileName)
+        dataView <- readDataLastEdited$capital
+        dataView[is.na(dataView)] <- 0 #NA replace with zero
         dataView    
-      }else if(!is.null(valP1()) | !is.null(valP2())){
-        dataView <- rbind(valP1(),valP2())
+      }
+      else if(cekCapital == F){
+        dataView <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
+        colnames(dataView) <- "Keterangan"
         dataView
       }
-    })    
+    })
     
     # End - Section tampilkan tabel ---------------------------------------------
     
     # Section Popup Modal Dialog---------------------------------------------
-
-    observeEvent(input$coba_button,{
+    observeEvent(input$buatPAM_button,{
       # browser()
       showModal(
         modalDialog(
           footer=tagList(
-            actionButton(("closeModalBuatPam"), "Tutup")
+            actionButton(("closeModalBuatPam"), "Batal")
           ),
-          h5("langkah 5: Membangun Tabel"),
+          h1("Langkah 5: Membangun Tabel", align="center"),
+          br(),
+          br(),
+          br(),
           actionButton(("sunting_button"),"Sunting Tabel Kuantitas, Harga, dan Modal Kapital",style="color: white;
                          background-color: green;"),
+          
           actionButton(("template_button"),"Gunakan Data Template",style="color: white;
                          background-color: green;")
           ,
@@ -625,6 +686,77 @@ app <- shiny::shinyApp(
       removeModal()
     })
 
+    observeEvent(input$template_button,{
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            actionButton(("closeModalPrice"), "Tutup")
+          ),
+          #tabsetPanel(
+          argonTabSet(
+            #tabPanel(
+            id = "tabPrice",
+            card_wrapper = TRUE,
+            horizontal = TRUE,
+            circle = FALSE,
+            size = "sm",
+            width = 12,
+            iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
+            argonTab(
+              tabName = "Input",
+              active = T,
+              sidebarLayout(
+                sidebarPanel(
+                  fluidPage(
+                    h2("Sunting Harga Input"),
+                    tags$b('Sunting secara manual'),
+                    tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
+                  ),
+                  tags$br(),
+                  width=12
+                ),
+                mainPanel(
+                  rHandsontableOutput(('editPriceInput')),
+                  tags$br(),
+                  actionButton(('savePriceInput'), 'simpan tabel'),
+                  tags$br(),
+                  tags$br(),
+                  tags$div(id='teksPriceInputSave'),
+                  width=12)
+              )
+            ),
+            argonTab(
+              tabName = "Output",
+              sidebarLayout(
+                sidebarPanel(
+                  fluidPage(
+                    h2("Sunting Harga Output"),
+                    tags$b('Sunting secara manual'),
+                    tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
+                    
+                  ),
+                  tags$br(),
+                  width=12
+                ),
+                mainPanel(
+                  rHandsontableOutput(('editPriceOutput')),
+                  tags$br(),
+                  actionButton(('savePriceOutput'), 'simpan tabel'), 
+                  tags$br(), 
+                  tags$br(),
+                  tags$div(id='teksPriceOutputSave'),
+                  width=12)
+              )
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+    })
+    
+    observeEvent(input$closeModalPrice,{
+      removeModal()
+    })
     
     # End - Section Popup Modal Dialog ---------------------------------------------
     

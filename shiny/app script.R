@@ -183,7 +183,6 @@ app <- shiny::shinyApp(
     resultTemplate <- reactive({
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"resultDefault","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       
       ioInput <- read.table(paste0(datapath,"io template input.csv"), header = T, sep = ",")
       ioOutput <- read.table(paste0(datapath,"io template output.csv"), header = T, sep = ",")
@@ -420,6 +419,8 @@ app <- shiny::shinyApp(
       dataDefine$th <- input$th
       
       print("save result default untuk klik pertama run_button")
+      
+      fileName <- paste0(datapath,"resultDefault","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
       saveRDS(dataDefine,file = fileName)
       
       

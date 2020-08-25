@@ -22,7 +22,7 @@ verifikasi <- argonTabItem(
         argonColumn(
           width = 12,
           argonH1("Informasi Umum", display = 4),
-          h5("langkah 1: menentukan informasi umum untuk data PAM yang dibangun"),
+          h5("Langkah 1: menentukan informasi umum untuk data PAM yang dibangun"),
           br(),
           fluidRow(
             column(2,
@@ -45,7 +45,7 @@ verifikasi <- argonTabItem(
             ),
             column(2,
                    br(),
-                   actionButton(("run_button"),"Tentukan Asumsi Makro",icon("paper-plane"),style="color: white; 
+                   actionButton(("asumsiMakro_button"),"Tentukan Asumsi Makro",icon("paper-plane"),style="color: white; 
                          background-color: green;") 
                    
             )
@@ -62,10 +62,15 @@ verifikasi <- argonTabItem(
       argonRow(
         argonColumn(
           width = 12,
-          tags$div(id = 'uiShowTable'),
+          tags$div(id = 'uiShowTable')
+        )
+      ),
+      argonRow(
+        argonColumn(
+          width = 12,
           tags$div(id = 'uiShowButton')
         )
-      )
+      ),
 
     )
   )
