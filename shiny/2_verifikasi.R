@@ -71,6 +71,12 @@ verifikasi <- argonTabItem(
           tags$div(id = 'uiShowButton')
         )
       ),
+      argonRow(
+        argonColumn(
+          width = 12,
+          tags$div(id = 'uiShowResult')
+        )
+      ),
 
     )
   )

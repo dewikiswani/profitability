@@ -173,6 +173,8 @@ app <- shiny::shinyApp(
       tipeLahan <- input$tipeLahan
       
       
+      
+      
       combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
                          capital=capital,
@@ -510,6 +512,10 @@ app <- shiny::shinyApp(
       insertUI(selector='#uiShowTable',
                where='afterEnd',
                ui= uiOutput('showTable'))
+      
+      insertUI(selector='#uiShowButton',
+               where='afterEnd',
+               ui= uiOutput('showButton'))
       }) 
     
     output$showTable <- renderUI({
@@ -519,7 +525,7 @@ app <- shiny::shinyApp(
         argonH1("Tabel", display = 4),
         h5("Langkah 3: menampilkan Tabel PAM yang terpilih"),
         
-        # ga bisa pakai dataTableOutput krn action button dibawah tabset ini tdk bisa jadi input buttton utk showmodal berikutnya
+        # jika tdk bisa jadi input buttton maka coba ubah nama action  buttonnya sepertinya conflict dengan script lain
         argonTabSet(
           id = "tab-1",
           card_wrapper = TRUE,
@@ -548,42 +554,9 @@ app <- shiny::shinyApp(
             style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
           )
         ),
-        
-        
       )
       )
-      
     })
-    
-    observeEvent(input$tampilkanTabel_button, {
-      insertUI(selector='#uiShowButton',
-               where='afterEnd',
-               ui= uiOutput('showButton'))
-
-
-    })
-
-    output$showButton <- renderUI({
-      argonRow(
-        argonColumn(
-        width = 12,
-            h5("Langkah 4: Membangun tabel PAM dengan menyunting atau menggunakan data template", align = "center"),
-            fluidRow(
-              column(5,
-                     
-              ),
-              column(7,
-                     actionButton("buatPAM_button","Membangun PAM",icon("paper-plane"),style="color: white;
-                           background-color: green;")
-              )
-            )
-        )
-      )
-
-    })
-
-
-
     
     output$showTablePrice <- renderDataTable({
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -656,33 +629,69 @@ app <- shiny::shinyApp(
       }
     })
     
-    # End - Section tampilkan tabel ---------------------------------------------
-    
-    # Section Popup Modal Dialog---------------------------------------------
-    observeEvent(input$buatPAM_button,{
-      # browser()
-      showModal(
-        modalDialog(
-          footer=tagList(
-            actionButton(("closeModalBuatPam"), "Batal")
-          ),
-          h1("Langkah 5: Membangun Tabel", align="center"),
+    output$showButton <- renderUI({
+      argonRow(
+        argonColumn(
+          width = 12,
           br(),
-          br(),
-          br(),
-          actionButton(("sunting_button"),"Sunting Tabel Kuantitas, Harga, dan Modal Kapital",style="color: white;
-                         background-color: green;"),
-          
-          actionButton(("template_button"),"Gunakan Data Template",style="color: white;
-                         background-color: green;")
-          ,
-          size="l",
-          easyClose = FALSE)
+          h5("Langkah 4: Membangun tabel PAM dengan menyunting atau menggunakan data template", align = "center"),
+          fluidRow(
+            column(5,
+                   
+            ),
+            column(7,
+                   actionButton("buatPAM_button","Membangun PAM",icon("paper-plane"),style="color: white;
+                           background-color: green;")
+            )
+          )
+        )
       )
       
     })
     
-    observeEvent(input$closeModalBuatPam,{
+    # End - Section tampilkan tabel ---------------------------------------------
+    
+    # Section Popup Modal Dialog---------------------------------------------
+    dataModalCreatePam <- function(failed = FALSE) {
+      modalDialog(
+        footer=tagList(
+          actionButton(("closeModalCreatePam"), "Batal")
+        ),
+        argonTabSet(
+          id = "tabTemplate",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Langkah 5: Membangun Tabel",
+            active = T,
+            fluidRow(
+              column(8,
+                     actionButton(("sunting_button"),"Sunting Tabel Kuantitas, Harga, dan Modal Kapital",style="color: white;
+                         background-color: green;"),
+              ),
+              column(4,
+                     actionButton(("template_button"),"Gunakan Data Template",style="color: white;
+                         background-color: green;")
+              )
+            )
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    
+    
+    observeEvent(input$buatPAM_button,{
+      # browser()
+      showModal(dataModalCreatePam())
+      
+    })
+    
+    observeEvent(input$closeModalCreatePam,{
       removeModal()
     })
 
@@ -690,48 +699,23 @@ app <- shiny::shinyApp(
       showModal(
         modalDialog( 
           footer=tagList(
-            actionButton(("closeModalPrice"), "Tutup")
+            actionButton(("backModalCreatePam"), "Kembali"),
+            actionButton(("running_button"), "Jalankan Analisis",style="color: white;background-color: green;")
           ),
-          #tabsetPanel(
           argonTabSet(
-            #tabPanel(
             id = "tabPrice",
             card_wrapper = TRUE,
             horizontal = TRUE,
             circle = FALSE,
             size = "sm",
             width = 12,
-            iconList = lapply(X = 1:2, FUN = argonIcon, name = "atom"),
             argonTab(
-              tabName = "Input",
+              tabName = "Sunting Harga Output",
               active = T,
               sidebarLayout(
                 sidebarPanel(
                   fluidPage(
-                    h2("Sunting Harga Input"),
-                    tags$b('Sunting secara manual'),
-                    tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
-                  ),
-                  tags$br(),
-                  width=12
-                ),
-                mainPanel(
-                  rHandsontableOutput(('editPriceInput')),
-                  tags$br(),
-                  actionButton(('savePriceInput'), 'simpan tabel'),
-                  tags$br(),
-                  tags$br(),
-                  tags$div(id='teksPriceInputSave'),
-                  width=12)
-              )
-            ),
-            argonTab(
-              tabName = "Output",
-              sidebarLayout(
-                sidebarPanel(
-                  fluidPage(
-                    h2("Sunting Harga Output"),
-                    tags$b('Sunting secara manual'),
+                    h3("Sunting secara manual"),
                     tags$h5("kolom yang dapat di sunting hanya kolom harga.privat dan harga.sosial"),
                     
                   ),
@@ -754,9 +738,391 @@ app <- shiny::shinyApp(
       )
     })
     
-    observeEvent(input$closeModalPrice,{
-      removeModal()
+    observeEvent(input$backModalCreatePam,{
+      showModal(dataModalCreatePam())
     })
+    
+    observeEvent(input$running_button,{
+      removeModal()
+        insertUI(selector='#uiShowResult',
+                 where='afterEnd',
+                 ui= uiOutput('showResult'))
+    })
+    
+    output$showResult <- renderUI({
+      fluidPage(
+        fluidRow(
+          column(11,
+                 br(),
+                 br(),
+                 h1("Hasil Analisis", align = "center"),
+                 br(),
+          )
+        ),
+        br(),
+        fluidRow(
+          column(4,
+                 verbatimTextOutput(("npv"))
+          ),
+          column(4,
+                 verbatimTextOutput(("nlc"))
+          ),
+          column(4,
+                 verbatimTextOutput(("ec"))
+          )
+        ),
+        br(),
+        br(),
+        fluidRow(
+          column(8,
+                 verbatimTextOutput(("hp"))
+          ),
+          column(4,
+                 verbatimTextOutput(("lr"))
+          )
+        ),
+        fluidRow(
+          column(9,
+                 h6(" ")
+          ),
+          column(3,
+                 actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;background-color: green;")
+          )
+        ),
+        fluidRow(
+          column(9,
+                 h6(" ")
+          ),
+          column(3,
+                 br(),
+                 tags$div(id='teksNewPamSave')
+          )
+        )
+        
+        
+      )
+    })
+    
+    ################################################################################
+    #                                                                              #
+    #                                RESULT                                        #
+    #                                                                              #
+    ################################################################################
+    data.gab <- eventReactive(input$running_button,{
+      # observeEvent(input$running_button,{
+      #   browser()
+      
+      # aktifin dataTemplate
+      # agar ketika run pertama kali yang terbaca tetap data default di excel
+      
+      # resultTemplate()
+      # dataTemplate()
+      
+      #setelah dataTemplate(data default) aktif, 
+      # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
+      # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
+      
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"resultTemplate","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      #### io  ####    
+      io.in <-  dataDefine$ioInput
+      io.in <- cbind(grup="input",io.in)
+      io.out <-  dataDefine$ioOutput
+      io.out <- cbind(grup="output",io.out)
+      
+      io.in[is.na(io.in)] <- 0 #NA replace with zero
+      io.out[is.na(io.out)] <- 0
+      io.all <- rbind(io.in,io.out) #combine all data input-output
+      io.all <- cbind(status="general", io.all) #add variable status
+      io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      
+      yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+      
+      #### price ####
+      price.in <-  dataDefine$priceInput
+      price.in <- cbind(grup="input",price.in)
+      price.out <-  dataDefine$priceOutput
+      price.out <- cbind(grup="output",price.out)
+      price.in[is.na(price.in)] <- 0
+      price.out[is.na(price.out)] <- 0
+      price.all <- rbind(price.in, price.out)
+      
+      p.price<-price.all[-6]
+      p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+      colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+      p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      s.price<-price.all[-5]
+      s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+      colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+      s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+      
+      price.all.year <- rbind(p.price, s.price)
+      
+      #### buat if else untuk modal kapital ####
+      if (is.null(dataDefine$capital)){
+        # capital = NULL
+        data.gab <- bind_rows(io.all,
+                              price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+        
+      }else{
+        capital <- cbind(grup="input",dataDefine$capital)
+        
+        # menambahkan pada tabel io matrix bernilai 1
+        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
+        # modal kapital sosialnya diwakili oleh momdal kapital privat
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        
+        kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
+        kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
+        kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
+        data.gab <- rbind(io.all, ioKapital,
+                          price.all.year, 
+                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+      }
+    })
+    
+    hitung.npv<-eventReactive(input$running_button,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"resultTemplate","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      
+      #perkalian antara general dan Private Price
+      dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+      dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
+      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+      p.budget <- cbind(dataGeneral[c(1:4,36)],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- p.budget %>%
+        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+      
+      #perkalian antara general dengan Social Price
+      dataSosial <- filter(data.gab(), status == c("harga.sosial")) #filter data social price
+      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+      s.budget <- cbind(dataGeneral[c(1:4,36)],s.budget)
+      s.budget <- s.budget %>%
+        mutate(status = case_when(status == "general" ~ "social budget"))
+      
+      
+      ################ penghitungan NPV
+      p.cost.input <- p.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      s.cost.input <- s.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      p.sum.cost<- p.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.cost<- s.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      p.rev.output <- p.budget %>%
+        filter(str_detect(grup,"output"))
+      s.rev.output <- s.budget %>%
+        filter(str_detect(grup,"output"))
+      
+      p.sum.rev <- p.rev.output[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.rev <- s.rev.output[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      
+      p.profit <- p.sum.rev - p.sum.cost
+      s.profit <- s.sum.rev - s.sum.cost
+      profit0 <- 0
+      p.profit<-c(profit0,p.profit)
+      s.profit<-c(profit0,s.profit)
+      
+      npv.p<-npv(dataDefine$rate.p/100,p.profit)
+      npv.s<-npv(dataDefine$rate.s/100,s.profit)
+      
+      hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+      
+      npv.p.us<-npv.p/dataDefine$nilai.tukar
+      npv.s.us<-npv.s/dataDefine$nilai.tukar
+      npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+      hsl.npv<-rbind(hsl.npv,npv.us)
+      
+      #browser()
+      
+      rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+      hsl.npv
+    })
+    
+    ##npv
+    output$npv<- renderPrint({
+      hasil<-t(hitung.npv())
+      hasil
+    })
+    
+    hitung.nlc<-eventReactive(input$running_button,{
+      #perkalian antara general dan Private Price
+      dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+      dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
+      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+      p.budget <- cbind(dataGeneral[c(1:4,36)],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- p.budget %>%
+        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+      
+      #perkalian antara general dengan Social Price
+      dataSosial <- filter(data.gab(), status == c("harga.sosial")) #filter data social price
+      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+      s.budget <- cbind(dataGeneral[c(1:4,36)],s.budget)
+      s.budget <- s.budget %>%
+        mutate(status = case_when(status == "general" ~ "social budget"))
+      
+      
+      ################ penghitungan NPV
+      p.cost.input <- p.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      s.cost.input <- s.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      p.sum.cost<- p.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.cost<- s.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      p.tot.cost<- sum(p.sum.cost)
+      s.tot.cost<- sum(s.sum.cost)
+      
+      p.labor.input <- p.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+      s.labor.input <- s.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+      
+      p.sum.labor <- p.labor.input[,-(1:5)] %>%
+        sum(na.rm = T)
+      s.sum.labor <- s.labor.input[,-(1:5)] %>%
+        sum(na.rm = T)
+      
+      
+      
+      nlc.p <- (p.tot.cost - p.sum.labor)/1000000
+      nlc.s <- (s.tot.cost - s.sum.labor)/1000000
+      nlc<-data.frame(PRIVATE=nlc.p,SOCIAL=nlc.s)
+      rownames(nlc)<-c("Non Labor Cost (Juta Rp/Ha)")
+      nlc
+      
+    })
+    
+    output$nlc<- renderPrint({
+      hasil<-t(hitung.nlc())
+      hasil
+    })
+    
+    hitung.ec<-eventReactive(input$running_button,{
+      #perkalian antara general dan Private Price
+      dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+      dataPrivat <- filter(data.gab(),status == c("harga.privat")) #filter data private price
+      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+      p.budget <- cbind(dataGeneral[c(1:4,36)],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- p.budget %>%
+        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+      
+      #perkalian antara general dengan Social Price
+      dataSosial <- filter(data.gab(), status == c("harga.sosial")) #filter data social price
+      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+      s.budget <- cbind(dataGeneral[c(1:4,36)],s.budget)
+      s.budget <- s.budget %>%
+        mutate(status = case_when(status == "general" ~ "social budget"))
+      
+      
+      ################ penghitungan NPV
+      p.cost.input <- p.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      s.cost.input <- s.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      p.sum.cost<- p.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.cost<- s.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      ############# PERHITUNGAN ESTABLISHMENT COST
+      p.ec <- p.sum.cost[[1]]/1000000
+      s.ec <- s.sum.cost[[1]]/1000000
+      ec <- data.frame(p.ec,s.ec)
+      ec<-data.frame(PRIVATE=p.ec,SOCIAL=s.ec)
+      rownames(ec)<-c("Establishment cost (1st year only, MRp/ha)")
+      ec
+    })
+    
+    output$ec<- renderPrint({
+      hasil<-t(hitung.ec())
+      hasil
+    })
+    
+    hitung.hp<-eventReactive(input$running_button,{
+      # observeEvent(input$running_button,{
+      # browser()
+      dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+      
+      ############# PERHITUNGAN HARVESTING PRODUCT
+      fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
+      fil.prod <- fil.prod %>%  filter(str_detect(komponen,"utama"))
+      sum.prod <- fil.prod[,-c(1:5,36)] %>%
+        colSums(na.rm = T)
+      tot.prod <- sum(sum.prod)
+      
+      fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      sum.labor <- fil.labor[,-c(1:5,36)] %>%
+        colSums(na.rm = T)
+      tot.labor <- sum(sum.labor)
+      
+      hp <- data.frame(tot.prod/tot.labor)/1000 # karena ton jadi di bagi 1000
+      colnames(hp)<-c("Harvesting Product (ton/HOK) Labor Req for Est (1 tahun pertama)")
+      rownames(hp) <- c("Nilai")
+      hp
+    })
+    
+    output$hp<- renderPrint({
+      hasil<-hitung.hp()
+      hasil
+    })
+    
+    hitung.lr<-eventReactive(input$running_button,{
+      # observeEvent(input$running_button,{
+      #   
+      #   browser()
+      dataGeneral <- filter(data.gab(),status == c("general")) #filter data input output (yg sudah diberi status=general)
+      
+      fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      sum.labor <- fil.labor[,-c(1:5,36)] %>%
+        colSums(na.rm = T)
+      
+      ############# PERHITUNGAN LABOR REQ FOR EST
+      lr <- data.frame(sum.labor[[1]]) #pekerja pada tahun 1
+      colnames(lr)<-c("Labor Req for Est (1 tahun pertama)")
+      rownames(lr) <- c("Nilai")
+      lr
+      
+    })
+    
+    output$lr<- renderPrint({
+      hasil<-hitung.lr()
+      hasil
+    })
+    
+    
     
     # End - Section Popup Modal Dialog ---------------------------------------------
     
