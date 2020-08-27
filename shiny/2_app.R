@@ -129,13 +129,16 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       
       readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      yearIO <- 30 #tahun daur tanam
+      
       inputData <- filter(readDataTemplate,faktor == c("input"))
-      ioInput <- inputData[,c(2:4,8:37)] #menghilangkan kolom harga
-      priceInput <- inputData[,c(2,3,5,6,7)] #mengambil kolom harga
+      ioInput <- inputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+      priceInput <- inputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
       
       outputData <- filter(readDataTemplate,faktor == c("output"))
-      ioOutput <- outputData[,c(2:4,8:37)] #menghilangkan kolom harga
-      priceOutput <- outputData[,c(2,3,5,6,7)] #mengambil kolom harga
+      ioOutput <- outputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+      priceOutput <- outputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
+      
       
       
       # case for modal kapital
@@ -171,6 +174,7 @@ app <- shiny::shinyApp(
       provinsi <- input$selected_provinsi
       th <- input$th
       tipeLahan <- input$tipeLahan
+      tipeKebun <- readDataTemplate$tipe
       
       
       
@@ -182,7 +186,8 @@ app <- shiny::shinyApp(
                          kom=kom,
                          provinsi = provinsi,
                          th=th,
-                         tipeLahan = tipeLahan)
+                         tipeLahan = tipeLahan,
+                         tipeKebun = tipeKebun)
       
       # save data untuk setiap perubahan
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -202,13 +207,17 @@ app <- shiny::shinyApp(
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       
       readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      yearIO <- 30 #tahun daur tanam
+      
       inputData <- filter(readDataTemplate,faktor == c("input"))
-      ioInput <- inputData[,c(2:4,8:37)] #menghilangkan kolom harga
-      priceInput <- inputData[,c(2,3,5,6,7)] #mengambil kolom harga
+      ioInput <- inputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+      priceInput <- inputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
       
       outputData <- filter(readDataTemplate,faktor == c("output"))
-      ioOutput <- outputData[,c(2:4,8:37)] #menghilangkan kolom harga
-      priceOutput <- outputData[,c(2,3,5,6,7)] #mengambil kolom harga
+      ioOutput <- outputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+      priceOutput <- outputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
+      
+      
       
       # case for modal kapital
       cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
@@ -241,6 +250,8 @@ app <- shiny::shinyApp(
       dataDefine$provinsi <- input$selected_provinsi
       dataDefine$th <- input$th
       dataDefine$tipeLahan <- input$tipeLahan
+      dataDefine$tipeKebun <- readDataTemplate$tipe
+      
       
       
       #### io  ####    
@@ -314,14 +325,14 @@ app <- shiny::shinyApp(
       dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
       dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
       p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
-      p.budget <- cbind(dataGeneral[c(1:4,36)],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
       p.budget <- p.budget %>%
         mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
       
       #perkalian antara general dengan Social Price
       dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
       s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
-      s.budget <- cbind(dataGeneral[c(1:4,36)],s.budget)
+      s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
       s.budget <- s.budget %>%
         mutate(status = case_when(status == "general" ~ "social budget"))
       
@@ -363,8 +374,6 @@ app <- shiny::shinyApp(
       npv.s.us<-npv.s/dataDefine$nilai.tukar
       npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
       hsl.npv<-rbind(hsl.npv,npv.us)
-      
-      #browser()
       
       rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
       hsl.npv
@@ -782,18 +791,18 @@ app <- shiny::shinyApp(
         #   )
         # ),
         fluidRow(
-          column(3,
+          column(4,
                  dataTableOutput("tableResultBAU1"),
           ),
-          column(3,
+          column(2,
                  dataTableOutput("tableResultBAU2")
                  
           ),
-          column(3,
+          column(4,
                  dataTableOutput("tableResultSimulasi1"),
                  
           ),
-          column(3,
+          column(2,
                  dataTableOutput("tableResultSimulasi2")
                  
           ),
@@ -921,14 +930,14 @@ app <- shiny::shinyApp(
       dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
       dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
       p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
-      p.budget <- cbind(dataGeneral[c(1:4,36)],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
       p.budget <- p.budget %>%
         mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
       
       #perkalian antara general dengan Social Price
       dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
       s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
-      s.budget <- cbind(dataGeneral[c(1:4,36)],s.budget)
+      s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
       s.budget <- s.budget %>%
         mutate(status = case_when(status == "general" ~ "social budget"))
       
