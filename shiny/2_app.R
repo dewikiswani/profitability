@@ -251,6 +251,7 @@ app <- shiny::shinyApp(
       dataDefine$th <- input$th
       dataDefine$tipeLahan <- input$tipeLahan
       dataDefine$tipeKebun <- readDataTemplate$tipe
+      dataDefine$tipeData <- c("BAU")
       
       
       
@@ -572,24 +573,30 @@ app <- shiny::shinyApp(
       fileName <- paste0(datapath,"saveData","_",
                          # input$sut,"_",input$kom,"_",
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-      # print("data terakhir tersimpan di rds")
       readDataLastEdited <- readRDS(fileName)
       dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
       dataView[is.na(dataView)] <- 0 #NA replace with zero
       dataView
       
+      # if(!is.null(data.gab())){
+      #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput) #karena output nya saja yg kmgknan berubah
+      #   dataView[is.na(dataView)] <- 0 #NA replace with zero
+      #   dataView
+      # }else 
+      #   if(!is.null(valP2())){
+      #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
+      #   dataView[is.na(dataView)] <- 0 #NA replace with zero
+      #   dataView
+      # }
+      
       # CONDITION IF ELSE NYA DI UBAH
-      # if(!is.null(valP1()) | !is.null(valP2())){
-      #   dataView <- rbind(valP1(),valP2())
+      # if(!is.null(valP2())){
+      #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput) #karena output nya saja yg kmgknan berubah
+      #   dataView[is.na(dataView)] <- 0 #NA replace with zero
       #   dataView
       # }else{
-      #   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      #   fileName <- paste0(datapath,"saveData","_",
-      #                      # input$sut,"_",input$kom,"_",
-      #                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-      #   # print("data terakhir tersimpan di rds")
-      #   readDataLastEdited <- readRDS(fileName)
       #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
+      #   dataView[is.na(dataView)] <- 0 #NA replace with zero
       #   dataView
       # }
       
@@ -732,7 +739,7 @@ app <- shiny::shinyApp(
                   width=12
                 ),
                 mainPanel(
-                  rHandsontableOutput(('editPriceOutput')),
+                  rHandsontableOutput(('editPriceOutputTemplate')),
                   tags$br(),
                   actionButton(('savePriceOutput'), 'simpan tabel'), 
                   tags$br(), 
@@ -758,6 +765,88 @@ app <- shiny::shinyApp(
                  ui= uiOutput('showResult'))
     })
     
+    # Start Price Output ------------------------------------------------------
+    reactData <- reactiveValues(
+      tableP1 = NULL, #price input
+      tableP2 = NULL, #price output
+      tableIO1 = NULL, #io input
+      tableIO2 = NULL, #io output
+      tableCapP = NULL, #capital privat
+      tableCapS = NULL #capital sosial
+    )
+    
+    valP2 <- eventReactive(input$template_button,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      reactData$tableP2 <- dataDefine$priceOutput
+      reactData$tableP2
+      
+      
+      # indexRow <- as.numeric(nrow(dataDefine$ioOutput))
+      # reactData$tableP2 <- dataDefine$ioOutput[,1:2]
+      # no.id <- as.numeric(rownames(reactData$tableP2))
+      # reactData$tableP2 <- cbind(no.id,reactData$tableP2)
+      # 
+      # readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      # yearIO <- 30 #tahun daur tanam
+      # outputData <- filter(readDataTemplate,faktor == c("output"))
+      # templatePriceOutput <- outputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
+      # 
+      # # templatePriceOutput <- read.table(paste0(datapath,"price template output.csv"), header = T, sep = ",")
+      # templatePrice <- (templatePriceOutput[,-1])
+      # reactData$tableP2 <- merge(reactData$tableP2,unique(templatePrice), by.x = "jenis",by.y = "jenis", all.x = T)
+      # reactData$tableP2 <- reactData$tableP2[order(reactData$tableP2$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+      # rownames(reactData$tableP2) <- no.id
+      # reactData$tableP2 <- reactData$tableP2[, c(3, 1, 4, 5,6)]
+      # reactData$tableP2
+      # 
+      # reactData$tableP2 <- reactData$tableP2[1:indexRow,]
+      # reactData$tableP2
+    })
+    
+    output$editPriceOutputTemplate <- renderRHandsontable({
+      rhandsontable(valP2(),
+                    rowHeaderWidth = 50,
+                    fixedColumnsLeft = 2,
+                    height = 300,
+      )
+    })
+    
+    observeEvent(input$savePriceOutput,{
+      removeUI(selector='#textTampilOutput')
+      # browser()
+      editNew<-as.data.frame(hot_to_r(input$editPriceOutputTemplate))
+      editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      # replace data price
+      dataDefine$priceOutput <- editNew
+      dataDefine$rate.p <- input$rate.p
+      dataDefine$rate.s <- input$rate.s
+      dataDefine$nilai.tukar <- input$nilai.tukar
+      dataDefine$tipeData <- c("simulasi")
+      
+      saveRDS(dataDefine,file = fileName)
+      
+      insertUI(selector='#teksPriceOutputSave',
+               where = 'afterEnd',
+               ui = tags$div(id="textTampilOutput","tabel di atas sudah tersimpan"))
+      # browser()
+    })
+    
+    # Ending Price Output -----------------------------------------------------
+    
+    
+    
     output$showResult <- renderUI({
       fluidPage(
         fluidRow(
@@ -769,27 +858,14 @@ app <- shiny::shinyApp(
           )
         ),
         br(),
-        # fluidRow(
-        #   column(4,
-        #          verbatimTextOutput(("npv"))
-        #   ),
-        #   column(4,
-        #          verbatimTextOutput(("nlc"))
-        #   ),
-        #   column(4,
-        #          verbatimTextOutput(("ec"))
-        #   )
-        # ),
-        # br(),
-        # br(),
-        # fluidRow(
-        #   column(8,
-        #          verbatimTextOutput(("hp"))
-        #   ),
-        #   column(4,
-        #          verbatimTextOutput(("lr"))
-        #   )
-        # ),
+        fluidRow(
+          column(6,
+                 h3("Business As Usual (BAU)", align = "center")
+          ),
+          column(6,
+                 h3("Simulasi", align = "center")
+          )
+        ),
         fluidRow(
           column(4,
                  dataTableOutput("tableResultBAU1"),
@@ -807,22 +883,12 @@ app <- shiny::shinyApp(
                  
           ),
         ),
-        # fluidRow(
-        #   column(4,
-        #          dataTableOutput("tableResultBAU2")
-        #   ),
-        #   column(1,
-        #          
-        #   ),
-        #   column(4,
-        #          dataTableOutput("tableResultSimulasi2")
-        #   )
-        # ),
         fluidRow(
-          column(3,
-                 actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;background-color: green;")
+          column(9,
+                 plotlyOutput('plotComparing')
           ),
           column(3,
+                 actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;background-color: green;"),
                  br(),
                  tags$div(id='teksNewPamSave')
           )
@@ -839,7 +905,7 @@ app <- shiny::shinyApp(
     ################################################################################
     data.gab <- eventReactive(input$running_button,{
       # observeEvent(input$running_button,{
-        # browser()
+      # browser()
       # 
       # aktifin dataTemplate
       # agar ketika run pertama kali yang terbaca tetap data default di excel
@@ -1068,6 +1134,237 @@ app <- shiny::shinyApp(
       
     })
     
+    data.gab.new <- eventReactive(input$running_button,{
+      # observeEvent(input$running_button,{
+      # browser()
+      # 
+      # aktifin dataTemplate
+      # agar ketika run pertama kali yang terbaca tetap data default di excel
+      
+      # resultTemplate()
+      # dataTemplate()
+      
+      #setelah dataTemplate(data default) aktif, 
+      # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
+      # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
+      
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      # dataDefine <- readDataLastEdited()
+      
+      #### io  ####    
+      io.in <-  dataDefine$ioInput
+      io.in <- cbind(grup="input",io.in)
+      io.out <-  dataDefine$ioOutput
+      io.out <- cbind(grup="output",io.out)
+      
+      io.in[is.na(io.in)] <- 0 #NA replace with zero
+      io.out[is.na(io.out)] <- 0
+      io.all <- rbind(io.in,io.out) #combine all data input-output
+      io.all <- cbind(status="general", io.all) #add variable status
+      io.all <- io.all %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      
+      yearIO <- ncol(io.in)-4 #banyaknya tahun pada tabel io 
+      
+      #### price ####
+      price.in <-  dataDefine$priceInput
+      price.in <- cbind(grup="input",price.in)
+      price.out <-  dataDefine$priceOutput
+      price.out <- cbind(grup="output",price.out)
+      price.in[is.na(price.in)] <- 0
+      price.out[is.na(price.out)] <- 0
+      price.all <- rbind(price.in, price.out)
+      
+      p.price<-price.all[-6]
+      p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
+      colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+      p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
+      
+      s.price<-price.all[-5]
+      s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
+      colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+      s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
+      
+      price.all.year <- rbind(p.price, s.price)
+      
+      #### buat if else untuk modal kapital ####
+      if (is.null(dataDefine$capital)){
+        # capital = NULL
+        data.gab <- bind_rows(io.all,
+                              price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+        
+      }else{
+        capital <- cbind(grup="input",dataDefine$capital)
+        
+        # menambahkan pada tabel io matrix bernilai 1
+        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
+        # modal kapital sosialnya diwakili oleh momdal kapital privat
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
+        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        
+        kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
+        kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
+        kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
+        data.gab <- rbind(io.all, ioKapital,
+                          price.all.year, 
+                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        data.gab
+      }
+      
+      # hitung npv --------------------------------------------------------------
+      dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+      dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+      p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+      p.budget <- p.budget %>%
+        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+      
+      #perkalian antara general dengan Social Price
+      dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+      s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
+      s.budget <- s.budget %>%
+        mutate(status = case_when(status == "general" ~ "social budget"))
+      
+      ################ penghitungan NPV
+      p.cost.input <- p.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      s.cost.input <- s.budget %>%
+        filter(str_detect(grup,"input"))
+      
+      p.sum.cost<- p.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.cost<- s.cost.input[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      p.rev.output <- p.budget %>%
+        filter(str_detect(grup,"output"))
+      s.rev.output <- s.budget %>%
+        filter(str_detect(grup,"output"))
+      
+      p.sum.rev <- p.rev.output[,-(1:5)] %>%
+        colSums(na.rm = T)
+      s.sum.rev <- s.rev.output[,-(1:5)] %>%
+        colSums(na.rm = T)
+      
+      
+      p.profit <- p.sum.rev - p.sum.cost
+      s.profit <- s.sum.rev - s.sum.cost
+      profit0 <- 0
+      p.profit<-c(profit0,p.profit)
+      s.profit<-c(profit0,s.profit)
+      
+      npv.p<-npv(input$rate.p/100,p.profit)
+      npv.s<-npv(input$rate.s/100,s.profit)
+      
+      hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+      
+      npv.p.us<-npv.p/input$nilai.tukar
+      npv.s.us<-npv.s/input$nilai.tukar
+      npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+      hsl.npv<-rbind(hsl.npv,npv.us)
+      
+      #browser()
+      
+      rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+      hsl.npv
+      # ending  npv --------------------------------------------------------------
+      
+      
+      
+      # hitung nlc --------------------------------------------------------------
+      
+      ################ penghitungan NLC
+      
+      p.tot.cost<- sum(p.sum.cost)
+      s.tot.cost<- sum(s.sum.cost)
+      
+      p.labor.input <- p.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+      s.labor.input <- s.budget %>% filter(str_detect(komponen,c("tenaga kerja")))
+      
+      p.sum.labor <- p.labor.input[,-(1:5)] %>%
+        sum(na.rm = T)
+      s.sum.labor <- s.labor.input[,-(1:5)] %>%
+        sum(na.rm = T)
+      
+      
+      
+      nlc.p <- (p.tot.cost - p.sum.labor)/1000000
+      nlc.s <- (s.tot.cost - s.sum.labor)/1000000
+      nlc<-data.frame(PRIVATE=nlc.p,SOCIAL=nlc.s)
+      rownames(nlc)<-c("Non Labor Cost (Juta Rp/Ha)")
+      nlc
+      # ending  nlc ------------------------------------------------------- 
+      
+      # hitung EC --------------------------------------------------------------
+      ############# PERHITUNGAN ESTABLISHMENT COST
+      p.ec <- p.sum.cost[[1]]/1000000
+      s.ec <- s.sum.cost[[1]]/1000000
+      ec <- data.frame(p.ec,s.ec)
+      ec<-data.frame(PRIVATE=p.ec,SOCIAL=s.ec)
+      rownames(ec)<-c("Establishment cost (1 tahun pertama, Juta Rp/Ha)")
+      ec
+      
+      # ending  EC ------------------------------------------------------- 
+      
+      # hitung hp --------------------------------------------------------------
+      ############# PERHITUNGAN HARVESTING PRODUCT
+      fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
+      fil.prod <- fil.prod %>%  filter(str_detect(komponen,"utama"))
+      sum.prod <- fil.prod[,-c(1:5,36)] %>%
+        colSums(na.rm = T)
+      tot.prod <- sum(sum.prod)
+      
+      fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      sum.labor <- fil.labor[,-c(1:5,36)] %>%
+        colSums(na.rm = T)
+      tot.labor <- sum(sum.labor)
+      
+      hp <- data.frame(tot.prod/tot.labor)/1000 # karena ton jadi di bagi 1000
+      colnames(hp)<-c("Harvesting Product (ton/HOK) Labor Req for Est (1 tahun pertama)")
+      rownames(hp) <- c("Nilai")
+      hp <- data.frame(t(hp))
+      hp
+      # ending  hp ------------------------------------------------------- 
+      
+      # hitung lr --------------------------------------------------------------
+      ############# PERHITUNGAN LABOR REQ FOR EST
+      lr <- data.frame(sum.labor[[1]]) #pekerja pada tahun 1
+      colnames(lr)<-c("Labor Req for Est (1 tahun pertama)")
+      rownames(lr) <- c("Nilai")
+      lr <- data.frame(t(lr))
+      lr
+      
+      # ending  lr ------------------------------------------------------- 
+      
+      tabel1 <- rbind(hsl.npv,nlc,ec)
+      tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
+      tabel1
+      
+      tabel2 <- rbind(hp,lr)
+      tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
+      tabel2
+      
+      tabelGab <- list(tabel1=tabel1,tabel2=tabel2)
+      tabelGab
+      
+      
+      
+    })
+    
     output$tableResultBAU1 <- renderDataTable({
       datatable(data.gab()$tabel1, option=list(dom = "t"))
     })
@@ -1078,15 +1375,55 @@ app <- shiny::shinyApp(
     })
     
     output$tableResultSimulasi1 <- renderDataTable({
-      datatable(data.gab()$tabel1, option=list(dom = "t"))
+      datatable(data.gab.new()$tabel1, option=list(dom = "t"))
     })
     
     output$tableResultSimulasi2 <- renderDataTable({
-      datatable(data.gab()$tabel2, option=list(dom = "t"))
+      datatable(data.gab.new()$tabel2, option=list(dom = "t"))
     })
     
     
+    preparePlot <- eventReactive(input$saveNewPAM,{
+      # row_to_select=as.numeric(gsub("Row","",input$checked_rows))
+      # row_to_select_newPam = as.numeric(gsub("Row","",input$checked_rows_newPam))
+      
+      # data template BAU
+      # dataCheck <- loadRDSAll()
+      # dataCheck <- dataCheck[row_to_select]
+      # sut <- unlist(lapply(dataCheck, function(x)x[[15]]))
+      # komoditas <- unlist(lapply(dataCheck, function(x)x[[16]]))
+      # NPV.Privat.RP <- unlist(lapply(dataCheck, function(x)x[[7]][1,1]))
+      browser()
+      
+      
+      
+      dataPlotDefault <- data.frame(tipe.data=tipeData,
+                                    komoditas=komoditas,
+                                    NPV.Privat.RP=NPV.Privat.RP)
+      
+      # data simulasi Pam baru
+      # dataCheckNewPam <- loadRDSAllNewPam()
+      # dataCheckNewPam <- dataCheckNewPam[row_to_select_newPam]
+      # sut <- unlist(lapply(dataCheckNewPam, function(x)x[[15]]))
+      # sut<-paste0("PAM BARU ",sut)
+      # komoditas <- unlist(lapply(dataCheckNewPam, function(x)x[[16]]))
+      # komoditas<-paste0("PAM BARU ",komoditas) # supaya barchartnya terpisah dari setiap komoditas
+      # NPV.Privat.RP <- unlist(lapply(dataCheckNewPam, function(x)x[[7]][1,1]))
+      
+      dataPlotNewPam <- data.frame(tipe.data=tipeData,
+                                   komoditas=komoditas,
+                                   NPV.Privat.RP=NPV.Privat.RP)
+      dataPlot <- rbind(dataPlotDefault,dataPlotNewPam)
+      
+      
+      dataPlot %>%
+        group_by(tipe.data) %>%
+        plot_ly(x = ~komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.data)
+    })
     
+    output$plotComparing <- renderPlotly({
+      preparePlot()
+    })
     
    
     
