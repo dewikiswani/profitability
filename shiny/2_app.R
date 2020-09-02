@@ -36,11 +36,11 @@ source("shiny/footer.R")
 
 # input file
 komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
-# indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
+dataPupuk <- read.csv("shiny/data/template/jenis pupuk.csv", stringsAsFactors = F)
 
 # elements
 source("shiny/2_verifikasi.R")
-source("shiny/pambaru_modul2.R")
+source("shiny/2_pambaru_modul2.R")
 # source("shiny/analisis.R")
 
 
@@ -583,14 +583,14 @@ app <- shiny::shinyApp(
       #   dataView[is.na(dataView)] <- 0 #NA replace with zero
       #   dataView
       # }else 
-      #   if(!is.null(valP2())){
+      #   if(!is.null(valP2Template())){
       #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
       #   dataView[is.na(dataView)] <- 0 #NA replace with zero
       #   dataView
       # }
       
       # CONDITION IF ELSE NYA DI UBAH
-      # if(!is.null(valP2())){
+      # if(!is.null(valP2Template())){
       #   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput) #karena output nya saja yg kmgknan berubah
       #   dataView[is.na(dataView)] <- 0 #NA replace with zero
       #   dataView
@@ -603,8 +603,8 @@ app <- shiny::shinyApp(
       # if(!is.null(data.gab())){
       #   dataView <- rbind(readDataLastEdited()$priceInput, readDataLastEdited()$priceOutput)
       #   dataView
-      # }else if(!is.null(valP1()) | !is.null(valP2())){
-      #   dataView <- rbind(valP1(),valP2())
+      # }else if(!is.null(valP1()) | !is.null(valP2Template())){
+      #   dataView <- rbind(valP1(),valP2Template())
       #   dataView
       # }
     })
@@ -741,10 +741,10 @@ app <- shiny::shinyApp(
                 mainPanel(
                   rHandsontableOutput(('editPriceOutputTemplate')),
                   tags$br(),
-                  actionButton(('savePriceOutput'), 'simpan tabel'), 
+                  actionButton(('savePriceOutputTemplate'), 'simpan tabel'), 
                   tags$br(), 
                   tags$br(),
-                  tags$div(id='teksPriceOutputSave'),
+                  tags$div(id='teksPriceOutputSaveTemplate'),
                   width=12)
               )
             ))
@@ -775,7 +775,7 @@ app <- shiny::shinyApp(
       tableCapS = NULL #capital sosial
     )
     
-    valP2 <- eventReactive(input$template_button,{
+    valP2Template <- eventReactive(input$template_button,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          # input$sut,"_",input$kom,"_",
@@ -809,15 +809,15 @@ app <- shiny::shinyApp(
     })
     
     output$editPriceOutputTemplate <- renderRHandsontable({
-      rhandsontable(valP2(),
+      rhandsontable(valP2Template(),
                     rowHeaderWidth = 50,
                     fixedColumnsLeft = 2,
                     height = 300,
       )
     })
     
-    observeEvent(input$savePriceOutput,{
-      removeUI(selector='#textTampilOutput')
+    observeEvent(input$savePriceOutputTemplate,{
+      removeUI(selector='#textTampilOutputTemplate')
       # browser()
       editNew<-as.data.frame(hot_to_r(input$editPriceOutputTemplate))
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
@@ -833,13 +833,13 @@ app <- shiny::shinyApp(
       dataDefine$rate.p <- input$rate.p
       dataDefine$rate.s <- input$rate.s
       dataDefine$nilai.tukar <- input$nilai.tukar
-      dataDefine$tipeData <- c("simulasi")
+      dataDefine$tipeData <- c("SIMULASI")
       
       saveRDS(dataDefine,file = fileName)
       
-      insertUI(selector='#teksPriceOutputSave',
+      insertUI(selector='#teksPriceOutputSaveTemplate',
                where = 'afterEnd',
-               ui = tags$div(id="textTampilOutput","tabel di atas sudah tersimpan"))
+               ui = tags$div(id="textTampilOutputTemplate","tabel di atas sudah tersimpan"))
       # browser()
     })
     
@@ -1350,6 +1350,15 @@ app <- shiny::shinyApp(
       
       # ending  lr ------------------------------------------------------- 
       
+      # RESULT 
+      dataDefine$npv <- hsl.npv
+      dataDefine$nlc <- nlc
+      dataDefine$ec <- ec
+      dataDefine$hp <- hp
+      dataDefine$lr <- lr
+      saveRDS(dataDefine,file = fileName)
+      
+      
       tabel1 <- rbind(hsl.npv,nlc,ec)
       tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
       tabel1
@@ -1383,7 +1392,7 @@ app <- shiny::shinyApp(
     })
     
     
-    preparePlot <- eventReactive(input$saveNewPAM,{
+    preparePlot <- eventReactive(input$running_button,{
       # row_to_select=as.numeric(gsub("Row","",input$checked_rows))
       # row_to_select_newPam = as.numeric(gsub("Row","",input$checked_rows_newPam))
       
@@ -1393,13 +1402,17 @@ app <- shiny::shinyApp(
       # sut <- unlist(lapply(dataCheck, function(x)x[[15]]))
       # komoditas <- unlist(lapply(dataCheck, function(x)x[[16]]))
       # NPV.Privat.RP <- unlist(lapply(dataCheck, function(x)x[[7]][1,1]))
-      browser()
+      # browser()
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"resultTemplate","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
       
       
-      
-      dataPlotDefault <- data.frame(tipe.data=tipeData,
-                                    komoditas=komoditas,
-                                    NPV.Privat.RP=NPV.Privat.RP)
+      dataPlotBAU <- data.frame(tipe.data=dataDefine$tipeData,
+                                    komoditas=dataDefine$kom,
+                                    NPV.Privat.RP=dataDefine$npv[1,1])
       
       # data simulasi Pam baru
       # dataCheckNewPam <- loadRDSAllNewPam()
@@ -1410,10 +1423,18 @@ app <- shiny::shinyApp(
       # komoditas<-paste0("PAM BARU ",komoditas) # supaya barchartnya terpisah dari setiap komoditas
       # NPV.Privat.RP <- unlist(lapply(dataCheckNewPam, function(x)x[[7]][1,1]))
       
-      dataPlotNewPam <- data.frame(tipe.data=tipeData,
-                                   komoditas=komoditas,
-                                   NPV.Privat.RP=NPV.Privat.RP)
-      dataPlot <- rbind(dataPlotDefault,dataPlotNewPam)
+      # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      dataPlotSimulasi <- data.frame(tipe.data=dataDefine$tipeData,
+                                   komoditas=dataDefine$kom,
+                                   NPV.Privat.RP=dataDefine$npv[1,1])
+      
+      
+      dataPlot <- rbind(dataPlotBAU,dataPlotSimulasi)
       
       
       dataPlot %>%
@@ -1429,11 +1450,460 @@ app <- shiny::shinyApp(
     
     # End - Section Popup Modal Dialog ---------------------------------------------
     
-
+    # Start - Section sunting_button---------------------------------------------
+    ################################################################################
+    #                                                                              #
+    #                                 BUTTON IO                                    #
+    #                                                                              #
+    ################################################################################
+    observeEvent(input$sunting_button,{
+      showModal(
+        modalDialog( 
+          footer=tagList(
+            # actionButton(("backModalCreatePam"), "Kembali"),
+            actionButton(("sunting_button_1"), "Lanjut",style="color: white;background-color: green;")
+          ),
+          argonTabSet(
+            id = "tabSunting1",
+            card_wrapper = TRUE,
+            horizontal = TRUE,
+            circle = FALSE,
+            size = "l",
+            width = 12,
+            argonTab(
+              tabName = "Pilih Tahun Daur Tanam",
+              active = T,
+              selectInput(("ioYear_input"),
+                          "pilih tahun skenario:",
+                          choices = c(30:60),selected = 30) # pilihannnya masih 30 tahun sesuai default
+            ))
+          ,
+          size="l",
+          easyClose = FALSE)
+      )
+    })
+    
+    modalPilihBaris <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          # actionButton(("backModalCreatePam"), "Kembali"),
+          actionButton(("sunting_button_2"), "Lanjut",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabSunting2",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Menentukan Komponen (Baris) pada Input Tabel Kuantitas",
+            active = T,
+            h3("Apakah user akan menambahkan komponen (baris) pada bagian Input Tabel Kuantitas?"),
+            radioButtons(("ioKomponen_input"),
+                         " ",
+                         choices = c("Tidak","Ya"),selected = "Tidak"), # pilihannnya masih 30 tahun sesuai default
+            # tags$div(id='tambahBaris')
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    
+    observeEvent(input$sunting_button_1,{
+      showModal(modalPilihBaris())
+    })
+    
+    # observeEvent(input$ioKomponen_input,{
+    #   if (input$ioKomponen_input == "Ya"){
+    #     insertUI(selector='#tambahBaris',
+    #              where = 'afterEnd',
+    #              ui = uiOutput("pilihTambahBaris")) 
+    #   }else if(input$ioKomponen_input == "Tidak"){
+    #     removeUI(selector='#pilihTambahBaris')
+    #   }
+    # })
+    # 
+    # 
+    # output$pilihTambahBaris<- renderUI({
+    #   selectInput(("pilihTambahBaris_input"),
+    #               "Berapa komponen (baris) yang akan ditambahkan pada Input Tabel Kuantitas?",
+    #               choices = c(1:10),selected = 1,width = "600px")
+    #   
+    # })
+    
+    modalTambahBaris <- function(failed = FALSE) {
+      modalDialog(
+        footer=tagList(
+          actionButton(("sunting_button_3"),"Simpan dan Lanjut",style="color: white;
+                         background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabSunting3",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Sunting Tabel Kuantitas (Input)",
+            active = T,
+            fluidRow(
+              column(6,
+                     selectInput('pilihKomponenInput',"Pilih Komponen", choices = c("pupuk", "bibit", "peralatan","tenaga kerja")),
+                     
+              ),
+              column(6,
+                     br(),
+                     actionButton("showTabelJenis","Tampilkan Tabel")
+                     ),
+              column(12,
+                     tags$div(id = 'uiShowTablePilihJenis')
+                     )
+            )
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    
+    observeEvent(input$showTabelJenis,{
+      insertUI(selector='#uiShowTablePilihJenis',
+               where='afterEnd',
+               ui= uiOutput('showTablePilihJenis'))
+      
+      
+    }) 
+    
+    output$showTablePilihJenis <- renderUI({
+        if (input$pilihKomponenInput == "pupuk"){
+          fluidRow(
+            column(12,
+                   selectInput("tambahBarisPupuk",
+                                    "Berapa baris yang akan ditambahkan untuk komponen pupuk?",
+                                    choices = c(0:10),selected = 5,width = "600px")
+            ),
+            column(12,
+                   rHandsontableOutput('tabelJenis')
+            )
+          )
+          # selectInput("tambahBarisPupuk",
+          #                  "Berapa baris yang akan ditambahkan untuk komponen pupuk?",
+          #                  choices = c(0:10),selected = 0)
+          # br()
+          # rHandsontableOutput('tabelJenis')
+        }
+    })
+    
+    
+    valJenis <- eventReactive(input$showTabelJenis,{
+      # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      # fileName <- paste0(datapath,"saveData","_",
+      #                    # input$sut,"_",input$kom,"_",
+      #                    input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      # dataDefine <- readRDS(fileName)
+      # 
+      # reactData$tableIO1 <- dataDefine$ioInput
+      # reactData$tableIO1
+      dataPupuk
+    })
+    
+    output$tabelJenis <- renderRHandsontable({
+      rhandsontable(valJenis(),
+                    rowHeaderWidth = 50,
+                    fixedColumnsLeft = 2,
+                    height = 300,
+      )
+    })
+    
+    
+    observeEvent(input$sunting_button_3,{
+      # browser()
+      showModal(suntingTabelKuantitas_input())
+    })
+    
+    
+    suntingTabelKuantitas_input <- function(failed = FALSE) {
+      modalDialog(
+        footer=tagList(
+          actionButton(("batalSunting_button"), "Batal", style="color: white;background-color: red;"),
+          actionButton("backtoPilihBaris_button","Kembali"),
+          actionButton(("sunting_button_4"),"Simpan dan Lanjut",style="color: white;
+                         background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabSunting4",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Langkah 6: Sunting Tabel Kuantitas (Input)",
+            active = T,
+            fluidRow(
+              column(12,
+                     h1("Tabel kuantitas",align = "center"),
+                     rHandsontableOutput(('suntingKuantitasInput'))
+                     )
+            )
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    observeEvent(input$batalSunting_button,{
+      removeModal()
+    })
+    
+    observeEvent(input$backtoPilihBaris_button,{
+      showModal(modalPilihBaris())
+    })
+    
+    
+   observeEvent(input$sunting_button_2,{
+     if (input$ioKomponen_input == "Ya"){
+       showModal(modalTambahBaris()) 
+     }else if(input$ioKomponen_input == "Tidak"){
+       showModal(suntingTabelKuantitas_input())
+     }
+   })
+   
+   valIO1 <- eventReactive(input$sunting_button_2,{
+     datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+     fileName <- paste0(datapath,"saveData","_",
+                        # input$sut,"_",input$kom,"_",
+                        input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+     dataDefine <- readRDS(fileName)
+     
+     reactData$tableIO1 <- dataDefine$ioInput
+     reactData$tableIO1
+     
+   })
+   
+   output$suntingKuantitasInput <- renderRHandsontable({
+     rhandsontable(valIO1(),
+                   rowHeaderWidth = 50,
+                   fixedColumnsLeft = 2,
+                   height = 300,
+     )
+   })
     
     
     
+    # End - Section sunting_button---------------------------------------------
     
+   # Section informasi umum new---------------------------------------------
+   observe({
+     updateSelectInput(
+       session,
+       "kom_new",
+       choices = komoditas %>%
+         filter(sut == input$sut_new) %>%
+         select(nama_komoditas) %>%
+         .[[1]]
+     )
+   })
+   
+   observe({
+     updateSelectInput(
+       session,
+       "selected_provinsi_new",
+       choices = komoditas %>%
+         filter(nama_komoditas == input$kom_new) %>%
+         select(provinsi) %>%
+         .[[1]]
+     )
+   })
+   
+   observe({
+     updateSelectInput(
+       session,
+       "th_new",
+       choices = komoditas %>%
+         filter(provinsi == input$selected_provinsi_new) %>%
+         select(tahun_analisis) %>%
+         .[[1]]
+     )
+   })
+   
+   observe({
+     updateSelectInput(
+       session,
+       "tipeLahan_new",
+       choices = komoditas %>%
+         filter(tahun_analisis == input$th_new) %>%
+         select(tipe_lahan) %>%
+         .[[1]]
+     )
+   })
+   
+   # End - Section informasi umum new---------------------------------------------
+   
+   
+   
+   # Section asumsi makro NEW---------------------------------------------
+   reactData_new <- reactiveValues(
+     tableP1 = NULL, #price input
+     tableP2 = NULL, #price output
+     tableIO1 = NULL, #io input
+     tableIO2 = NULL, #io output
+     tableCapP = NULL, #capital privat
+     tableCapS = NULL #capital sosial
+   )
+   
+   data_new <- reactive({
+     # informasi umum
+     sut <- input$sut_new
+     kom <- input$kom_new
+     provinsi <- input$selected_provinsi_new
+     th <- input$th_new
+     tipeLahan <- input$tipeLahan_new
+     
+     
+     
+     
+     combineDef <- list(
+                        sut=sut,
+                        kom=kom,
+                        provinsi = provinsi,
+                        th=th,
+                        tipeLahan = tipeLahan)
+     
+     # save data untuk setiap perubahan
+     datapath <- paste0("shiny/data/", input$sut_new, "/")
+     fileName <- paste0(datapath,"saveData_new","_",
+                        # input$sut,"_",input$kom,"_",
+                        input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+     saveRDS(combineDef,file = fileName)
+     combineDef
+     
+   })
+   
+   
+   observeEvent(input$asumsiMakro_button_new, {
+     data_new()
+     
+     insertUI(selector='#uiShowMakro_new',
+              where='afterEnd',
+              ui= uiOutput('showMakro_new'))
+     
+     
+   }) 
+   
+   output$showMakro_new <- renderUI({
+     argonRow(
+       argonColumn(
+         width = 12,
+         argonH1("Asumsi Makro", display = 4),
+         h5("Langkah 2: menentukan asumsi makro untuk data PAM yang dibangun"),
+         br(),
+         fluidRow(
+           column(3,
+                  sliderInput(("rate.p_new"), "Discount Rate Private", 7.4 ,min = 0, max = 15, step = 0.01)
+           ),
+           column(3,
+                  sliderInput(("rate.s_new"), "Discount Rate Social", 2.4 ,min = 0, max = 8, step = 0.01)
+           ),
+           column(4,
+                  sliderInput(("nilai.tukar_new"), "Nilai Tukar Rupiah", 14831 ,min = 10000, max = 20000, step = 10)
+           ),
+           column(2,
+                  br(),
+                  actionButton(("pilihBarisInput_new"),"Membangun Tabel PAM",icon("paper-plane"),style="color: white; 
+                         background-color: green;")
+           )
+         )
+       )
+     )
+   })
+   # End - Section asumsi makro NEW---------------------------------------------
+  
+   modalPilihBarisInput_new <- function(failed = FALSE) {
+     modalDialog( 
+       footer=tagList(
+         actionButton(("bangunKuantitas_new"), "Lanjut",style="color: white;background-color: green;")
+       ),
+       argonTabSet(
+         id = "tabNew",
+         card_wrapper = TRUE,
+         horizontal = TRUE,
+         circle = FALSE,
+         size = "l",
+         width = 12,
+         argonTab(
+           tabName = "Menentukan Jumlah Komponen (Baris) Pada Tabel Kuantitas bagian Input",
+           active = T,
+           h3("Berapa jumlah komponen (baris) yang akan user bangun pada Input-Tabel Kuantitas?"),
+           selectInput(("pilihTambahBaris_input_new"),
+                       " ",
+                       choices = c(5:40),selected = 5,width = "800px")
+         ))
+       ,
+       size="l",
+       easyClose = FALSE)
+   }
+   
+   
+   observeEvent(input$pilihBarisInput_new,{
+     showModal(modalPilihBarisInput_new())
+   })
+    
+   modalTabelKuantitas_new <- function(failed = FALSE) {
+     modalDialog( 
+       footer=tagList(
+         actionButton(("pilihBaris_output_new"), "Simpan Tabel dan Lanjutkan Membangun Tabel Harga",style="color: white;background-color: green;")
+       ),
+       argonTabSet(
+         id = "tabNew",
+         card_wrapper = TRUE,
+         horizontal = TRUE,
+         circle = FALSE,
+         size = "l",
+         width = 12,
+         argonTab(
+           tabName = "Langkah 3: Mengisi Tabel Kuantitas Bagian Input",
+           active = T,
+           h3("Tabel Kuantitas", align = "center"),
+           rHandsontableOutput('kuantitasInput_new')
+         ))
+       ,
+       size="l",
+       easyClose = FALSE)
+   }
+   
+   valIO1_new <- eventReactive(input$bangunKuantitas_new,{
+     readDataTemplate <- read.table(paste0("shiny/data/template/tabel pam kosong",".csv"), header = T, sep = ",")
+     yearIO <- 30 #tahun daur tanam
+     
+     inputData <- readDataTemplate[1:input$pilihTambahBaris_input_new,]
+     ioInput <- inputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+     ioInput$komponen <- as.character(ioInput$komponen)
+     ioInput$jenis<- as.character(ioInput$jenis)
+     ioInput$unit<- as.character(ioInput$unit)
+     ioInput[,c(4:33)] <- as.numeric(as.character(ioInput[,c(4:33)]))
+     
+     reactData_new$tableIO1 <- ioInput
+     reactData_new$tableIO1
+     
+   })
+   
+   output$kuantitasInput_new <- renderRHandsontable({
+     rhandsontable(valIO1_new(),
+                   rowHeaderWidth = 50,
+                   fixedColumnsLeft = 2,
+                   height = 300,
+     )
+   })
+   
+   
+   observeEvent(input$bangunKuantitas_new,{
+     # browser()
+     showModal(modalTabelKuantitas_new())
+   })
     
   }
 )
