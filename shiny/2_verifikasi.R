@@ -1,6 +1,6 @@
 verifikasi <- argonTabItem(
   tabName = "template",
-  # argonH1("Membangun PAM dari data template", display = 4),
+  argonH1("Membangun PAM dari data template", display = 4),
   argonRow(
     argonCard(
       width = 12,

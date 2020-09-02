@@ -65,12 +65,12 @@ pamBaru <- argonTabItem(
           tags$div(id = 'uiShowTable_new')
         )
       ),
-      argonRow(
-        argonColumn(
-          width = 12,
-          tags$div(id = 'uiShowButton_new')
-        )
-      ),
+      # argonRow(
+      #   argonColumn(
+      #     width = 12,
+      #     tags$div(id = 'uiShowButton_new')
+      #   )
+      # ),
       argonRow(
         argonColumn(
           width = 12,
