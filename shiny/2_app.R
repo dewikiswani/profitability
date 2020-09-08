@@ -128,7 +128,7 @@ app <- shiny::shinyApp(
     dataTemplate <- reactive({
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       
-      readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       yearIO <- 30 #tahun daur tanam
       
       inputData <- filter(readDataTemplate,faktor == c("input"))
@@ -206,7 +206,7 @@ app <- shiny::shinyApp(
     resultTemplate <- reactive({
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       
-      readDataTemplate <- read.table(paste0(datapath,input$selected_provinsi,"_",input$th,".csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       yearIO <- 30 #tahun daur tanam
       
       inputData <- filter(readDataTemplate,faktor == c("input"))
@@ -2224,10 +2224,13 @@ app <- shiny::shinyApp(
          )
        ),
        fluidRow(
-         column(9,
+         column(4,
                 plotlyOutput('plot_new')
          ),
-         column(3,
+         column(6,
+                  
+         ),
+         column(2,
                 actionButton(("saveNewPAM_new"),"Simpan PAM",icon("paper-plane"),style="color: white;background-color: green;"),
                 br(),
                 tags$div(id='teksNewPamSave')

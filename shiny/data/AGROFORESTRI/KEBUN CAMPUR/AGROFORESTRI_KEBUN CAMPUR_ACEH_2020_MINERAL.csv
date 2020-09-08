@@ -1,0 +1,12 @@
+sut,komoditas,provinsi,tipe,tipe lahan,faktor,komponen,jenis,unit,unit harga,harga privat,harga sosial,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,peralatan,Cangkul,unit,Rp/unit,100000,100000,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,peralatan,Parang,unit,Rp/unit,75000,75000,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,tenaga kerja buah,"pembuatan lubang, tanam, pagar",hok,Rp/HOK,80000,80000,15,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,tenaga kerja buah,penyiangan,hok,Rp/HOK,80000,80000,21,21,21,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,tenaga kerja buah,pruning,hok,Rp/HOK,80000,80000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,tenaga kerja buah,pemanenan durian,hok,Rp/HOK,80000,80000,,,,,,,,,,,,2,,,8,,,8,,,8,,,8,,,8,,,8
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,tenaga kerja buah,pemanenan duku,hok,Rp/HOK,80000,80000,,,,,,,,,,,,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,input,tenaga kerja buah,pemanenan jengkol,hok,Rp/HOK,80000,80000,,,,,,,,,,,,2,2,3,3,4,4,5,7,8,8,8,8,8,8,8,8,8,8,8
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,output,utama,Durian ,butir,Rp/btr,5000,5000,,,,,,,,,,,,100,,,200,,,300,,,300,,,300,,,300,,,300
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,output,utama,Duku ,kg,Rp/kg,5000,5000,,,,,,,,,,,,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500
+AGROFORESTRI,KEBUN CAMPUR,ACEH,SMALLHOLDER,MINERAL,output,utama,Jengkol ,kg,Rp/kg,10000,10000,,,,,,,,,,,,100,150,300,300,350,400,500,600,600,600,600,600,600,600,600,600,600,600,600
