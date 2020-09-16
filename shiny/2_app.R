@@ -36,8 +36,8 @@ source("shiny/footer.R")
 
 # input file
 komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
-dataPupuk <- read.csv("shiny/data/template/jenis pupuk.csv")
-
+# dataPupuk <- read.csv("shiny/data/template/kumpulan data jenis pupuk, bibit, alat, dan tenaga kerja.csv")
+kumpulanDataJenisInput <- read.csv("shiny/data/template/kumpulan data jenis pupuk, bibit, alat, dan tenaga kerja.csv")
 
 
 # elements
@@ -720,7 +720,7 @@ app <- shiny::shinyApp(
       tableCapS = NULL, #capital sosial
       tableAddPupuk = NULL,
       tableAddBibit = NULL,
-      tableAddAlat = NULL,
+      tableAddPeralatan = NULL,
       tableAddTK = NULL
     )
     
@@ -1643,23 +1643,23 @@ app <- shiny::shinyApp(
                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
      dataDefine <- readRDS(fileName)
      
-     if(is.null(dataDefine$addPupuk)  & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
+     if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
        reactData$tableIO1 <- dataDefine$ioInput
        reactData$tableIO1
-     } else if  (!is.null(dataDefine$addPupuk)  & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
+     } else if  ((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK))  & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
        reactData$tableIO1 <- dataDefine$ioInput
        reactData$tableIO1
-     } else if (!is.null(dataDefine$addPupuk) & input$ioYear_input == 30){
-       reactData$tableIO1 <- bind_rows(dataDefine$ioInput,dataDefine$addPupuk) 
+     } else if ((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK))  & input$ioYear_input == 30 & input$ioKomponen_input == "Ya"){
+       reactData$tableIO1 <- bind_rows(dataDefine$ioInput,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
        reactData$tableIO1
-     } else if(is.null(dataDefine$addPupuk) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
+     } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
        reactData$tableIO1 <- dataDefine$ioInput
        yearIOadd <- as.numeric(input$ioYear_input)
        addCol <- data.frame(matrix(0, nrow = nrow(dataDefine$ioInput), ncol = yearIOadd - 30))
        colnames(addCol)<-paste0(c(rep("Y", yearIOadd)),1:yearIOadd)[31:yearIOadd] # start dari thun 31 utk nama kolom baru
        reactData$tableIO1 <- cbind(dataDefine$ioInput,addCol)
        reactData$tableIO1
-     } else if(is.null(dataDefine$addPupuk) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
+     } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
        reactData$tableIO1 <- dataDefine$ioInput
        yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
        filterIO <-  dataDefine$ioInput[,-(1:3)]
@@ -1669,17 +1669,17 @@ app <- shiny::shinyApp(
        colnames(addCol)<-paste0(c(rep("Y", ncol(addCol))),31:yearIOadd)
        reactData$tableIO1 <- cbind(dataDefine$ioInput,addCol)
        reactData$tableIO1
-     }else if(!is.null(dataDefine$addPupuk) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
+     }else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
        reactData$tableIO1 <- dataDefine$ioInput
        yearIOadd <- as.numeric(input$ioYear_input)
        addCol <- data.frame(matrix(0, nrow = nrow(dataDefine$ioInput), ncol = yearIOadd - 30))
        colnames(addCol)<-paste0(c(rep("Y", yearIOadd)),1:yearIOadd)[31:yearIOadd] # start dari thun 31 utk nama kolom baru
        addCol <- cbind(dataDefine$ioInput,addCol)
        
-       reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk) 
+       reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
        reactData$tableIO1
        
-     } else if(!is.null(dataDefine$addPupuk) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
+     } else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
        reactData$tableIO1 <- dataDefine$ioInput
        yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
        filterIO <-  dataDefine$ioInput[,-(1:3)]
@@ -1689,7 +1689,7 @@ app <- shiny::shinyApp(
        colnames(addCol)<-paste0(c(rep("Y", ncol(addCol))),31:yearIOadd)
        addCol <- cbind(dataDefine$ioInput,addCol)
        
-       reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk) 
+       reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
        reactData$tableIO1
        
      }
