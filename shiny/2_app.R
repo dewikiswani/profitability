@@ -36,8 +36,8 @@ source("shiny/footer.R")
 
 # input file
 komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
-# dataPupuk <- read.csv("shiny/data/template/kumpulan data jenis pupuk, bibit, alat, dan tenaga kerja.csv")
 kumpulanDataJenisInputOutput <- read.csv("shiny/data/template/kumpulan data jenis input output.csv")
+indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
 
 
 # elements
@@ -1417,7 +1417,6 @@ app <- shiny::shinyApp(
       showModal(
         modalDialog( 
           footer=tagList(
-            # actionButton(("backModalCreatePam"), "Kembali"),
             actionButton(("sunting_button_1"), "Simpan dan Lanjut",style="color: white;background-color: green;")
           ),
           argonTabSet(
@@ -1483,7 +1482,6 @@ app <- shiny::shinyApp(
     modalPilihBarisOutput <- function(failed = FALSE) {
       modalDialog( 
         footer=tagList(
-          # actionButton(("backModalCreatePam"), "Kembali"),
           actionButton(("sunting_button_2_output"), "Lanjut",style="color: white;background-color: green;")
         ),
         argonTabSet(
@@ -1606,7 +1604,7 @@ app <- shiny::shinyApp(
       removeModal()
     })
 
-    observeEvent(input$backtoPilihBaris_input,{
+    observeEvent(input$backtoPilihBaris_output,{
       showModal(modalTambahBarisOutput())
     })
     

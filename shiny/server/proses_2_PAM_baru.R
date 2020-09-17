@@ -1,48 +1,56 @@
 
 # Section informasi umum new---------------------------------------------
-observe({
-  updateSelectInput(
-    session,
-    "kom_new",
-    choices = komoditas %>%
-      filter(sut == input$sut_new) %>%
-      select(nama_komoditas) %>%
-      .[[1]]
-  )
-})
+
+# observe({
+#   updateSelectInput(
+#     session,
+#     "kom_new",
+#     choices = komoditas %>%
+#       filter(sut == input$sut_new) %>%
+#       select(nama_komoditas) %>%
+#       .[[1]]
+#   )
+# })
+
 
 observe({
-  updateSelectInput(
-    session,
-    "selected_provinsi_new",
-    choices = komoditas %>%
-      filter(nama_komoditas == input$kom_new) %>%
-      select(provinsi) %>%
-      .[[1]]
-  )
+  updateSelectInput(session,
+                    "selected_provinsi_new",
+                    choices =sort(unique(indonesia$provinsi)))
 })
 
-observe({
-  updateSelectInput(
-    session,
-    "th_new",
-    choices = komoditas %>%
-      filter(provinsi == input$selected_provinsi_new) %>%
-      select(tahun_analisis) %>%
-      .[[1]]
-  )
-})
+# observe({
+#   updateSelectInput(
+#     session,
+#     "selected_provinsi_new",
+#     choices = komoditas %>%
+#       filter(nama_komoditas == input$kom_new) %>%
+#       select(provinsi) %>%
+#       .[[1]]
+#   )
+# })
 
-observe({
-  updateSelectInput(
-    session,
-    "tipeLahan_new",
-    choices = komoditas %>%
-      filter(tahun_analisis == input$th_new) %>%
-      select(tipe_lahan) %>%
-      .[[1]]
-  )
-})
+# observe({
+#   updateSelectInput(
+#     session,
+#     "th_new",
+#     choices = komoditas %>%
+#       filter(provinsi == input$selected_provinsi_new) %>%
+#       select(tahun_analisis) %>%
+#       .[[1]]
+#   )
+# })
+
+# observe({
+#   updateSelectInput(
+#     session,
+#     "tipeLahan_new",
+#     choices = komoditas %>%
+#       filter(tahun_analisis == input$th_new) %>%
+#       select(tipe_lahan) %>%
+#       .[[1]]
+#   )
+# })
 
 # End - Section informasi umum new---------------------------------------------
 
@@ -61,11 +69,11 @@ reactData_new <- reactiveValues(
 data_new <- reactive({
   # informasi umum
   sut <- input$sut_new
-  kom <- input$kom_new
+  kom <- toupper(input$kom_new)
   provinsi <- input$selected_provinsi_new
   th <- input$th_new
   tipeLahan <- input$tipeLahan_new
-  
+  tipeKebun <- input$tipeKebun_new
   
   
   
@@ -74,13 +82,14 @@ data_new <- reactive({
     kom=kom,
     provinsi = provinsi,
     th=th,
-    tipeLahan = tipeLahan)
+    tipeLahan = tipeLahan,
+    tipeKebun = tipeKebun)
   
   # save data untuk setiap perubahan
-  datapath <- paste0("shiny/data/", input$sut_new, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   saveRDS(combineDef,file = fileName)
   combineDef
   
@@ -88,6 +97,7 @@ data_new <- reactive({
 
 
 observeEvent(input$asumsiMakro_button_new, {
+  # browser()
   data_new()
   
   insertUI(selector='#uiShowMakro_new',
@@ -216,10 +226,10 @@ output$kuantitasInput_new <- renderRHandsontable({
 
 observeEvent(input$pilihBarisOutput_new,{
   # save data untuk setiap perubahan
-  datapath <- paste0("shiny/data/", input$sut_new, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   editNew<-as.data.frame(hot_to_r(input$kuantitasInput_new))
@@ -318,10 +328,10 @@ output$kuantitasOutput_new <- renderRHandsontable({
 
 observeEvent(input$bangunTabelHarga_new,{
   # save data untuk setiap perubahan
-  datapath <- paste0("shiny/data/", input$sut_new, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   editNew<-as.data.frame(hot_to_r(input$kuantitasOutput_new))
@@ -378,10 +388,10 @@ output$hargaOutput_new <- renderRHandsontable({
 
 
 valP2_new <- eventReactive(input$bangunKuantitasOut_new,{
-  datapath <- paste0("shiny/data/", input$sut_new, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   reactData$tableP2 <- dataDefine$ioOutput[,1:2]
@@ -408,10 +418,10 @@ output$hargaInput_new <- renderRHandsontable({
 
 
 valP1_new <- eventReactive(input$bangunKuantitasOut_new,{
-  datapath <- paste0("shiny/data/", input$sut_new, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   reactData$tableP1 <- dataDefine$ioInput[,1:2]
@@ -430,10 +440,10 @@ valP1_new <- eventReactive(input$bangunKuantitasOut_new,{
 
 observeEvent(input$running_button_new,{
   # save data untuk setiap perubahan
-  datapath <- paste0("shiny/data/", input$sut_new, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   editNewP1<-as.data.frame(hot_to_r(input$hargaInput_new))
@@ -500,10 +510,10 @@ output$showTable_new <- renderUI({
 })
 
 output$showTablePrice_new <- renderDataTable({
-  datapath <- paste0("shiny/data/", input$sut, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   readDataLastEdited <- readRDS(fileName)
   dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
   dataView[is.na(dataView)] <- 0 #NA replace with zero
@@ -511,10 +521,10 @@ output$showTablePrice_new <- renderDataTable({
 })
 
 output$showTableKuantitas_new <- renderDataTable({
-  datapath <- paste0("shiny/data/", input$sut, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   # print("data terakhir tersimpan di rds")
   readDataLastEdited <- readRDS(fileName)
   dataView <- rbind(readDataLastEdited$ioInput, readDataLastEdited$ioOutput)
@@ -527,13 +537,13 @@ output$showTableKuantitas_new <- renderDataTable({
 
 output$showTableKapital_new <- renderDataTable({
   # case for modal kapital
-  datapath <- paste0("shiny/data/", input$sut, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
   
   if(cekCapital == T){
-    fileName <- paste0(datapath,"saveData","_",
+    fileName <- paste0(datapath,"saveData_new","_",
                        # input$sut,"_",input$kom,"_",
-                       input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                       input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
     # print("data terakhir tersimpan di rds")
     readDataLastEdited <- readRDS(fileName)
     dataView <- readDataLastEdited$capital
@@ -605,10 +615,10 @@ output$tableResultBAU2_new <- renderDataTable({
 
 data.gab_new <- eventReactive(input$running_button_new,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   dataDefine$rate.p <- input$rate.p_new
@@ -835,10 +845,10 @@ data.gab_new <- eventReactive(input$running_button_new,{
 
 preparePlot_new <- eventReactive(input$running_button_new,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   
@@ -858,10 +868,10 @@ output$plot_new <- renderPlotly({
 
 observeEvent(input$saveNewPAM_new, {
   browser()
-  datapath <- paste0("shiny/data/", input$sut, "/")
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
                      # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,".rds")
   dataDefine <- readRDS(fileName)
   
   #replace informasi umum -- untuk lbh yakin yang tersave adalah pilihan terakhir user
