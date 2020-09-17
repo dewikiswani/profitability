@@ -1,6 +1,6 @@
 komoditas,komponen,jenis,unit
 UMUM,pupuk,npk,kg
-UMUM,pupuk,urea,kg
+UMUM,pupuk,urea,kg/ha
 UMUM,pupuk,organik,kg
 UMUM,pupuk,za,kg
 UMUM,pupuk,sp36,kg
@@ -102,3 +102,19 @@ PADI,tenaga kerja,Crop watching from pig,hok
 PADI,tenaga kerja,Crop watching from bird,hok
 PADI,tenaga kerja,Harvesting,hok
 PADI,tenaga kerja,Drying,hok
+COKLAT,utama,,
+JAGUNG,utama,,
+KARET,utama,,
+KARET,utama,,
+KELAPA,utama,,
+KELAPA SAWIT,utama,,
+KELAPA SAWIT,utama,,
+PADI,utama,,
+COKLAT,sampingan,,
+JAGUNG,sampingan,,
+KARET,sampingan,,
+KARET,sampingan,,
+KELAPA,sampingan,,
+KELAPA SAWIT,sampingan,,
+KELAPA SAWIT,sampingan,,
+PADI,sampingan,,

@@ -1,4 +1,4 @@
-output$showTablePilihJenis <- renderUI({
+output$showTablePilihJenisInput <- renderUI({
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      # input$sut,"_",input$kom,"_",
@@ -144,11 +144,12 @@ valJenisPupuk <- eventReactive(input$showTabelAddPupuk,{
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk),])
     reactData$tableAddPupuk
   } else if (is.null(dataDefine$addPupuk)){
-    dataKomponen <- filter(kumpulanDataJenisInput,komponen == c("pupuk"))
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("pupuk"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain pupuk ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen pupuk aja
     reactData$tableAddPupuk <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk),])
+    rownames(reactData$tableAddPupuk) <- c(1:input$tambahBarisPupuk)
     reactData$tableAddPupuk
   } 
 
@@ -222,12 +223,13 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
     reactData$tableAddBibit
   } else if (is.null(dataDefine$addBibit)){
-    dataKomponen <- filter(kumpulanDataJenisInput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
     dataKomponen <- filter(dataKomponen,komponen == c("bibit"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain bibit ga masuk level faktor nya
-    dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen bibit aja
+    # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen bibit aja
     reactData$tableAddBibit <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
+    rownames(reactData$tableAddBibit) <- c(1:input$tambahBarisBibit)
     reactData$tableAddBibit
   } 
   
@@ -301,12 +303,13 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
     reactData$tableAddPeralatant
   } else if (is.null(dataDefine$addPeralatan)){
-    dataKomponen <- filter(kumpulanDataJenisInput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
     dataKomponen <- filter(dataKomponen,komponen == c("peralatan"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain peralatan ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen peralatan aja
     reactData$tableAddPeralatan <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
+    rownames(reactData$tableAddPeralatan) <- c(1:input$tambahBarisPeralatan)
     reactData$tableAddPeralatan
   } 
   
@@ -380,13 +383,14 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
     reactData$tableAddTK
   } else if (is.null(dataDefine$addTK)){
-    dataKomponen <- filter(kumpulanDataJenisInput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
     dataKomponen <- filter(dataKomponen,komponen == c("tenaga kerja"))
     
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain TK ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen TK aja
     reactData$tableAddTK <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
+    rownames(reactData$tableAddTK) <- c(1:input$tambahBarisTK)
     reactData$tableAddTK
   } 
   
