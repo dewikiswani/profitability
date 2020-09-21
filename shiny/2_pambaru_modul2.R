@@ -37,7 +37,7 @@ pamBaru <- argonTabItem(
                                choices = ""),
             ),
             column(1,
-                   selectInput(("th_new"),"Tahun",choices = c(1995:2020) ),
+                   selectInput(("th_new"),"Tahun",choices = c(1995:as.integer(format(Sys.Date(), "%Y"))) ),
             ),
             column(1,
                    selectInput(("tipeLahan_new"),"Tipe Lahan",choices = c("MINERAL","GAMBUT") ),
@@ -50,7 +50,8 @@ pamBaru <- argonTabItem(
             column(2,
                    br(),
                    actionButton(("asumsiMakro_button_new"),"Tentukan Asumsi Makro",icon("paper-plane"),style="color: white; 
-                         background-color: green;") 
+                         background-color: green;"),
+                   useShinyalert()
                    
             )
           )

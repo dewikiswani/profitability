@@ -223,8 +223,8 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
     reactData$tableAddBibit
   } else if (is.null(dataDefine$addBibit)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
-    dataKomponen <- filter(dataKomponen,komponen == c("bibit"))
+    # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("bibit"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain bibit ga masuk level faktor nya
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen bibit aja
     reactData$tableAddBibit <- as.data.frame(dataKomponen[,c(3:4)])
@@ -303,8 +303,8 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
     reactData$tableAddPeralatant
   } else if (is.null(dataDefine$addPeralatan)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
-    dataKomponen <- filter(dataKomponen,komponen == c("peralatan"))
+    # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("peralatan"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain peralatan ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen peralatan aja
     reactData$tableAddPeralatan <- as.data.frame(dataKomponen[,c(3:4)])
@@ -383,8 +383,8 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
     reactData$tableAddTK
   } else if (is.null(dataDefine$addTK)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
-    dataKomponen <- filter(dataKomponen,komponen == c("tenaga kerja"))
+    # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("tenaga kerja"))
     
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain TK ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen TK aja

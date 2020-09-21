@@ -17,6 +17,7 @@ library(stringr)
 library(tidyverse)
 library(rhandsontable)
 library(shinyWidgets)
+library(shinyalert)
 
 # untuk tab analisis
 library(shinydashboard)
@@ -28,6 +29,7 @@ library(cowplot) #ggplot2 white theme
 library(plotly)
 
 
+
 # template
 source("shiny/2_sidebar.R")
 source("shiny/navbar.R")
@@ -36,7 +38,7 @@ source("shiny/footer.R")
 
 # input file
 komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
-kumpulanDataJenisInputOutput <- read.csv("shiny/data/template/kumpulan data jenis input output.csv")
+kumpulanDataJenisInputOutput <- read.csv("shiny/data/template/kumpulan jenis input output.csv")
 indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
 
 
@@ -712,6 +714,7 @@ app <- shiny::shinyApp(
     
     # Start Price Output ------------------------------------------------------
     reactData <- reactiveValues(
+      timeInput = NULL,
       tableP1 = NULL, #price input
       tableP2 = NULL, #price output
       tableIO1 = NULL, #io input
