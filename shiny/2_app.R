@@ -90,7 +90,8 @@ app <- shiny::shinyApp(
       
       readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
-      
+      readDataTemplate <- lowcase(readDataTemplate, c(7:11))
+        
       yearIO <- 30 #tahun daur tanam
       
       inputData <- filter(readDataTemplate,faktor == c("input"))
@@ -170,6 +171,7 @@ app <- shiny::shinyApp(
       
       readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
+      readDataTemplate <- lowcase(readDataTemplate, c(7:11))
       yearIO <- 30 #tahun daur tanam
       
       inputData <- filter(readDataTemplate,faktor == c("input"))
@@ -457,6 +459,7 @@ app <- shiny::shinyApp(
       dataTemplate()
       resultTemplate()
       
+      # browser()
       insertUI(selector='#uiShowMakro',
                where='afterEnd',
                ui= uiOutput('showMakro'))
