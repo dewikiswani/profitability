@@ -198,7 +198,9 @@ observeEvent(c(input$rate.p_new,input$rate.s_new,input$nilai.tukar_new), {
 ################################################################################
 
 observeEvent(input$pilihBarisOutput_new,{
-  # show modal
+  removeUI(selector='#showTable_new')
+  removeUI(selector='#showButton_new')
+  removeUI(selector='#showResult_new')
   showModal(modalPilihBarisOutput_new())
   
 })
@@ -232,52 +234,17 @@ modalPilihBarisOutput_new <- function(failed = FALSE) {
 }
 
 observeEvent(input$bangunKuantitasOut_new,{
-  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
-  fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
-  dataDefine <- readRDS(fileName)
+  # datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  # fileName <- paste0(datapath,"saveData_new","_",
+  #                    input$sut,"_",input$kom,"_",
+  #                    input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  # dataDefine <- readRDS(fileName)
   
   # replace data price
-  dataDefine$pilihTambahBaris_output_new <- input$pilihTambahBaris_output_new
-  saveRDS(dataDefine,file = fileName)
+  # dataDefine$pilihTambahBaris_output_new <- input$pilihTambahBaris_output_new
+  # saveRDS(dataDefine,file = fileName)
   
   showModal(modalTabelKuantitasOut_new())
-})
-
-valIO2_new <- eventReactive(input$bangunKuantitasOut_new,{
-  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
-  fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  if(is.null(dataDefine$ioOutput)){
-  readDataTemplate <- read.table(paste0("shiny/data/template/tabel pam kosong",".csv"), header = T, sep = ",")
-  yearIO <- 30 #tahun daur tanam
-  
-  inputData <- readDataTemplate[1:input$pilihTambahBaris_output_new,]
-  ioInput <- inputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
-  ioInput$komponen <- as.character(ioInput$komponen)
-  ioInput$jenis<- as.character(ioInput$jenis)
-  ioInput$unit<- as.character(ioInput$unit)
-  ioInput[,c(4:33)] <- as.numeric(as.character(ioInput[,c(4:33)]))
-  
-  reactData_new$tableIO2 <- ioInput
-  reactData_new$tableIO2
-  }else{
-    reactData$tableIO2 <- dataDefine$ioOutput
-    reactData$tableIO2
-  }
- 
-})
-
-output$kuantitasOutput_new <- renderRHandsontable({
-  rhandsontable(valIO2_new(),
-                rowHeaderWidth = 50,
-                fixedColumnsLeft = 2,
-                height = 300,
-  )
 })
 
 
@@ -308,6 +275,44 @@ modalTabelKuantitasOut_new <- function(failed = FALSE) {
 observeEvent(input$backtoRowOutput,{
   showModal(modalPilihBarisOutput_new())
 })
+
+
+output$kuantitasOutput_new <- renderRHandsontable({
+  rhandsontable(valIO2_new(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 300,
+  )
+})
+
+valIO2_new <- eventReactive(input$bangunKuantitasOut_new,{
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  if(is.null(dataDefine$ioOutput)){
+    readDataTemplate <- read.table(paste0("shiny/data/template/tabel pam kosong komponen output",".csv"), header = T, sep = ",")
+    yearIO <- 30 #tahun daur tanam
+    
+    inputData <- readDataTemplate[1:input$pilihTambahBaris_output_new,]
+    ioInput <- inputData[,c("komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+    
+    ioInput$jenis<- as.character(ioInput$jenis)
+    ioInput$unit<- as.character(ioInput$unit)
+    ioInput[,c(4:33)] <- as.numeric(as.character(ioInput[,c(4:33)]))
+    
+    reactData_new$tableIO2 <- ioInput
+    rownames(reactData_new$tableIO2) <- c(1:nrow(reactData_new$tableIO2))
+    reactData_new$tableIO2
+  }else{
+    reactData$tableIO2 <- dataDefine$ioOutput
+    reactData$tableIO2
+  }
+  
+})
+
 
 ################################################################################
 #                                                                              #
@@ -362,15 +367,15 @@ modalPilihBarisInput_new <- function(failed = FALSE) {
 
 observeEvent(input$bangunKuantitas_new,{
   # browser()
-  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
-  fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
-  dataDefine <- readRDS(fileName)
+  # datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  # fileName <- paste0(datapath,"saveData_new","_",
+  #                    input$sut,"_",input$kom,"_",
+  #                    input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  # dataDefine <- readRDS(fileName)
   
   # replace data price
-  dataDefine$pilihTambahBaris_input_new <- input$pilihTambahBaris_input_new
-  saveRDS(dataDefine,file = fileName)
+  # dataDefine$pilihTambahBaris_input_new <- input$pilihTambahBaris_input_new
+  # saveRDS(dataDefine,file = fileName)
   
   showModal(modalTabelKuantitasIn_new())
 })
@@ -406,6 +411,15 @@ observeEvent(input$backtoRowInput,{
 })
 
 
+
+output$kuantitasInput_new <- renderRHandsontable({
+  rhandsontable(valIO1_new(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 600,
+  )
+})
+
 valIO1_new <- eventReactive(input$bangunKuantitas_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
@@ -432,13 +446,6 @@ valIO1_new <- eventReactive(input$bangunKuantitas_new,{
   }
 })
 
-output$kuantitasInput_new <- renderRHandsontable({
-  rhandsontable(valIO1_new(),
-                rowHeaderWidth = 50,
-                fixedColumnsLeft = 2,
-                height = 600,
-  )
-})
 
 observeEvent(input$bangunTabelHarga_new,{
   # save data untuk setiap perubahan
@@ -472,7 +479,7 @@ modalTabelHarga_new <- function(failed = FALSE) {
   modalDialog( 
     footer=tagList(
       actionButton(("batalButton"), "Batal", style="color: white;background-color: red;"),
-      actionButton(("running_button_new"), "Simpan Tabel dan Jalankan Analisis",style="color: white;background-color: green;")
+      actionButton(("capitalButton_new"), "Simpan Tabel dan Lanjutkan Membangun Tabel Modal Kapital",style="color: white;background-color: green;")
     ),
     argonTabSet(
       id = "tabNew3",
@@ -484,9 +491,10 @@ modalTabelHarga_new <- function(failed = FALSE) {
       argonTab(
         tabName = "Langkah 5: Mengisi Tabel Harga",
         active = T,
-        h3("Tabel Harga", align = "center"),
+        h3("Tabel Harga Output", align = "center"),
         rHandsontableOutput('hargaOutput_new'),
         br(),
+        h3("Tabel Harga Input", align = "center"),
         rHandsontableOutput('hargaInput_new')
       ))
     ,
@@ -495,7 +503,7 @@ modalTabelHarga_new <- function(failed = FALSE) {
 }
 
 observeEvent(input$batalButton,{
-  browser()
+  # browser()
   removeModal()
 })
 
@@ -519,6 +527,7 @@ valP2_new <- eventReactive(input$bangunTabelHarga_new,{
     reactData$tableP2 <- dataDefine$ioOutput[,1:2]
     
     unit.harga <- data.frame(matrix("rp",ncol = 1,nrow = nrow(reactData$tableP2)))
+    unit.harga[] <- lapply(unit.harga, as.character)
     colnames(unit.harga) <- "unit.harga"
     harga.privat <- data.frame(matrix(0,ncol = 1,nrow = nrow(reactData$tableP2)))
     colnames(harga.privat) <- "harga.privat"
@@ -553,12 +562,13 @@ valP1_new <- eventReactive(input$bangunTabelHarga_new,{
     reactData$tableP1 <- dataDefine$ioInput[,1:2]
     
     unit.harga <- data.frame(matrix("rp",ncol = 1,nrow = nrow(reactData$tableP1)))
+    unit.harga[] <- lapply(unit.harga, as.character) #ubah dr faktor jd char, spy masih bisa diedit
     colnames(unit.harga) <- "unit.harga"
     harga.privat <- data.frame(matrix(0,ncol = 1,nrow = nrow(reactData$tableP1)))
     colnames(harga.privat) <- "harga.privat"
     harga.sosial <- data.frame(matrix(0,ncol = 1,nrow = nrow(reactData$tableP1)))
     colnames(harga.sosial) <- "harga.sosial"
-    
+
     reactData$tableP1 <- cbind(reactData$tableP1,unit.harga,harga.privat,harga.sosial)
     reactData$tableP1
   }else{
@@ -567,7 +577,7 @@ valP1_new <- eventReactive(input$bangunTabelHarga_new,{
   }
 })
 
-observeEvent(input$running_button_new,{
+observeEvent(input$capitalButton_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
@@ -585,10 +595,433 @@ observeEvent(input$running_button_new,{
   dataDefine$priceOutput <- editNewP2
   
   saveRDS(dataDefine,file = fileName)
+  
+  # show modal
+  showModal(modalTabelCapital_new())
 })
 
+modalTabelCapital_new <- function(failed = FALSE) {
+  modalDialog( 
+    footer=tagList(
+      actionButton(("running_button_new"), "Jalankan Analisis",style="color: white;background-color: green;")
+    ),
+    argonTabSet(
+      id = "tabNew",
+      card_wrapper = TRUE,
+      horizontal = TRUE,
+      circle = FALSE,
+      size = "l",
+      width = 12,
+      argonTab(
+        tabName = "Menentukan Tabel Modal Kapital",
+        active = T,
+        h3("Apakah terdapat tabel modal kapital?"),
+        radioButtons("tipeTabelCapital_new",
+                     " ",
+                     choices = c("Tidak","Ya"),selected = "Ya"),
+        tags$div(id='uiTipeModalKapital')
+      ))
+    ,
+    size="l",
+    easyClose = FALSE)
+}
+
+observeEvent(input$tipeTabelCapital_new,{
+  if (input$tipeTabelCapital_new == "Tidak"){
+    removeUI(selector = '#tipeModalKapital')
+  } else if(input$tipeTabelCapital_new == "Ya"){
+    insertUI(selector='#uiTipeModalKapital',
+             where='afterEnd',
+             ui= uiOutput('tipeModalKapital'))
+  } 
+})
+
+output$tipeModalKapital <- renderUI({
+  actionButton(("EksisTabelCapital_new"), "Lanjut Membangun Tabel Modal Kapital")
+})
+
+
+observeEvent(input$EksisTabelCapital_new,{
+  if (input$tipeTabelCapital_new == "Ya"){
+    showModal(modalPilihBarisCapitalPrivat_new())
+  } 
+  # else if(input$tipeTabelCapital_new == "Tidak"){
+  #   removeModal()
+  #   
+  #   insertUI(selector='#uiShowTable_new',
+  #            where='afterEnd',
+  #            ui= uiOutput('showTable_new'))
+  #   
+  #   insertUI(selector='#uiShowResult_new',
+  #            where='afterEnd',
+  #            ui= uiOutput('showResult_new'))
+  # } 
+})
+
+
+################################################################################
+#                                                                              #
+#                         MODAL KAPITAL PRIVAT                                #
+#                                                                              #
+################################################################################
+modalPilihBarisCapitalPrivat_new <- function(failed = FALSE) {
+  modalDialog( 
+    footer=tagList(
+      actionButton("backtoRowtipeTabelCapital_new","Kembali"),
+      actionButton(("bangunKapitalPrivat_new"), "Lanjut",style="color: white;background-color: green;")
+    ),
+    argonTabSet(
+      id = "tabNew",
+      card_wrapper = TRUE,
+      horizontal = TRUE,
+      circle = FALSE,
+      size = "l",
+      width = 12,
+      argonTab(
+        tabName = "Menentukan Jumlah Komponen (Baris) Pada Tabel Modal Kapital Privat",
+        active = T,
+        h3("Berapa jumlah komponen (baris) yang akan user bangun pada Tabel Modal Kapital Privat?"),
+        selectInput(("pilihTambahBaris_capitalP_new"),
+                    " ",
+                    choices = c(1:10),selected = if (is.null(reactData_new$tableCapP)){
+                      20
+                    } else {nrow(reactData_new$tableCapP)}
+                    ,width = "800px")
+      ))
+    ,
+    size="l",
+    easyClose = FALSE)
+}
+
+observeEvent(input$backtoRowtipeTabelCapital_new,{
+  showModal(modalTabelCapital_new())
+})
+
+
+observeEvent(input$bangunKapitalPrivat_new,{
+  showModal(modalTabelCapitalPrivat_new())
+})
+
+modalTabelCapitalPrivat_new <- function(failed = FALSE) {
+  modalDialog( 
+    footer=tagList(
+      actionButton(("batalButtonCapitalP_new"), "Batal", style="color: white;background-color: red;"),
+      actionButton("backtoRowCapitalP_new","Kembali"),
+      actionButton(("bangunKapitalSosial_new"), "Simpan Tabel dan Lanjutkan Membangun Tabel Modal Kapital Sosial",style="color: white;background-color: green;")
+    ),
+    argonTabSet(
+      id = "tabNew3",
+      card_wrapper = TRUE,
+      horizontal = TRUE,
+      circle = FALSE,
+      size = "l",
+      width = 12,
+      argonTab(
+        tabName = "Langkah 6: Mengisi Tabel Modal Kapital Privat",
+        active = T,
+        h3("Tabel Modal Kapital Privat", align = "center"),
+        rHandsontableOutput('capitalP_new')
+      ))
+    ,
+    size="l",
+    easyClose = FALSE)
+}
+
+observeEvent(input$batalButtonCapitalP_new,{
+  browser()
+  removeModal()
+})
+
+observeEvent(input$backtoRowCapitalP_new,{
+  # browser()
+  showModal(modalPilihBarisCapitalPrivat_new())
+})
+
+output$capitalP_new <- renderRHandsontable({
+  rhandsontable(valCapP_new(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 100) %>%
+    hot_col(1, readOnly = TRUE)
+})
+
+
+valCapP_new <- eventReactive(input$bangunKapitalPrivat_new,{
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  if(is.null(dataDefine$capitalPrivat)){
+    readDataTemplate <- read.table(paste0("shiny/data/template/tabel pam kosong",".csv"), header = T, sep = ",")
+    yearIO <- 30 #tahun daur tanam
+    
+    inputData <- readDataTemplate[1:input$pilihTambahBaris_capitalP_new,]
+    inputData <- inputData[,c("jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+    inputData <- cbind(komponen="modal kapital privat",inputData)
+    inputData$komponen <- as.character(inputData$komponen)
+    inputData$jenis<- as.character(inputData$jenis)
+    inputData$unit<- as.character(inputData$unit)
+    inputData[,c(4:33)] <- as.numeric(as.character(inputData[,c(4:33)]))
+    
+    reactData_new$tableCapP <- inputData
+    reactData_new$tableCapP
+  }else{
+    reactData$tableCapP <- dataDefine$capitalPrivat
+    reactData$tableCapP
+  }
+})
+
+observeEvent(input$bangunKapitalSosial_new,{
+  # save data untuk setiap perubahan
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  editNewP1<-as.data.frame(hot_to_r(input$capitalP_new))
+  editNewP1[is.na(editNewP1)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  
+  dataDefine$capitalPrivat <- editNewP1
+  
+  saveRDS(dataDefine,file = fileName)
+  
+  # show modal
+  showModal(modalPilihBarisCapitalSosial_new())
+})
+################################################################################
+#                                                                              #
+#                         MODAL KAPITAL SOSIAL                                 #
+#                                                                              #
+################################################################################
+modalPilihBarisCapitalSosial_new <- function(failed = FALSE) {
+  modalDialog( 
+    footer=tagList(
+      actionButton(("tipeKapitalSosial_new"), "Lanjut",style="color: white;background-color: green;")
+    ),
+    argonTabSet(
+      id = "tabNew",
+      card_wrapper = TRUE,
+      horizontal = TRUE,
+      circle = FALSE,
+      size = "l",
+      width = 12,
+      argonTab(
+        tabName = "Menentukan Tabel Modal Kapital sosial",
+        active = T,
+        h3("Apakah akan menggunakan nilai yang sama dengan modal kapital privat untuk Tabel Modal Kapital Sosial?"),
+        radioButtons("tipeCapitalS_new",
+                     " ",
+                     choices = c("Ya","Tidak"),selected = "Ya"), 
+        tags$div(id='uiTipeCapitalSosial')
+      ))
+    ,
+    size="l",
+    easyClose = FALSE)
+}
+
+
+observeEvent(input$tipeCapitalS_new,{
+  if (input$tipeCapitalS_new == "Ya"){
+    removeUI(selector = '#tipeCapitalSosial')
+  } else if(input$tipeCapitalS_new == "Tidak"){
+    insertUI(selector='#uiTipeCapitalSosial',
+             where='afterEnd',
+             ui= uiOutput('tipeCapitalSosial'))
+  } 
+})
+
+output$tipeCapitalSosial <- renderUI({
+  selectInput(("pilihTambahBaris_capitalS_new"),
+              "Berapa jumlah komponen (baris) yang akan user bangun untuk7 Tabel Modal Kapital Sosial?",
+              choices = c(1:10),selected = if (is.null(reactData_new$tableCapS)){
+                20
+              } else {nrow(reactData_new$tableCapS)}
+              ,width = "800px")
+})
+
+observeEvent(input$tipeKapitalSosial_new,{
+  if (input$tipeCapitalS_new == "Ya"){
+    showModal(modalTabelCapitalSosial_Yes_new())
+  } else if(input$tipeCapitalS_new == "Tidak"){
+    showModal(modalTabelCapitalSosial_No_new())
+  } 
+  
+})
+
+modalTabelCapitalSosial_Yes_new <- function(failed = FALSE) {
+  modalDialog( 
+    footer=tagList(
+      actionButton(("batalButtonCapitalS_new"), "Batal", style="color: white;background-color: red;"),
+      actionButton("backtoRowCapitalS_new","Kembali"),
+      actionButton(("running_button_Yes_new"), "Jalankan Analisis",style="color: white;background-color: green;")
+    ),
+    argonTabSet(
+      id = "tabNew3",
+      card_wrapper = TRUE,
+      horizontal = TRUE,
+      circle = FALSE,
+      size = "l",
+      width = 12,
+      argonTab(
+        tabName = "Langkah 7: Menentukan Tabel Modal Kapital Sosial",
+        active = T,
+        h3("Tabel Modal Kapital Sosial", align = "center"),
+        rHandsontableOutput('capitalS_Yes_new')
+      ))
+    ,
+    size="l",
+    easyClose = FALSE)
+}
+
+modalTabelCapitalSosial_No_new <- function(failed = FALSE) {
+  modalDialog( 
+    footer=tagList(
+      actionButton(("batalButtonCapitalS_new"), "Batal", style="color: white;background-color: red;"),
+      actionButton("backtoRowCapitalS_new","Kembali"),
+      actionButton(("running_button_No_new"), "Jalankan Analisis",style="color: white;background-color: green;")
+    ),
+    argonTabSet(
+      id = "tabNew3",
+      card_wrapper = TRUE,
+      horizontal = TRUE,
+      circle = FALSE,
+      size = "l",
+      width = 12,
+      argonTab(
+        tabName = "Langkah 7: Menentukan Tabel Modal Kapital Sosial",
+        active = T,
+        h3("Tabel Modal Kapital Sosial", align = "center"),
+        rHandsontableOutput('capitalS_No_new')
+      ))
+    ,
+    size="l",
+    easyClose = FALSE)
+}
+
+observeEvent(input$batalButtonCapitalS_new,{
+  browser()
+  removeModal()
+})
+
+observeEvent(input$backtoRowCapitalS_new,{
+  showModal(modalPilihBarisCapitalSosial_new())
+})
+
+output$capitalS_Yes_new <- renderRHandsontable({
+  rhandsontable(valCapS_Yes_new(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 100,
+                readOnly = T
+  )
+})
+
+
+valCapS_Yes_new <- eventReactive(input$bangunKapitalPrivat_new,{
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  if(is.null(dataDefine$capitalSosial)){
+    inputData <- dataDefine$capitalPrivat[c(-1)]
+    reactData_new$tableCapS <- cbind(komponen="modal kapital sosial",inputData)
+    reactData_new$tableCapS
+  }else{
+    reactData$tableCapS <- dataDefine$capitalSosial
+    reactData$tableCapS
+  }
+})
+
+observeEvent(input$running_button_Yes_new,{
+  # save data untuk setiap perubahan
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  editNew<-as.data.frame(hot_to_r(input$capitalS_Yes_new))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  
+  dataDefine$capitalSosial <- editNew
+  
+  capitalAll <- rbind(dataDefine$capitalPrivat,dataDefine$capitalSosial)
+  rownames(capitalAll) <- c(1:nrow(capitalAll))
+  dataDefine$capital <- capitalAll 
+  
+  saveRDS(dataDefine,file = fileName)
+})
+
+
+output$capitalS_No_new <- renderRHandsontable({
+  rhandsontable(valCapS_No_new(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 100) %>%
+    hot_col(1, readOnly = TRUE)
+})
+
+
+valCapS_No_new <- eventReactive(input$bangunKapitalPrivat_new,{
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  if(is.null(dataDefine$capitalSosial)){
+    readDataTemplate <- read.table(paste0("shiny/data/template/tabel pam kosong",".csv"), header = T, sep = ",")
+    yearIO <- 30 #tahun daur tanam
+
+    inputData <- readDataTemplate[1:input$pilihTambahBaris_capitalS_new,]
+    inputData <- inputData[,c("jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
+    inputData <- cbind(komponen="modal kapital sosial",inputData)
+    inputData$komponen <- as.character(inputData$komponen)
+    inputData$jenis<- as.character(inputData$jenis)
+    inputData$unit<- as.character(inputData$unit)
+    inputData[,c(4:33)] <- as.numeric(as.character(inputData[,c(4:33)]))
+    
+    reactData_new$tableCapS <- inputData
+    reactData_new$tableCapS
+  }else{
+    reactData$tableCapS <- dataDefine$capitalSosial
+    reactData$tableCapS
+  }
+})
+
+observeEvent(input$running_button_No_new,{
+  # save data untuk setiap perubahan
+  datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  editNew<-as.data.frame(hot_to_r(input$capitalS_No_new))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  
+  dataDefine$capitalSosial <- editNew
+  
+  capitalAll <- rbind(dataDefine$capitalPrivat,dataDefine$capitalSosial)
+  rownames(capitalAll) <- c(1:nrow(capitalAll))
+  dataDefine$capital <- capitalAll 
+  
+  saveRDS(dataDefine,file = fileName)
+})
+
+
+################################################################################
+#                                                                              #
+#                                   SHOW TABEL                                 #
+#                                                                              #
+################################################################################
 # Section tampilkan tabel---------------------------------------------
-observeEvent(input$running_button_new, {
+observeEvent(c(input$running_button_No_new,input$running_button_Yes_new, input$running_button_new), {
   removeModal()
   insertUI(selector='#uiShowTable_new',
            where='afterEnd',
@@ -643,9 +1076,11 @@ output$showTablePrice_new <- renderDataTable({
   fileName <- paste0(datapath,"saveData_new","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
-  readDataLastEdited <- readRDS(fileName)
-  dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
+  dataDefine <- readRDS(fileName)
+  dataView <- rbind(dataDefine$priceInput, dataDefine$priceOutput)
   dataView[is.na(dataView)] <- 0 #NA replace with zero
+  no.id <- as.numeric(1:nrow(dataView))
+  rownames(dataView) <- no.id
   dataView
 })
 
@@ -655,8 +1090,8 @@ output$showTableKuantitas_new <- renderDataTable({
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   # print("data terakhir tersimpan di rds")
-  readDataLastEdited <- readRDS(fileName)
-  dataView <- rbind(readDataLastEdited$ioInput, readDataLastEdited$ioOutput)
+  dataDefine <- readRDS(fileName)
+  dataView <- rbind(dataDefine$ioInput, dataDefine$ioOutput)
   dataView[is.na(dataView)] <- 0 #NA replace with zero
   no.id <- as.numeric(1:nrow(dataView))
   rownames(dataView) <- no.id
@@ -667,19 +1102,16 @@ output$showTableKuantitas_new <- renderDataTable({
 output$showTableKapital_new <- renderDataTable({
   # case for modal kapital
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
-  cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+  # cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+  fileName <- paste0(datapath,"saveData_new","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
+  dataDefine <- readRDS(fileName)
   
-  if(cekCapital == T){
-    fileName <- paste0(datapath,"saveData_new","_",
-                       input$sut,"_",input$kom,"_",
-                       input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
-    # print("data terakhir tersimpan di rds")
-    readDataLastEdited <- readRDS(fileName)
-    dataView <- readDataLastEdited$capital
-    dataView[is.na(dataView)] <- 0 #NA replace with zero
+  if(!is.null(dataDefine$capital)){
+    dataView <- dataDefine$capital
     dataView    
-  }
-  else if(cekCapital == F){
+  }else if(is.null(dataDefine$capital)){
     dataView <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
     colnames(dataView) <- "Keterangan"
     dataView
@@ -742,7 +1174,7 @@ output$tableResultBAU2_new <- renderDataTable({
   
 })
 
-data.gab_new <- eventReactive(input$running_button_new,{
+data.gab_new <- eventReactive(c(input$running_button_No_new,input$running_button_Yes_new, input$running_button_new),{
   
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
@@ -753,7 +1185,6 @@ data.gab_new <- eventReactive(input$running_button_new,{
   dataDefine$rate.p <- input$rate.p_new
   dataDefine$rate.s <- input$rate.s_new
   dataDefine$nilai.tukar <- input$nilai.tukar_new
-  # dataDefine <- readDataLastEdited()
   
   #### io  ####    
   io.in <-  dataDefine$ioInput
@@ -798,89 +1229,157 @@ data.gab_new <- eventReactive(input$running_button_new,{
     # capital = NULL
     data.gab <- bind_rows(io.all,
                           price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-    data.gab
     
-  }else{
+    # hitung npv --------------------------------------------------------------
+    dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+    dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+    p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+    p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+    p.budget <- p.budget %>%
+      mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+    
+    #perkalian antara general dengan Social Price
+    dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+    s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+    s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
+    s.budget <- s.budget %>%
+      mutate(status = case_when(status == "general" ~ "social budget"))
+    
+    ################ penghitungan NPV
+    p.cost.input <- p.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    s.cost.input <- s.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    p.sum.cost<- p.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.cost<- s.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    p.rev.output <- p.budget %>%
+      filter(str_detect(grup,"output"))
+    s.rev.output <- s.budget %>%
+      filter(str_detect(grup,"output"))
+    
+    p.sum.rev <- p.rev.output[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.rev <- s.rev.output[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    
+    p.profit <- p.sum.rev - p.sum.cost
+    s.profit <- s.sum.rev - s.sum.cost
+    profit0 <- 0
+    p.profit<-c(profit0,p.profit)
+    s.profit<-c(profit0,s.profit)
+    
+    npv.p<-npv(dataDefine$rate.p/100,p.profit)
+    npv.s<-npv(dataDefine$rate.s/100,s.profit)
+    
+    hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+    
+    npv.p.us<-npv.p/dataDefine$nilai.tukar
+    npv.s.us<-npv.s/dataDefine$nilai.tukar
+    npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+    hsl.npv<-rbind(hsl.npv,npv.us)
+    
+    #browser()
+    
+    rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+    hsl.npv
+    # ending  npv --------------------------------------------------------------
+    
+  }else if(!is.null(dataDefine$capital)){
     capital <- cbind(grup="input",dataDefine$capital)
     
     # menambahkan pada tabel io matrix bernilai 1
-    # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
-    # modal kapital sosialnya diwakili oleh momdal kapital privat
-    ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+    ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital) , ncol = ncol(dataDefine$ioInput)-3))
     colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-    ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+    ioKapital<-cbind(status="modal kapital" ,capital[c(1:4)],ioKapital)
     ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
     
     
     kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
     kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+    kapitalPrivat <- kapitalPrivat %>% mutate_if(is.factor,as.character) #change factor var to char var
+    
     kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
     kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
-    data.gab <- rbind(io.all, ioKapital,
+    kapitalSosial <- kapitalSosial %>% mutate_if(is.factor,as.character) #change factor var to char var
+    
+    data.gab <- bind_rows(io.all, ioKapital,
                       price.all.year, 
                       kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-    data.gab
+    # hitung npv --------------------------------------------------------------
+    dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+    dataCapitalAll <- filter(data.gab,status == c("modal kapital"))
+    
+    
+    dataGeneralPrivat <- filter(dataCapitalAll,komponen == c("modal kapital privat"))
+    dataGeneralPrivat <- rbind(dataGeneral,dataGeneralPrivat)
+    dataPrivat <- filter(data.gab,status == c("harga.privat"))
+    p.budget <- dataGeneralPrivat[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+    p.budget <- cbind(dataGeneralPrivat[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+    p.budget <- p.budget[-1] #menghilangkan label status yang awal
+    p.budget <- cbind(status = "privat budget", p.budget) #merename keseluruhan tabel status
+      
+    #perkalian antara general dengan Social Price
+    dataGeneralSosial <- filter(dataCapitalAll,komponen == c("modal kapital sosial"))
+    dataGeneralSosial <- rbind(dataGeneral,dataGeneralSosial)
+    dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+    s.budget <- dataGeneralSosial[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+    s.budget <- cbind(dataGeneralSosial[c(1:4)],dataSosial[36],s.budget)
+    s.budget <- s.budget[-1] #menghilangkan label status yang awal
+    s.budget <- cbind(status = "sosial budget", s.budget) #merename keseluruhan tabel status
+    
+    ################ penghitungan NPV
+    p.cost.input <- p.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    s.cost.input <- s.budget %>%
+      filter(str_detect(grup,"input"))
+    
+    p.sum.cost<- p.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.cost<- s.cost.input[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    p.rev.output <- p.budget %>%
+      filter(str_detect(grup,"output"))
+    s.rev.output <- s.budget %>%
+      filter(str_detect(grup,"output"))
+    
+    p.sum.rev <- p.rev.output[,-(1:5)] %>%
+      colSums(na.rm = T)
+    s.sum.rev <- s.rev.output[,-(1:5)] %>%
+      colSums(na.rm = T)
+    
+    
+    p.profit <- p.sum.rev - p.sum.cost
+    s.profit <- s.sum.rev - s.sum.cost
+    profit0 <- 0
+    p.profit<-c(profit0,p.profit)
+    s.profit<-c(profit0,s.profit)
+    
+    npv.p<-npv(dataDefine$rate.p/100,p.profit)
+    npv.s<-npv(dataDefine$rate.s/100,s.profit)
+    
+    hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+    
+    npv.p.us<-npv.p/dataDefine$nilai.tukar
+    npv.s.us<-npv.s/dataDefine$nilai.tukar
+    npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+    hsl.npv<-rbind(hsl.npv,npv.us)
+    
+    #browser()
+    
+    rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+    hsl.npv
+    # ending  npv --------------------------------------------------------------
+    
   }
   
-  # hitung npv --------------------------------------------------------------
-  dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
-  dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-  p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
-  p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
-  p.budget <- p.budget %>%
-    mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
-  
-  #perkalian antara general dengan Social Price
-  dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-  s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
-  s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
-  s.budget <- s.budget %>%
-    mutate(status = case_when(status == "general" ~ "social budget"))
-  
-  ################ penghitungan NPV
-  p.cost.input <- p.budget %>%
-    filter(str_detect(grup,"input"))
-  
-  s.cost.input <- s.budget %>%
-    filter(str_detect(grup,"input"))
-  
-  p.sum.cost<- p.cost.input[,-(1:5)] %>%
-    colSums(na.rm = T)
-  s.sum.cost<- s.cost.input[,-(1:5)] %>%
-    colSums(na.rm = T)
-  
-  p.rev.output <- p.budget %>%
-    filter(str_detect(grup,"output"))
-  s.rev.output <- s.budget %>%
-    filter(str_detect(grup,"output"))
-  
-  p.sum.rev <- p.rev.output[,-(1:5)] %>%
-    colSums(na.rm = T)
-  s.sum.rev <- s.rev.output[,-(1:5)] %>%
-    colSums(na.rm = T)
-  
-  
-  p.profit <- p.sum.rev - p.sum.cost
-  s.profit <- s.sum.rev - s.sum.cost
-  profit0 <- 0
-  p.profit<-c(profit0,p.profit)
-  s.profit<-c(profit0,s.profit)
-  
-  npv.p<-npv(dataDefine$rate.p/100,p.profit)
-  npv.s<-npv(dataDefine$rate.s/100,s.profit)
-  
-  hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
-  
-  npv.p.us<-npv.p/dataDefine$nilai.tukar
-  npv.s.us<-npv.s/dataDefine$nilai.tukar
-  npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
-  hsl.npv<-rbind(hsl.npv,npv.us)
-  
-  #browser()
-  
-  rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
-  hsl.npv
-  # ending  npv --------------------------------------------------------------
   
   
   
@@ -928,6 +1427,7 @@ data.gab_new <- eventReactive(input$running_button_new,{
   tot.prod <- sum(sum.prod)
   
   fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+  fil.labor <- filter(fil.labor, str_detect(unit, c("hok")))
   sum.labor <- fil.labor[,-c(1:5,36)] %>%
     colSums(na.rm = T)
   tot.labor <- sum(sum.labor)
@@ -972,7 +1472,7 @@ data.gab_new <- eventReactive(input$running_button_new,{
 
 
 
-preparePlot_new <- eventReactive(input$running_button_new,{
+preparePlot_new <- eventReactive(c(input$running_button_No_new,input$running_button_Yes_new, input$running_button_new),{
   
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",

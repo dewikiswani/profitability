@@ -389,6 +389,7 @@ app <- shiny::shinyApp(
       tot.prod <- sum(sum.prod)
       
       fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      fil.labor <- filter(fil.labor, str_detect(unit, c("hok")))
       sum.labor <- fil.labor[,-c(1:5,36)] %>%
         colSums(na.rm = T)
       tot.labor <- sum(sum.labor)
@@ -549,8 +550,8 @@ app <- shiny::shinyApp(
       fileName <- paste0(datapath,"saveData","_",
                          # input$sut,"_",input$kom,"_",
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-      readDataLastEdited <- readRDS(fileName)
-      dataView <- rbind(readDataLastEdited$priceInput, readDataLastEdited$priceOutput)
+      dataDefine <- readRDS(fileName)
+      dataView <- rbind(dataDefine$priceInput, dataDefine$priceOutput)
       dataView[is.na(dataView)] <- 0 #NA replace with zero
       dataView
       
@@ -562,8 +563,8 @@ app <- shiny::shinyApp(
                          # input$sut,"_",input$kom,"_",
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
       # print("data terakhir tersimpan di rds")
-      readDataLastEdited <- readRDS(fileName)
-      dataView <- rbind(readDataLastEdited$ioInput, readDataLastEdited$ioOutput)
+      dataDefine <- readRDS(fileName)
+      dataView <- rbind(dataDefine$ioInput, dataDefine$ioOutput)
       dataView[is.na(dataView)] <- 0 #NA replace with zero
       dataView
       
@@ -580,8 +581,8 @@ app <- shiny::shinyApp(
                            # input$sut,"_",input$kom,"_",
                            input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
         # print("data terakhir tersimpan di rds")
-        readDataLastEdited <- readRDS(fileName)
-        dataView <- readDataLastEdited$capital
+        dataDefine <- readRDS(fileName)
+        dataView <- dataDefine$capital
         dataView[is.na(dataView)] <- 0 #NA replace with zero
         dataView    
       }
@@ -856,7 +857,6 @@ app <- shiny::shinyApp(
                          # input$sut,"_",input$kom,"_",
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
-      # dataDefine <- readDataLastEdited()
       
       #### io  ####    
       io.in <-  dataDefine$ioInput
@@ -1031,6 +1031,7 @@ app <- shiny::shinyApp(
       tot.prod <- sum(sum.prod)
       
       fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      fil.labor <- filter(fil.labor, str_detect(unit, c("hok")))
       sum.labor <- fil.labor[,-c(1:5,36)] %>%
         colSums(na.rm = T)
       tot.labor <- sum(sum.labor)
@@ -1087,9 +1088,6 @@ app <- shiny::shinyApp(
                          # input$sut,"_",input$kom,"_",
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
-      
-      
-      # dataDefine <- readDataLastEdited()
       
       #### io  ####    
       io.in <-  dataDefine$ioInput
@@ -1264,6 +1262,7 @@ app <- shiny::shinyApp(
       tot.prod <- sum(sum.prod)
       
       fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
+      fil.labor <- filter(fil.labor, str_detect(unit, c("hok")))
       sum.labor <- fil.labor[,-c(1:5,36)] %>%
         colSums(na.rm = T)
       tot.labor <- sum(sum.labor)
@@ -1615,8 +1614,9 @@ app <- shiny::shinyApp(
       rhandsontable(valIO2(),
                     rowHeaderWidth = 50,
                     fixedColumnsLeft = 2,
-                    height = 300,
-      )
+                    height = 300
+      )%>%
+        hot_col(1, readOnly = TRUE)
     })
     
     valIO2 <- eventReactive(c(input$sunting_button_2_output,input$sunting_button_3_output),{
@@ -1834,7 +1834,8 @@ app <- shiny::shinyApp(
                     rowHeaderWidth = 50,
                     fixedColumnsLeft = 2,
                     height = 300,
-      )
+      )%>%
+        hot_col(1, readOnly = TRUE)
     })
     
     valIO1 <- eventReactive(c(input$sunting_button_2_input,input$sunting_button_3_input),{

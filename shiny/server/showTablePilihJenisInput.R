@@ -90,6 +90,7 @@ output$showTablePilihJenisInput <- renderUI({
 #                                                                              #
 ################################################################################
 observeEvent(input$showTabelAddPupuk,{
+  removeUI(selector='#textTampilSaveTambahPupuk')
   insertUI(selector='#rhandsAddPupuk',
            where='afterEnd',
            ui= uiOutput('showRhandsAddPupuk'))
@@ -142,6 +143,7 @@ valJenisPupuk <- eventReactive(input$showTabelAddPupuk,{
   if (!is.null(dataDefine$addPupuk)){
     reactData$tableAddPupuk <- as.data.frame(dataDefine$addPupuk[,-1]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk),])
+    rownames(reactData$tableAddPupuk) <- c(1:nrow(reactData$tableAddPupuk))
     reactData$tableAddPupuk
   } else if (is.null(dataDefine$addPupuk)){
     dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("pupuk"))
@@ -149,7 +151,7 @@ valJenisPupuk <- eventReactive(input$showTabelAddPupuk,{
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen pupuk aja
     reactData$tableAddPupuk <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk),])
-    rownames(reactData$tableAddPupuk) <- c(1:input$tambahBarisPupuk)
+    rownames(reactData$tableAddPupuk) <- c(1:nrow(reactData$tableAddPupuk))
     reactData$tableAddPupuk
   } 
 
@@ -159,7 +161,7 @@ output$tabelTambahPupuk <- renderRHandsontable({
   rhandsontable(valJenisPupuk(),
                 rowHeaderWidth = 50,
                 fixedColumnsLeft = 2,
-                height = 300,
+                height = 300
   )
 })
 
@@ -169,6 +171,7 @@ output$tabelTambahPupuk <- renderRHandsontable({
 #                                                                              #
 ################################################################################
 observeEvent(input$showTabelAddBibit,{
+  removeUI(selector='#textTampilSaveTambahBibit')
   insertUI(selector='#rhandsAddBibit',
            where='afterEnd',
            ui= uiOutput('showRhandsAddBibit'))
@@ -221,6 +224,8 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
   if (!is.null(dataDefine$addBibit)){
     reactData$tableAddBibit <- as.data.frame(dataDefine$addBibit[,-1])
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
+    rownames(reactData$tableAddBibit) <- c(1:nrow(reactData$tableAddBibit))
+    reactData$tableAddBibit[] <- lapply(reactData$tableAddBibit, as.character) #ubah dr faktor jd char
     reactData$tableAddBibit
   } else if (is.null(dataDefine$addBibit)){
     # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
@@ -229,7 +234,7 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen bibit aja
     reactData$tableAddBibit <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
-    rownames(reactData$tableAddBibit) <- c(1:input$tambahBarisBibit)
+    rownames(reactData$tableAddBibit) <- c(1:nrow(reactData$tableAddBibit))
     reactData$tableAddBibit
   } 
   
@@ -239,7 +244,7 @@ output$tabelTambahBibit <- renderRHandsontable({
   rhandsontable(valJenisBibit(),
                 rowHeaderWidth = 50,
                 fixedColumnsLeft = 2,
-                height = 300,
+                height = 300
   )
 })
 
@@ -249,6 +254,7 @@ output$tabelTambahBibit <- renderRHandsontable({
 #                                                                              #
 ################################################################################
 observeEvent(input$showTabelAddPeralatan,{
+  removeUI(selector='#textTampilSaveTambahPeralatan')
   insertUI(selector='#rhandsAddPeralatan',
            where='afterEnd',
            ui= uiOutput('showRhandsAddPeralatan'))
@@ -301,6 +307,8 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
   if (!is.null(dataDefine$addPeralatan)){
     reactData$tableAddPeralatan <- as.data.frame(dataDefine$addPeralatan[,-1])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
+    rownames(reactData$tableAddPeralatan) <- c(1:nrow(reactData$tableAddPeralatan))
+    reactData$tableAddPeralatant[] <- lapply(reactData$tableAddPeralatant, as.character) #ubah dr faktor jd char
     reactData$tableAddPeralatant
   } else if (is.null(dataDefine$addPeralatan)){
     # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
@@ -309,7 +317,7 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen peralatan aja
     reactData$tableAddPeralatan <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
-    rownames(reactData$tableAddPeralatan) <- c(1:input$tambahBarisPeralatan)
+    rownames(reactData$tableAddPeralatan) <- c(1:nrow(reactData$tableAddPeralatan))
     reactData$tableAddPeralatan
   } 
   
@@ -319,7 +327,7 @@ output$tabelTambahPeralatan <- renderRHandsontable({
   rhandsontable(valJenisPeralatan(),
                 rowHeaderWidth = 50,
                 fixedColumnsLeft = 2,
-                height = 300,
+                height = 300
   )
 })
 
@@ -329,6 +337,7 @@ output$tabelTambahPeralatan <- renderRHandsontable({
 #                                                                              #
 ################################################################################
 observeEvent(input$showTabelAddTK,{
+  removeUI(selector='#textTampilSaveTambahTK')
   insertUI(selector='#rhandsAddTK',
            where='afterEnd',
            ui= uiOutput('showRhandsAddTK'))
@@ -381,6 +390,8 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
   if (!is.null(dataDefine$addTK)){
     reactData$tableAddTK <- as.data.frame(dataDefine$addTK[,-1])
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
+    rownames(reactData$tableAddTK) <- c(1:nrow(reactData$tableAddTK))
+    reactData$tableAddTK[] <- lapply(reactData$tableAddTK, as.character) #ubah dr faktor jd char
     reactData$tableAddTK
   } else if (is.null(dataDefine$addTK)){
     # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
@@ -390,7 +401,7 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen TK aja
     reactData$tableAddTK <- as.data.frame(dataKomponen[,c(3:4)])
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
-    rownames(reactData$tableAddTK) <- c(1:input$tambahBarisTK)
+    rownames(reactData$tableAddTK) <- c(1:nrow(reactData$tableAddTK))
     reactData$tableAddTK
   } 
   
@@ -400,7 +411,7 @@ output$tabelTambahTK <- renderRHandsontable({
   rhandsontable(valJenisTK(),
                 rowHeaderWidth = 50,
                 fixedColumnsLeft = 2,
-                height = 300,
+                height = 300
   )
 })
 

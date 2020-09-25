@@ -54,6 +54,7 @@ output$showTablePilihJenisOutput <- renderUI({
 #                                                                              #
 ################################################################################
 observeEvent(input$showTabelAddUtama,{
+  removeUI(selector='#textTampilSaveTambahUtama')
   insertUI(selector='#rhandsAddUtama',
            where='afterEnd',
            ui= uiOutput('showRhandsAddUtama'))
@@ -106,6 +107,8 @@ valJenisUtama<- eventReactive(input$showTabelAddUtama,{
   if (!is.null(dataDefine$addUtama)){
     reactData$tableAddUtama <- as.data.frame(dataDefine$addUtama[,-1]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddUtama <- as.data.frame(reactData$tableAddUtama[1:as.numeric(input$tambahBarisUtama),])
+    rownames(reactData$tableAddUtama) <- c(1:nrow(reactData$tableAddUtama))
+    reactData$tableAddUtama[] <- lapply(reactData$tableAddUtama, as.character) #ubah dr faktor jd char
     reactData$tableAddUtama
   } else if (is.null(dataDefine$addUtama)){
     dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
@@ -124,7 +127,7 @@ output$tabelTambahUtama <- renderRHandsontable({
   rhandsontable(valJenisUtama(),
                 rowHeaderWidth = 50,
                 fixedColumnsLeft = 2,
-                height = 300,
+                height = 300
   )
 })
 
@@ -134,6 +137,7 @@ output$tabelTambahUtama <- renderRHandsontable({
 #                                                                              #
 ################################################################################
 observeEvent(input$showTabelAddSampingan,{
+  removeUI(selector='#textTampilSaveTambahSampingan')
   insertUI(selector='#rhandsAddSampingan',
            where='afterEnd',
            ui= uiOutput('showRhandsAddSampingan'))
@@ -186,6 +190,8 @@ valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
   if (!is.null(dataDefine$addSampingan)){
     reactData$tableAddSampingan <- as.data.frame(dataDefine$addSampingan[,-1]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddSampingan <- as.data.frame(reactData$tableAddSampingan[1:as.numeric(input$tambahBarisSampingan),])
+    rownames(reactData$tableAddSampingan) <- c(1:nrow(reactData$tableAddSampingan))
+    reactData$tableAddSampingan[] <- lapply(reactData$tableAddSampingan, as.character) #ubah dr faktor jd char
     reactData$tableAddSampingan
   } else if (is.null(dataDefine$addSampingan)){
     dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
@@ -204,7 +210,7 @@ output$tabelTambahSampingan <- renderRHandsontable({
   rhandsontable(valJenisSampingan(),
                 rowHeaderWidth = 50,
                 fixedColumnsLeft = 2,
-                height = 300,
+                height = 300
   )
 })
 
