@@ -1,4 +1,4 @@
-verifikasi <- argonTabItem(
+pamTemplate <- argonTabItem(
   tabName = "template",
   argonH1("Membangun PAM dari data template", display = 4),
   argonRow(

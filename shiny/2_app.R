@@ -43,8 +43,8 @@ indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFacto
 
 
 # elements
-source("shiny/2_verifikasi.R")
-source("shiny/2_pambaru_modul2.R")
+source("shiny/2_pamTemplate_modul1.R")
+source("shiny/2_pamBaru_modul2.R")
 # source("shiny/analisis.R")
 
 
@@ -60,7 +60,7 @@ app <- shiny::shinyApp(
     body = argonDashBody(
       argonTabItems(
         #home,
-        verifikasi,
+        pamTemplate,
         pamBaru
         # ,
         # deskriptifPlot
@@ -103,34 +103,19 @@ app <- shiny::shinyApp(
       priceOutput <- outputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
       
       
+      capital <- filter(readDataTemplate,faktor == c("modal kapital"))
       
-      # case for modal kapital
-      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
-      capital <- NULL
-      
-      
-      # if (cekCapital == T & input$checkKapital == F ){
-      #   capital <- NULL
-      #   insertUI(selector='#teksStatusCapital',
-      #            where = 'afterEnd',
-      #            ui = tags$div(id="statusCapital","Terdapat tabel modal kapital (tidak dimasukkan ke dalam perhitungan)"))
-      # } else if(cekCapital == T & input$checkKapital == T){
-      #   capital <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
-      #   insertUI(selector='#teksStatusCapital',
-      #            where = 'afterEnd',
-      #            ui = tags$div(id="statusCapital","Terdapat tabel modal kapital (dimasukkan kedalam perhitungan)"))
-      # } else if (cekCapital == F & input$checkKapital == F){
-      #   capital <- NULL
-      #   insertUI(selector='#teksStatusCapital',
-      #            where = 'afterEnd',
-      #            ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
-      # } else if(cekCapital == F & input$checkKapital == T){
-      #   capital <- NULL
-      #   insertUI(selector='#teksStatusCapital',
-      #            where = 'afterEnd',
-      #            ui = tags$div(id="statusCapital","Tidak terdapat tabel modal kapital"))
-      # }
-      
+      # kondisi if else nya dari cek jumlah row di variable capital
+      if(dim(capital)[1] == 0){
+        capital <- NULL
+        capitalPrivat <- NULL
+        capitalSosial <- NULL
+      } else if(dim(capital)[1] > 0){
+        capital <- capital[c(8,9,11,14:43)]
+        capitalPrivat <- filter(capital,str_detect(komponen,"privat"))
+        capitalSosial <- filter(capital,str_detect(komponen,"sosial"))
+      }
+
       # informasi umum
       sut <- input$sut
       kom <- input$kom
@@ -139,12 +124,9 @@ app <- shiny::shinyApp(
       tipeLahan <- input$tipeLahan
       tipeKebun <- readDataTemplate$tipe.kebun
       
-      
-      
-      
       combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
-                         capital=capital,
+                         capital=capital, capitalPrivat = capitalPrivat, capitalSosial = capitalSosial,
                          sut=sut,
                          kom=kom,
                          provinsi = provinsi,
@@ -185,12 +167,17 @@ app <- shiny::shinyApp(
       
       
       # case for modal kapital
-      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+      capital <- filter(readDataTemplate,faktor == c("modal kapital"))
       
-      if(cekCapital == T){
-        capital <- read.table(paste0(datapath,"kapital template.csv"), header = T, sep = ",")
-      } else if (cekCapital == F){
+      # kondisi if else nya dari cek jumlah row di variable capital
+      if(dim(capital)[1] == 0){
         capital <- NULL
+        capitalPrivat <- NULL
+        capitalSosial <- NULL
+      } else if(dim(capital)[1] > 0){
+        capital <- capital[c(8,9,11,14:43)]
+        capitalPrivat <- filter(capital,str_detect(komponen,"privat"))
+        capitalSosial <- filter(capital,str_detect(komponen,"sosial"))
       }
       
       # Asumsi makro
@@ -204,7 +191,7 @@ app <- shiny::shinyApp(
       # memmbuat list gabungan dataDefine
       dataDefine <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
-                         capital=capital,
+                         capital=capital, capitalPrivat = capitalPrivat, capitalSosial = capitalSosial,
                          rate.p = rate.p,
                          rate.s = rate.s,
                          nilai.tukar=nilai.tukar)
@@ -263,89 +250,159 @@ app <- shiny::shinyApp(
         # capital = NULL
         data.gab <- bind_rows(io.all,
                               price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
         
-      }else{
+        # hitung npv --------------------------------------------------------------
+        dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+        dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+        p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+        p.budget <- p.budget %>%
+          mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+        
+        #perkalian antara general dengan Social Price
+        dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+        s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
+        s.budget <- s.budget %>%
+          mutate(status = case_when(status == "general" ~ "social budget"))
+        
+        ################ penghitungan NPV
+        p.cost.input <- p.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        s.cost.input <- s.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        p.sum.cost<- p.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.cost<- s.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        p.rev.output <- p.budget %>%
+          filter(str_detect(grup,"output"))
+        s.rev.output <- s.budget %>%
+          filter(str_detect(grup,"output"))
+        
+        p.sum.rev <- p.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.rev <- s.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        
+        p.profit <- p.sum.rev - p.sum.cost
+        s.profit <- s.sum.rev - s.sum.cost
+        profit0 <- 0
+        p.profit<-c(profit0,p.profit)
+        s.profit<-c(profit0,s.profit)
+        
+        npv.p<-npv(dataDefine$rate.p/100,p.profit)
+        npv.s<-npv(dataDefine$rate.s/100,s.profit)
+        
+        hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+        
+        npv.p.us<-npv.p/dataDefine$nilai.tukar
+        npv.s.us<-npv.s/dataDefine$nilai.tukar
+        npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+        hsl.npv<-rbind(hsl.npv,npv.us)
+        
+        #browser()
+        
+        rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+        hsl.npv
+        # ending  npv --------------------------------------------------------------
+        
+      }else if (!is.null(dataDefine$capital)){
         capital <- cbind(grup="input",dataDefine$capital)
         
         # menambahkan pada tabel io matrix bernilai 1
-        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
-        # modal kapital sosialnya diwakili oleh momdal kapital privat
-        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital) , ncol = ncol(dataDefine$ioInput)-3))
         colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital<-cbind(status="modal kapital" ,capital[c(1:4)],ioKapital)
         ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
         
         
         kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
         kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalPrivat <- kapitalPrivat %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
         kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
         kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
-        data.gab <- rbind(io.all, ioKapital,
-                          price.all.year, 
-                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
+        kapitalSosial <- kapitalSosial %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        data.gab <- bind_rows(io.all, ioKapital,
+                              price.all.year, 
+                              kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        # hitung npv --------------------------------------------------------------
+        dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+        dataCapitalAll <- filter(data.gab,status == c("modal kapital"))
+        
+        
+        dataGeneralPrivat <- filter(dataCapitalAll,komponen == c("modal kapital privat"))
+        dataGeneralPrivat <- rbind(dataGeneral,dataGeneralPrivat)
+        dataPrivat <- filter(data.gab,status == c("harga.privat"))
+        p.budget <- dataGeneralPrivat[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- cbind(dataGeneralPrivat[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+        p.budget <- p.budget[-1] #menghilangkan label status yang awal
+        p.budget <- cbind(status = "privat budget", p.budget) #merename keseluruhan tabel status
+        
+      
+        
+        
+        #perkalian antara general dengan Social Price
+        dataGeneralSosial <- filter(dataCapitalAll,komponen == c("modal kapital sosial"))
+        dataGeneralSosial <- rbind(dataGeneral,dataGeneralSosial)
+        dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+        s.budget <- dataGeneralSosial[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- cbind(dataGeneralSosial[c(1:4)],dataSosial[36],s.budget)
+        s.budget <- s.budget[-1] #menghilangkan label status yang awal
+        s.budget <- cbind(status = "sosial budget", s.budget) #merename keseluruhan tabel status
+        
+        ################ penghitungan NPV
+        p.cost.input <- p.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        s.cost.input <- s.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        p.sum.cost<- p.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.cost<- s.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        p.rev.output <- p.budget %>%
+          filter(str_detect(grup,"output"))
+        s.rev.output <- s.budget %>%
+          filter(str_detect(grup,"output"))
+        
+        p.sum.rev <- p.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.rev <- s.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        
+        p.profit <- p.sum.rev - p.sum.cost
+        s.profit <- s.sum.rev - s.sum.cost
+        profit0 <- 0
+        p.profit<-c(profit0,p.profit)
+        s.profit<-c(profit0,s.profit)
+        
+        npv.p<-npv(dataDefine$rate.p/100,p.profit)
+        npv.s<-npv(dataDefine$rate.s/100,s.profit)
+        
+        hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+        
+        npv.p.us<-npv.p/dataDefine$nilai.tukar
+        npv.s.us<-npv.s/dataDefine$nilai.tukar
+        npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+        hsl.npv<-rbind(hsl.npv,npv.us)
+        
+        #browser()
+        
+        rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+        hsl.npv
+        # ending  npv --------------------------------------------------------------
+        
       }
-      
-      # hitung npv --------------------------------------------------------------
-      dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
-      dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
-      p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
-      p.budget <- p.budget %>%
-        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
-      
-      #perkalian antara general dengan Social Price
-      dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
-      s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
-      s.budget <- s.budget %>%
-        mutate(status = case_when(status == "general" ~ "social budget"))
-      
-      ################ penghitungan NPV
-      p.cost.input <- p.budget %>%
-        filter(str_detect(grup,"input"))
-      
-      s.cost.input <- s.budget %>%
-        filter(str_detect(grup,"input"))
-      
-      p.sum.cost<- p.cost.input[,-(1:5)] %>%
-        colSums(na.rm = T)
-      s.sum.cost<- s.cost.input[,-(1:5)] %>%
-        colSums(na.rm = T)
-      
-      p.rev.output <- p.budget %>%
-        filter(str_detect(grup,"output"))
-      s.rev.output <- s.budget %>%
-        filter(str_detect(grup,"output"))
-      
-      p.sum.rev <- p.rev.output[,-(1:5)] %>%
-        colSums(na.rm = T)
-      s.sum.rev <- s.rev.output[,-(1:5)] %>%
-        colSums(na.rm = T)
-      
-      
-      p.profit <- p.sum.rev - p.sum.cost
-      s.profit <- s.sum.rev - s.sum.cost
-      profit0 <- 0
-      p.profit<-c(profit0,p.profit)
-      s.profit<-c(profit0,s.profit)
-      
-      npv.p<-npv(dataDefine$rate.p/100,p.profit)
-      npv.s<-npv(dataDefine$rate.s/100,s.profit)
-      
-      hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
-      
-      npv.p.us<-npv.p/dataDefine$nilai.tukar
-      npv.s.us<-npv.s/dataDefine$nilai.tukar
-      npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
-      hsl.npv<-rbind(hsl.npv,npv.us)
-      
-      rownames(hsl.npv)<-c("NPV (IDR/Ha)", "NPV (US/Ha)")
-      hsl.npv
-      # ending  npv --------------------------------------------------------------
-      
-      
       
       # hitung nlc --------------------------------------------------------------
       
@@ -456,10 +513,9 @@ app <- shiny::shinyApp(
     
     # Section asumsi makro ---------------------------------------------
     observeEvent(input$asumsiMakro_button, {
+      # browser()
       dataTemplate()
       resultTemplate()
-      
-      # browser()
       insertUI(selector='#uiShowMakro',
                where='afterEnd',
                ui= uiOutput('showMakro'))
@@ -576,20 +632,17 @@ app <- shiny::shinyApp(
     output$showTableKapital <- renderDataTable({
       # case for modal kapital
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
       
-      if(cekCapital == T){
-        datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-        fileName <- paste0(datapath,"saveData","_",
-                           # input$sut,"_",input$kom,"_",
-                           input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-        # print("data terakhir tersimpan di rds")
-        dataDefine <- readRDS(fileName)
+      if (!is.null(dataDefine$capital)){
         dataView <- dataDefine$capital
         dataView[is.na(dataView)] <- 0 #NA replace with zero
         dataView    
       }
-      else if(cekCapital == F){
+      else if (is.null(dataDefine$capital)){
         dataView <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
         colnames(dataView) <- "Keterangan"
         dataView
@@ -797,9 +850,19 @@ app <- shiny::shinyApp(
         br(),
         fluidRow(
           column(6,
+                 id = 'bau',
+                 tags$style('#bau {
+                            background-color: #00cca3;
+                            }'),
+                 # tags$head(tags$style('h3 {color:white;}')),
                  h3("Business As Usual (BAU)", align = "center")
+                 
           ),
           column(6,
+                 id = 'sim',
+                 tags$style('#sim {
+                            background-color: #b3b3ff;
+                            }'),
                  h3("Simulasi", align = "center")
           )
         ),
@@ -899,96 +962,164 @@ app <- shiny::shinyApp(
       
       price.all.year <- rbind(p.price, s.price)
       
-      #### buat if else untuk modal kapital ####
       if (is.null(dataDefine$capital)){
         # capital = NULL
         data.gab <- bind_rows(io.all,
                               price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
         
-      }else{
+        # hitung npv --------------------------------------------------------------
+        dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+        dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+        p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+        p.budget <- p.budget %>%
+          mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+        
+        #perkalian antara general dengan Social Price
+        dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+        s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
+        s.budget <- s.budget %>%
+          mutate(status = case_when(status == "general" ~ "social budget"))
+        
+        ################ penghitungan NPV
+        p.cost.input <- p.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        s.cost.input <- s.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        p.sum.cost<- p.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.cost<- s.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        p.rev.output <- p.budget %>%
+          filter(str_detect(grup,"output"))
+        s.rev.output <- s.budget %>%
+          filter(str_detect(grup,"output"))
+        
+        p.sum.rev <- p.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.rev <- s.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        
+        p.profit <- p.sum.rev - p.sum.cost
+        s.profit <- s.sum.rev - s.sum.cost
+        profit0 <- 0
+        p.profit<-c(profit0,p.profit)
+        s.profit<-c(profit0,s.profit)
+        
+        npv.p<-npv(dataDefine$rate.p/100,p.profit)
+        npv.s<-npv(dataDefine$rate.s/100,s.profit)
+        
+        hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+        
+        npv.p.us<-npv.p/dataDefine$nilai.tukar
+        npv.s.us<-npv.s/dataDefine$nilai.tukar
+        npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+        hsl.npv<-rbind(hsl.npv,npv.us)
+        
+        #browser()
+        
+        rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+        hsl.npv
+        # ending  npv --------------------------------------------------------------
+        
+      }else if (!is.null(dataDefine$capital)){
         capital <- cbind(grup="input",dataDefine$capital)
         
         # menambahkan pada tabel io matrix bernilai 1
-        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
-        # modal kapital sosialnya diwakili oleh momdal kapital privat
-        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital) , ncol = ncol(dataDefine$ioInput)-3))
         colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital<-cbind(status="modal kapital" ,capital[c(1:4)],ioKapital)
         ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
         
         
         kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
         kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalPrivat <- kapitalPrivat %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
         kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
         kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
-        data.gab <- rbind(io.all, ioKapital,
-                          price.all.year, 
-                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
+        kapitalSosial <- kapitalSosial %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        data.gab <- bind_rows(io.all, ioKapital,
+                              price.all.year, 
+                              kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        # hitung npv --------------------------------------------------------------
+        dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+        dataCapitalAll <- filter(data.gab,status == c("modal kapital"))
+        
+        
+        dataGeneralPrivat <- filter(dataCapitalAll,komponen == c("modal kapital privat"))
+        dataGeneralPrivat <- rbind(dataGeneral,dataGeneralPrivat)
+        dataPrivat <- filter(data.gab,status == c("harga.privat"))
+        p.budget <- dataGeneralPrivat[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- cbind(dataGeneralPrivat[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+        p.budget <- p.budget[-1] #menghilangkan label status yang awal
+        p.budget <- cbind(status = "privat budget", p.budget) #merename keseluruhan tabel status
+        
+        
+        
+        
+        #perkalian antara general dengan Social Price
+        dataGeneralSosial <- filter(dataCapitalAll,komponen == c("modal kapital sosial"))
+        dataGeneralSosial <- rbind(dataGeneral,dataGeneralSosial)
+        dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+        s.budget <- dataGeneralSosial[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- cbind(dataGeneralSosial[c(1:4)],dataSosial[36],s.budget)
+        s.budget <- s.budget[-1] #menghilangkan label status yang awal
+        s.budget <- cbind(status = "sosial budget", s.budget) #merename keseluruhan tabel status
+        
+        ################ penghitungan NPV
+        p.cost.input <- p.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        s.cost.input <- s.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        p.sum.cost<- p.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.cost<- s.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        p.rev.output <- p.budget %>%
+          filter(str_detect(grup,"output"))
+        s.rev.output <- s.budget %>%
+          filter(str_detect(grup,"output"))
+        
+        p.sum.rev <- p.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.rev <- s.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        
+        p.profit <- p.sum.rev - p.sum.cost
+        s.profit <- s.sum.rev - s.sum.cost
+        profit0 <- 0
+        p.profit<-c(profit0,p.profit)
+        s.profit<-c(profit0,s.profit)
+        
+        npv.p<-npv(dataDefine$rate.p/100,p.profit)
+        npv.s<-npv(dataDefine$rate.s/100,s.profit)
+        
+        hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+        
+        npv.p.us<-npv.p/dataDefine$nilai.tukar
+        npv.s.us<-npv.s/dataDefine$nilai.tukar
+        npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+        hsl.npv<-rbind(hsl.npv,npv.us)
+        
+        #browser()
+        
+        rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+        hsl.npv
+        # ending  npv --------------------------------------------------------------
+        
       }
-      
-      # hitung npv --------------------------------------------------------------
-      dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
-      dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
-      p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
-      p.budget <- p.budget %>%
-        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
-      
-      #perkalian antara general dengan Social Price
-      dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
-      s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
-      s.budget <- s.budget %>%
-        mutate(status = case_when(status == "general" ~ "social budget"))
-      
-      ################ penghitungan NPV
-      p.cost.input <- p.budget %>%
-        filter(str_detect(grup,"input"))
-      
-      s.cost.input <- s.budget %>%
-        filter(str_detect(grup,"input"))
-      
-      p.sum.cost<- p.cost.input[,-(1:5)] %>%
-        colSums(na.rm = T)
-      s.sum.cost<- s.cost.input[,-(1:5)] %>%
-        colSums(na.rm = T)
-      
-      p.rev.output <- p.budget %>%
-        filter(str_detect(grup,"output"))
-      s.rev.output <- s.budget %>%
-        filter(str_detect(grup,"output"))
-      
-      p.sum.rev <- p.rev.output[,-(1:5)] %>%
-        colSums(na.rm = T)
-      s.sum.rev <- s.rev.output[,-(1:5)] %>%
-        colSums(na.rm = T)
-      
-      
-      p.profit <- p.sum.rev - p.sum.cost
-      s.profit <- s.sum.rev - s.sum.cost
-      profit0 <- 0
-      p.profit<-c(profit0,p.profit)
-      s.profit<-c(profit0,s.profit)
-      
-      npv.p<-npv(dataDefine$rate.p/100,p.profit)
-      npv.s<-npv(dataDefine$rate.s/100,s.profit)
-      
-      hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
-      
-      npv.p.us<-npv.p/dataDefine$nilai.tukar
-      npv.s.us<-npv.s/dataDefine$nilai.tukar
-      npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
-      hsl.npv<-rbind(hsl.npv,npv.us)
-      
-      #browser()
-      
-      rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
-      hsl.npv
-      # ending  npv --------------------------------------------------------------
-      
-      
+
       
       # hitung nlc --------------------------------------------------------------
       
@@ -1130,95 +1261,164 @@ app <- shiny::shinyApp(
       
       price.all.year <- rbind(p.price, s.price)
       
-      #### buat if else untuk modal kapital ####
+      
       if (is.null(dataDefine$capital)){
         # capital = NULL
         data.gab <- bind_rows(io.all,
                               price.all.year) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
         
-      }else{
+        # hitung npv --------------------------------------------------------------
+        dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+        dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
+        p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+        p.budget <- p.budget %>%
+          mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
+        
+        #perkalian antara general dengan Social Price
+        dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+        s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
+        s.budget <- s.budget %>%
+          mutate(status = case_when(status == "general" ~ "social budget"))
+        
+        ################ penghitungan NPV
+        p.cost.input <- p.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        s.cost.input <- s.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        p.sum.cost<- p.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.cost<- s.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        p.rev.output <- p.budget %>%
+          filter(str_detect(grup,"output"))
+        s.rev.output <- s.budget %>%
+          filter(str_detect(grup,"output"))
+        
+        p.sum.rev <- p.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.rev <- s.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        
+        p.profit <- p.sum.rev - p.sum.cost
+        s.profit <- s.sum.rev - s.sum.cost
+        profit0 <- 0
+        p.profit<-c(profit0,p.profit)
+        s.profit<-c(profit0,s.profit)
+        
+        npv.p<-npv(dataDefine$rate.p/100,p.profit)
+        npv.s<-npv(dataDefine$rate.s/100,s.profit)
+        
+        hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+        
+        npv.p.us<-npv.p/dataDefine$nilai.tukar
+        npv.s.us<-npv.s/dataDefine$nilai.tukar
+        npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+        hsl.npv<-rbind(hsl.npv,npv.us)
+        
+        #browser()
+        
+        rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+        hsl.npv
+        # ending  npv --------------------------------------------------------------
+        
+      }else if (!is.null(dataDefine$capital)){
         capital <- cbind(grup="input",dataDefine$capital)
         
         # menambahkan pada tabel io matrix bernilai 1
-        # nrow nya = dibagi 2 asumsi io modal kapital privat = io modal kapital sosial
-        # modal kapital sosialnya diwakili oleh momdal kapital privat
-        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital)/2 , ncol = ncol(dataDefine$ioInput)-3))
+        ioKapital <- data.frame(matrix(data=1,nrow = nrow(capital) , ncol = ncol(dataDefine$ioInput)-3))
         colnames(ioKapital)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        ioKapital<-cbind(status="general" ,capital[nrow(capital)/2,c(1:4)],ioKapital)
+        ioKapital<-cbind(status="modal kapital" ,capital[c(1:4)],ioKapital)
         ioKapital <- ioKapital %>% mutate_if(is.factor,as.character) #change factor var to char var
         
         
         kapitalPrivat <- filter(capital,komponen == c("modal kapital privat"))
         kapitalPrivat <- cbind(status ="harga.privat",kapitalPrivat )
+        kapitalPrivat <- kapitalPrivat %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
         kapitalSosial <- filter(capital,komponen == c("modal kapital sosial"))
         kapitalSosial <- cbind(status ="harga.sosial",kapitalSosial )
-        data.gab <- rbind(io.all, ioKapital,
-                          price.all.year, 
-                          kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
-        data.gab
+        kapitalSosial <- kapitalSosial %>% mutate_if(is.factor,as.character) #change factor var to char var
+        
+        data.gab <- bind_rows(io.all, ioKapital,
+                              price.all.year, 
+                              kapitalPrivat, kapitalSosial) ### nanti dibuat if else utk capital jika modal kapital jadi diinputkan
+        # hitung npv --------------------------------------------------------------
+        dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
+        dataCapitalAll <- filter(data.gab,status == c("modal kapital"))
+        
+        
+        dataGeneralPrivat <- filter(dataCapitalAll,komponen == c("modal kapital privat"))
+        dataGeneralPrivat <- rbind(dataGeneral,dataGeneralPrivat)
+        dataPrivat <- filter(data.gab,status == c("harga.privat"))
+        p.budget <- dataGeneralPrivat[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- cbind(dataGeneralPrivat[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
+        p.budget <- p.budget[-1] #menghilangkan label status yang awal
+        p.budget <- cbind(status = "privat budget", p.budget) #merename keseluruhan tabel status
+        
+        
+        
+        
+        #perkalian antara general dengan Social Price
+        dataGeneralSosial <- filter(dataCapitalAll,komponen == c("modal kapital sosial"))
+        dataGeneralSosial <- rbind(dataGeneral,dataGeneralSosial)
+        dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
+        s.budget <- dataGeneralSosial[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- cbind(dataGeneralSosial[c(1:4)],dataSosial[36],s.budget)
+        s.budget <- s.budget[-1] #menghilangkan label status yang awal
+        s.budget <- cbind(status = "sosial budget", s.budget) #merename keseluruhan tabel status
+        
+        ################ penghitungan NPV
+        p.cost.input <- p.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        s.cost.input <- s.budget %>%
+          filter(str_detect(grup,"input"))
+        
+        p.sum.cost<- p.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.cost<- s.cost.input[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        p.rev.output <- p.budget %>%
+          filter(str_detect(grup,"output"))
+        s.rev.output <- s.budget %>%
+          filter(str_detect(grup,"output"))
+        
+        p.sum.rev <- p.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        s.sum.rev <- s.rev.output[,-(1:5)] %>%
+          colSums(na.rm = T)
+        
+        
+        p.profit <- p.sum.rev - p.sum.cost
+        s.profit <- s.sum.rev - s.sum.cost
+        profit0 <- 0
+        p.profit<-c(profit0,p.profit)
+        s.profit<-c(profit0,s.profit)
+        
+        npv.p<-npv(dataDefine$rate.p/100,p.profit)
+        npv.s<-npv(dataDefine$rate.s/100,s.profit)
+        
+        hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
+        
+        npv.p.us<-npv.p/dataDefine$nilai.tukar
+        npv.s.us<-npv.s/dataDefine$nilai.tukar
+        npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
+        hsl.npv<-rbind(hsl.npv,npv.us)
+        
+        #browser()
+        
+        rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
+        hsl.npv
+        # ending  npv --------------------------------------------------------------
+        
       }
-      
-      # hitung npv --------------------------------------------------------------
-      dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
-      dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-      p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
-      p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
-      p.budget <- p.budget %>%
-        mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
-      
-      #perkalian antara general dengan Social Price
-      dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-      s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
-      s.budget <- cbind(dataGeneral[c(1:4)],dataSosial[36],s.budget)
-      s.budget <- s.budget %>%
-        mutate(status = case_when(status == "general" ~ "social budget"))
-      
-      ################ penghitungan NPV
-      p.cost.input <- p.budget %>%
-        filter(str_detect(grup,"input"))
-      
-      s.cost.input <- s.budget %>%
-        filter(str_detect(grup,"input"))
-      
-      p.sum.cost<- p.cost.input[,-(1:5)] %>%
-        colSums(na.rm = T)
-      s.sum.cost<- s.cost.input[,-(1:5)] %>%
-        colSums(na.rm = T)
-      
-      p.rev.output <- p.budget %>%
-        filter(str_detect(grup,"output"))
-      s.rev.output <- s.budget %>%
-        filter(str_detect(grup,"output"))
-      
-      p.sum.rev <- p.rev.output[,-(1:5)] %>%
-        colSums(na.rm = T)
-      s.sum.rev <- s.rev.output[,-(1:5)] %>%
-        colSums(na.rm = T)
-      
-      
-      p.profit <- p.sum.rev - p.sum.cost
-      s.profit <- s.sum.rev - s.sum.cost
-      profit0 <- 0
-      p.profit<-c(profit0,p.profit)
-      s.profit<-c(profit0,s.profit)
-      
-      npv.p<-npv(input$rate.p/100,p.profit)
-      npv.s<-npv(input$rate.s/100,s.profit)
-      
-      hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
-      
-      npv.p.us<-npv.p/input$nilai.tukar
-      npv.s.us<-npv.s/input$nilai.tukar
-      npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
-      hsl.npv<-rbind(hsl.npv,npv.us)
-      
-      #browser()
-      
-      rownames(hsl.npv)<-c("NPV (Rp/Ha)", "NPV (US/Ha)")
-      hsl.npv
-      # ending  npv --------------------------------------------------------------
-      
       
       
       # hitung nlc --------------------------------------------------------------
@@ -1312,7 +1512,10 @@ app <- shiny::shinyApp(
     })
     
     output$tableResultBAU1 <- renderDataTable({
-      datatable(data.gab()$tabel1, option=list(dom = "t"))
+      datatable(data.gab()$tabel1, option=list(dom = "t")) 
+      # %>%
+      # formatStyle("PRIVATE",
+      #   backgroundColor = "blue")
     })
     
     output$tableResultBAU2 <- renderDataTable({
