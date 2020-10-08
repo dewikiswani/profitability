@@ -124,6 +124,11 @@ app <- shiny::shinyApp(
       tipeLahan <- input$tipeLahan
       tipeKebun <- readDataTemplate$tipe.kebun
       
+      # asumsi makro
+      rate.p <- input$rate.p
+      rate.s <- input$rate.s
+      nilai.tukar <- input$nilai.tukar
+      
       combineDef <- list(ioInput=ioInput,ioOutput=ioOutput,
                          priceInput=priceInput,priceOutput=priceOutput,
                          capital=capital, capitalPrivat = capitalPrivat, capitalSosial = capitalSosial,
@@ -132,7 +137,10 @@ app <- shiny::shinyApp(
                          provinsi = provinsi,
                          th=th,
                          tipeLahan = tipeLahan,
-                         tipeKebun = tipeKebun)
+                         tipeKebun = tipeKebun,
+                         rate.p = rate.p,
+                         rate.s = rate.s,
+                         nilai.tukar = nilai.tukar)
       
       # save data untuk setiap perubahan
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -762,7 +770,7 @@ app <- shiny::shinyApp(
       showModal(dataModalCreatePam())
     })
     
-    observeEvent(input$running_button,{
+    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
       removeModal()
       insertUI(selector='#uiShowResult',
                where='afterEnd',
@@ -783,7 +791,10 @@ app <- shiny::shinyApp(
       tableAddPeralatan = NULL,
       tableAddTK = NULL,
       tableAddUtama =NULL,
-      tableAddSampingan = NULL
+      tableAddSampingan = NULL,
+      tableAddCapPrivat = NULL,
+      tableAddCapSosial = NULL,
+      tableCapitalAll = NULL
     )
     
     valP2Template <- eventReactive(input$template_button,{
@@ -903,7 +914,7 @@ app <- shiny::shinyApp(
     #                                RESULT                                        #
     #                                                                              #
     ################################################################################
-    data.gab <- eventReactive(input$running_button,{
+    data.gab <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
       # observeEvent(input$running_button,{
       # browser()
       # 
@@ -1202,7 +1213,7 @@ app <- shiny::shinyApp(
       
     })
     
-    data.gab.new <- eventReactive(input$running_button,{
+    data.gab.new <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
       # observeEvent(input$running_button,{
       # browser()
       # 
@@ -1216,6 +1227,7 @@ app <- shiny::shinyApp(
       # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
       # datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
+      
       
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
@@ -1356,7 +1368,7 @@ app <- shiny::shinyApp(
         dataGeneralPrivat <- filter(dataCapitalAll,komponen == c("modal kapital privat"))
         dataGeneralPrivat <- rbind(dataGeneral,dataGeneralPrivat)
         dataPrivat <- filter(data.gab,status == c("harga.privat"))
-        p.budget <- dataGeneralPrivat[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- dataGeneralPrivat[-(c(1:5,ncol(dataGeneralPrivat)))] * dataPrivat[-c(1:5,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
         p.budget <- cbind(dataGeneralPrivat[c(1:4)],dataPrivat[36],p.budget) #memunculkan kembali variabel 1 sd 5
         p.budget <- p.budget[-1] #menghilangkan label status yang awal
         p.budget <- cbind(status = "privat budget", p.budget) #merename keseluruhan tabel status
@@ -1368,7 +1380,7 @@ app <- shiny::shinyApp(
         dataGeneralSosial <- filter(dataCapitalAll,komponen == c("modal kapital sosial"))
         dataGeneralSosial <- rbind(dataGeneral,dataGeneralSosial)
         dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-        s.budget <- dataGeneralSosial[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+        s.budget <- dataGeneralSosial[-c(1:5,ncol(dataGeneralSosial))] * dataSosial[-c(1:5,ncol(dataSosial))]
         s.budget <- cbind(dataGeneralSosial[c(1:4)],dataSosial[36],s.budget)
         s.budget <- s.budget[-1] #menghilangkan label status yang awal
         s.budget <- cbind(status = "sosial budget", s.budget) #merename keseluruhan tabel status
@@ -1532,7 +1544,7 @@ app <- shiny::shinyApp(
     })
     
     
-    preparePlot <- eventReactive(input$running_button,{
+    preparePlot <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
       # row_to_select=as.numeric(gsub("Row","",input$checked_rows))
       # row_to_select_newPam = as.numeric(gsub("Row","",input$checked_rows_newPam))
       
@@ -1891,7 +1903,20 @@ app <- shiny::shinyApp(
     # End -  Modal Pilih Komponen Output ----------------------------------------
     
     observeEvent(input$sunting_button_4_output,{
-      # browser()
+      # save data untuk setiap perubahan
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      editNew<-as.data.frame(hot_to_r(input$suntingKuantitasOutput))
+      editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      dataDefine$ioOutput <- editNew
+      
+      saveRDS(dataDefine,file = fileName)
+
       showModal(modalPilihBarisInput())
     })
     
@@ -2000,7 +2025,7 @@ app <- shiny::shinyApp(
         footer=tagList(
           actionButton(("batalSunting_button_kuantitasInput"), "Batal", style="color: white;background-color: red;"),
           actionButton("backtoPilihBaris_input","Kembali"),
-          actionButton(("sunting_button_4"),"Simpan dan Lanjut",style="color: white;
+          actionButton(("sunting_button_4"),"Simpan dan Lanjut Membangun Tabel Harga",style="color: white;
                          background-color: green;")
         ),
         argonTabSet(
@@ -2011,7 +2036,7 @@ app <- shiny::shinyApp(
           size = "l",
           width = 12,
           argonTab(
-            tabName = "Langkah 6: Sunting Tabel Kuantitas (Input)",
+            tabName = "Langkah 7: Sunting Tabel Kuantitas (Input)",
             active = T,
             fluidRow(
               column(12,
@@ -2106,12 +2131,328 @@ app <- shiny::shinyApp(
 
     
     observeEvent(input$sunting_button_4,{
-      browser()
+      # browser()
+      # save data untuk setiap perubahan
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      editNew<-as.data.frame(hot_to_r(input$suntingKuantitasInput))
+      editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      dataDefine$ioInput <- editNew
+      
+      saveRDS(dataDefine,file = fileName)
+      showModal(modalTabelHarga())
+    })
+    
+    ################################################################################
+    #                                                                              #
+    #                                 MODAL  HARGA                                 #
+    #                                                                              #
+    ################################################################################
+    modalTabelHarga <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          actionButton(("batalButtonHarga"), "Batal", style="color: white;background-color: red;"),
+          actionButton(("capitalButton"), "Simpan Tabel dan Lanjutkan Membangun Tabel Modal Kapital",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabHarga",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Langkah 8: Menyunting Tabel Harga",
+            active = T,
+            h3("Tabel Harga Output", align = "center"),
+            rHandsontableOutput('hargaOutput'),
+            br(),
+            h3("Tabel Harga Input", align = "center"),
+            rHandsontableOutput('hargaInput')
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    observeEvent(input$batalButtonHarga,{
+      # browser()
       removeModal()
     })
     
+    output$hargaOutput <- renderRHandsontable({
+      rhandsontable(valP2(),
+                    rowHeaderWidth = 50,
+                    fixedColumnsLeft = 2,
+                    height = 100,
+      )
+    })
     
-    # End - Section sunting_button---------------------------------------------
+    
+    valP2 <- eventReactive(input$sunting_button_4,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
+      readDataTemplate[is.na(readDataTemplate)] <- 0
+      readDataTemplate <- lowcase(readDataTemplate, c(7:11))
+      
+      outputData <- filter(readDataTemplate,faktor == c("output"))
+      priceOutput <- outputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
+      priceOutput <- (priceOutput[,-1])
+      
+      
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      reactData$tableP2 <- dataDefine$ioOutput[,1:2]
+      no.id <- as.numeric(rownames(reactData$tableP2))
+      reactData$tableP2 <- cbind(no.id,reactData$tableP2)
+      
+      reactData$tableP2 <- merge(reactData$tableP2,unique(priceOutput), by.x = "jenis",by.y = "jenis", all.x = T)
+      reactData$tableP2 <- reactData$tableP2[order(reactData$tableP2$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+      rownames(reactData$tableP2) <- no.id
+      reactData$tableP2 <- reactData$tableP2[, c(3, 1, 4, 5,6)]
+      reactData$tableP2
+      
+      indexRow <- as.numeric(nrow(dataDefine$ioOutput))
+      reactData$tableP2 <- reactData$tableP2[1:indexRow,]
+      reactData$tableP2
+    })
+    
+    output$hargaInput <- renderRHandsontable({
+      rhandsontable(valP1(),
+                    rowHeaderWidth = 50,
+                    fixedColumnsLeft = 2,
+                    height = 600,
+      )
+    })
+    
+    valP1 <- eventReactive(input$sunting_button_4,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
+      readDataTemplate[is.na(readDataTemplate)] <- 0
+      readDataTemplate <- lowcase(readDataTemplate, c(7:11))
+      
+      inputData <- filter(readDataTemplate,faktor == c("input"))
+      priceInput <- inputData[,c("komponen","jenis","unit.harga","harga.privat","harga.sosial")] #memfilter tabel harga
+      priceInput <- (priceInput[,-1])
+      
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      reactData$tableP1 <- dataDefine$ioInput[,1:2]
+      no.id <- as.numeric(rownames(reactData$tableP1))
+      reactData$tableP1 <- cbind(no.id,reactData$tableP1)
+      
+      reactData$tableP1 <- merge(reactData$tableP1,unique(priceInput), by.x = "jenis",by.y = "jenis", all.x = T)
+      reactData$tableP1 <- reactData$tableP1[order(reactData$tableP1$no.id),]     #sort by nomor yang disesuaikan pada tabel i-o
+      rownames(reactData$tableP1) <- no.id
+      reactData$tableP1 <- reactData$tableP1[, c(3, 1, 4, 5,6)]
+      reactData$tableP1
+      
+      
+      indexRow <- as.numeric(nrow(dataDefine$ioInput))
+      reactData$tableP1 <- reactData$tableP1[1:indexRow,]
+      reactData$tableP1
+    })
+    
+
+    observeEvent(input$capitalButton,{
+      # save data untuk setiap perubahan
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         # input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      editNewP1<-as.data.frame(hot_to_r(input$hargaInput))
+      editNewP1[is.na(editNewP1)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      editNewP2<-as.data.frame(hot_to_r(input$hargaOutput))
+      editNewP2[is.na(editNewP2)] <- 0 
+      
+      dataDefine$priceInput <- editNewP1
+      dataDefine$priceOutput <- editNewP2
+      
+      saveRDS(dataDefine,file = fileName)
+      
+      # browser()
+      
+      if(is.null(dataDefine$capital)){
+        showModal(modalTanpaCapital())
+      }else if(!is.null(dataDefine$capital)){
+        showModal(modalTabelCapital())
+      }
+      
+      
+    })
+    
+    modalTanpaCapital <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          actionButton(("running_button_tanpaCapital"), "Jalankan Analisis",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabNew",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Status Tabel Modal Kapital",
+            active = T,
+            h3("Komoditas ini Tidak Memiliki Tabel Modal Kapital", align = "center")
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    # observeEvent(input$running_button_tanpaCapital,{
+    #  browser()
+    # })
+    
+    
+    
+    modalTabelCapital <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          # actionButton(("running_button"), "Jalankan Analisis",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabNew",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Tabel Modal Kapital",
+            active = T,
+            h3("Apakah user akan menambah komponen untuk tabel modal kapital?"),
+            radioButtons("tipeTabelCapital",
+                         " ",
+                         choices = c("Tidak","Ya"),selected = "Tidak"),
+            tags$div(id='uiTipeModalKapital')
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    observeEvent(input$tipeTabelCapital,{
+      if (input$tipeTabelCapital == "Tidak"){
+        removeUI(selector = '#tipeModalKapital')
+        insertUI(selector='#uiTipeModalKapital',
+                 where='afterEnd',
+                 ui= uiOutput('tipeModalKapital_No'))
+      } else if(input$tipeTabelCapital == "Ya"){
+        removeUI(selector = '#tipeModalKapital_No')
+        insertUI(selector='#uiTipeModalKapital',
+                 where='afterEnd',
+                 ui= uiOutput('tipeModalKapital'))
+      } 
+    })
+    
+    output$tipeModalKapital_No <- renderUI({
+      fluidRow(
+        column(9,
+               
+        ),
+        column(3,
+               actionButton(("running_button_noEditCapital"), "Jalankan Analisis",style="color: white;background-color: green;")
+        )
+      )
+      
+    })
+    
+    
+    
+    output$tipeModalKapital <- renderUI({
+      fluidRow(
+        column(6,
+               
+        ),
+        column(6,
+               actionButton(("EksisTabelCapital"), "Lanjut Membangun Tabel Modal Kapital")
+        )
+      )
+      
+    })
+    
+    
+    observeEvent(input$EksisTabelCapital,{
+      if (input$tipeTabelCapital == "Ya"){
+        showModal(modalPilihBarisCapital())
+      } 
+    })
+    
+    
+    modalPilihBarisCapital <- function(failed = FALSE) {
+      modalDialog(
+        footer=tagList(
+          actionButton(("suntingModalKapital"),"Lanjut",style="color: white;
+                         background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabSunting",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Sunting Tabel Modal Kapital",
+            active = T,
+            fluidRow(
+              column(9,
+                     selectInput('pilihKomponenCapital',"Pilih Komponen", width = "600px", 
+                                 choices = c(" ","privat", "sosial")),
+                     #dibuat manipulasi option nilai kosong krn utk mengaktifkan nilai input$pilihKomponenInput saat user kedua kalinya masuk 
+                     
+              ),
+              column(3,
+                     br(),
+                     actionButton("showTabelJenisCapital","pilih jumlah baris")
+              ),
+              column(12,
+                     tags$div(id = 'uiShowTablePilihJenisCapital')
+              )
+            )
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    observeEvent(input$showTabelJenisCapital,{
+      insertUI(selector='#uiShowTablePilihJenisCapital',
+               where='afterEnd',
+               ui= uiOutput('showTablePilihJenisCapital'))
+    }) 
+    
+    # Start Modal Pilih Komponen Modal Kapital ----------------------------------------
+    ################################################################################
+    #                                                                              #
+    #                      MODAL DIALOG PILIH KOMPONEN MODAL KAPITAL               #
+    #                                                                              #
+    ################################################################################
+    
+    source("shiny/server/showTablePilihJenisCapital.R", local = TRUE)
+    
+    
+    
+    # End -  Modal Pilih Komponen Modal Kapital ----------------------------------------
     
     
     ################################################################################

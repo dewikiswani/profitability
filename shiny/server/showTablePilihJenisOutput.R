@@ -69,32 +69,17 @@ output$showRhandsAddUtama <- renderUI({
                   tags$br(),
                   tags$div(id='teksSaveTambahUtama')
   ))
-  
 })
 
-observeEvent(input$saveTambahBarisUtama,{
-  # browser()
-  removeUI(selector='#textTampilSaveTambahUtama')
-  
-  editNew<-as.data.frame(hot_to_r(input$tabelTambahUtama))
-  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "utama", editNew)
-  
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-  fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  # replace data price
-  dataDefine$addUtama <- editNew
-  saveRDS(dataDefine,file = fileName)
-  
-  insertUI(selector='#teksSaveTambahUtama',
-           where = 'afterEnd',
-           ui = tags$div(id="textTampilSaveTambahUtama","tabel di atas sudah tersimpan"))
-})
 
+
+output$tabelTambahUtama <- renderRHandsontable({
+  rhandsontable(valJenisUtama(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 300
+  )
+})
 
 valJenisUtama<- eventReactive(input$showTabelAddUtama,{
   
@@ -123,13 +108,31 @@ valJenisUtama<- eventReactive(input$showTabelAddUtama,{
   
 })
 
-output$tabelTambahUtama <- renderRHandsontable({
-  rhandsontable(valJenisUtama(),
-                rowHeaderWidth = 50,
-                fixedColumnsLeft = 2,
-                height = 300
-  )
+
+observeEvent(input$saveTambahBarisUtama,{
+  # browser()
+  removeUI(selector='#textTampilSaveTambahUtama')
+  
+  editNew<-as.data.frame(hot_to_r(input$tabelTambahUtama))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  editNew <- cbind(komponen = "utama", editNew)
+  
+  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  fileName <- paste0(datapath,"saveData","_",
+                     # input$sut,"_",input$kom,"_",
+                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  # replace data price
+  dataDefine$addUtama <- editNew
+  saveRDS(dataDefine,file = fileName)
+  
+  insertUI(selector='#teksSaveTambahUtama',
+           where = 'afterEnd',
+           ui = tags$div(id="textTampilSaveTambahUtama","tabel di atas sudah tersimpan"))
 })
+
+
 
 ################################################################################
 #                                                                              #
@@ -155,27 +158,12 @@ output$showRhandsAddSampingan <- renderUI({
   
 })
 
-observeEvent(input$saveTambahBarisSampingan,{
-  # browser()
-  removeUI(selector='#textTampilSaveTambahSampingan')
-  
-  editNew<-as.data.frame(hot_to_r(input$tabelTambahSampingan))
-  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "sampingan", editNew)
-  
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-  fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  # replace data price
-  dataDefine$addSampingan <- editNew
-  saveRDS(dataDefine,file = fileName)
-  
-  insertUI(selector='#teksSaveTambahSampingan',
-           where = 'afterEnd',
-           ui = tags$div(id="textTampilSaveTambahSampingan","tabel di atas sudah tersimpan"))
+output$tabelTambahSampingan <- renderRHandsontable({
+  rhandsontable(valJenisSampingan(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 300
+  )
 })
 
 
@@ -206,11 +194,30 @@ valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
   
 })
 
-output$tabelTambahSampingan <- renderRHandsontable({
-  rhandsontable(valJenisSampingan(),
-                rowHeaderWidth = 50,
-                fixedColumnsLeft = 2,
-                height = 300
-  )
+observeEvent(input$saveTambahBarisSampingan,{
+  # browser()
+  removeUI(selector='#textTampilSaveTambahSampingan')
+  
+  editNew<-as.data.frame(hot_to_r(input$tabelTambahSampingan))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  editNew <- cbind(komponen = "sampingan", editNew)
+  
+  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  fileName <- paste0(datapath,"saveData","_",
+                     # input$sut,"_",input$kom,"_",
+                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  # replace data price
+  dataDefine$addSampingan <- editNew
+  saveRDS(dataDefine,file = fileName)
+  
+  insertUI(selector='#teksSaveTambahSampingan',
+           where = 'afterEnd',
+           ui = tags$div(id="textTampilSaveTambahSampingan","tabel di atas sudah tersimpan"))
 })
+
+
+
+
 

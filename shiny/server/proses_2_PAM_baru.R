@@ -97,7 +97,7 @@ data_new <- reactive({
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   saveRDS(combineDef,file = fileName)
   combineDef
@@ -236,7 +236,7 @@ modalPilihBarisOutput_new <- function(failed = FALSE) {
 observeEvent(input$bangunKuantitasOut_new,{
   # datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   # fileName <- paste0(datapath,"saveData_new","_",
-  #                    input$sut,"_",input$kom,"_",
+  #                    input$sut_new,"_",input$kom_new,"_",
   #                    input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   # dataDefine <- readRDS(fileName)
   
@@ -288,7 +288,7 @@ output$kuantitasOutput_new <- renderRHandsontable({
 valIO2_new <- eventReactive(input$bangunKuantitasOut_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -324,7 +324,7 @@ observeEvent(input$pilihBarisInput_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -369,7 +369,7 @@ observeEvent(input$bangunKuantitas_new,{
   # browser()
   # datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   # fileName <- paste0(datapath,"saveData_new","_",
-  #                    input$sut,"_",input$kom,"_",
+  #                    input$sut_new,"_",input$kom_new,"_",
   #                    input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   # dataDefine <- readRDS(fileName)
   
@@ -423,7 +423,7 @@ output$kuantitasInput_new <- renderRHandsontable({
 valIO1_new <- eventReactive(input$bangunKuantitas_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -451,7 +451,7 @@ observeEvent(input$bangunTabelHarga_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -519,7 +519,7 @@ output$hargaOutput_new <- renderRHandsontable({
 valP2_new <- eventReactive(input$bangunTabelHarga_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -554,7 +554,7 @@ output$hargaInput_new <- renderRHandsontable({
 valP1_new <- eventReactive(input$bangunTabelHarga_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -581,7 +581,7 @@ observeEvent(input$capitalButton_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -619,7 +619,7 @@ modalTabelCapital_new <- function(failed = FALSE) {
         radioButtons("tipeTabelCapital_new",
                      " ",
                      choices = c("Tidak","Ya"),selected = "Ya"),
-        tags$div(id='uiTipeModalKapital')
+        tags$div(id='uiTipeModalKapital_new')
       ))
     ,
     size="l",
@@ -628,15 +628,15 @@ modalTabelCapital_new <- function(failed = FALSE) {
 
 observeEvent(input$tipeTabelCapital_new,{
   if (input$tipeTabelCapital_new == "Tidak"){
-    removeUI(selector = '#tipeModalKapital')
+    removeUI(selector = '#tipeModalKapital_new')
   } else if(input$tipeTabelCapital_new == "Ya"){
-    insertUI(selector='#uiTipeModalKapital',
+    insertUI(selector='#uiTipeModalKapital_new',
              where='afterEnd',
-             ui= uiOutput('tipeModalKapital'))
+             ui= uiOutput('tipeModalKapital_new'))
   } 
 })
 
-output$tipeModalKapital <- renderUI({
+output$tipeModalKapital_new <- renderUI({
   actionButton(("EksisTabelCapital_new"), "Lanjut Membangun Tabel Modal Kapital")
 })
 
@@ -749,7 +749,7 @@ output$capitalP_new <- renderRHandsontable({
 valCapP_new <- eventReactive(input$bangunKapitalPrivat_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -777,7 +777,7 @@ observeEvent(input$bangunKapitalSosial_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -799,7 +799,7 @@ observeEvent(input$bangunKapitalSosial_new,{
 modalPilihBarisCapitalSosial_new <- function(failed = FALSE) {
   modalDialog( 
     footer=tagList(
-      actionButton(("tipeKapitalSosial_new"), "Lanjut",style="color: white;background-color: green;")
+      actionButton(("tipeKapitalSosialButton_new"), "Lanjut",style="color: white;background-color: green;")
     ),
     argonTabSet(
       id = "tabNew",
@@ -815,7 +815,7 @@ modalPilihBarisCapitalSosial_new <- function(failed = FALSE) {
         radioButtons("tipeCapitalS_new",
                      " ",
                      choices = c("Ya","Tidak"),selected = "Ya"), 
-        tags$div(id='uiTipeCapitalSosial')
+        tags$div(id='uiTipeCapitalSosial_new')
       ))
     ,
     size="l",
@@ -825,24 +825,24 @@ modalPilihBarisCapitalSosial_new <- function(failed = FALSE) {
 
 observeEvent(input$tipeCapitalS_new,{
   if (input$tipeCapitalS_new == "Ya"){
-    removeUI(selector = '#tipeCapitalSosial')
+    removeUI(selector = '#tipeCapitalSosial_new')
   } else if(input$tipeCapitalS_new == "Tidak"){
-    insertUI(selector='#uiTipeCapitalSosial',
+    insertUI(selector='#uiTipeCapitalSosial_new',
              where='afterEnd',
-             ui= uiOutput('tipeCapitalSosial'))
+             ui= uiOutput('tipeCapitalSosial_new'))
   } 
 })
 
-output$tipeCapitalSosial <- renderUI({
+output$tipeCapitalSosial_new <- renderUI({
   selectInput(("pilihTambahBaris_capitalS_new"),
-              "Berapa jumlah komponen (baris) yang akan user bangun untuk7 Tabel Modal Kapital Sosial?",
+              "Berapa jumlah komponen (baris) yang akan user bangun untuk Tabel Modal Kapital Sosial?",
               choices = c(1:10),selected = if (is.null(reactData_new$tableCapS)){
                 20
               } else {nrow(reactData_new$tableCapS)}
               ,width = "800px")
 })
 
-observeEvent(input$tipeKapitalSosial_new,{
+observeEvent(input$tipeKapitalSosialButton_new,{
   if (input$tipeCapitalS_new == "Ya"){
     showModal(modalTabelCapitalSosial_Yes_new())
   } else if(input$tipeCapitalS_new == "Tidak"){
@@ -923,7 +923,7 @@ output$capitalS_Yes_new <- renderRHandsontable({
 valCapS_Yes_new <- eventReactive(input$bangunKapitalPrivat_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -941,7 +941,7 @@ observeEvent(input$running_button_Yes_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -970,7 +970,7 @@ output$capitalS_No_new <- renderRHandsontable({
 valCapS_No_new <- eventReactive(input$bangunKapitalPrivat_new,{
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -998,7 +998,7 @@ observeEvent(input$running_button_No_new,{
   # save data untuk setiap perubahan
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -1074,7 +1074,7 @@ output$showTable_new <- renderUI({
 output$showTablePrice_new <- renderDataTable({
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   dataView <- rbind(dataDefine$priceInput, dataDefine$priceOutput)
@@ -1087,7 +1087,7 @@ output$showTablePrice_new <- renderDataTable({
 output$showTableKuantitas_new <- renderDataTable({
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   # print("data terakhir tersimpan di rds")
   dataDefine <- readRDS(fileName)
@@ -1104,7 +1104,7 @@ output$showTableKapital_new <- renderDataTable({
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   # cekCapital <- file.exists(paste0(datapath,"kapital template.csv")) #cek keberadaan file ini ada atau engga
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -1178,7 +1178,7 @@ data.gab_new <- eventReactive(c(input$running_button_No_new,input$running_button
   
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -1476,7 +1476,7 @@ preparePlot_new <- eventReactive(c(input$running_button_No_new,input$running_but
   
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -1499,7 +1499,7 @@ observeEvent(input$saveNewPAM_new, {
   browser()
   datapath <- paste0("shiny/data/", input$sut_new, "/","^KOMODITAS BARU","/")
   fileName <- paste0(datapath,"saveData_new","_",
-                     input$sut,"_",input$kom,"_",
+                     input$sut_new,"_",input$kom_new,"_",
                      input$selected_provinsi_new,"_",input$th_new,"_",input$tipeLahan_new,"_",input$tipeKebun_new,"_",reactData$timeInput,".rds")
   dataDefine <- readRDS(fileName)
   
