@@ -1,7 +1,7 @@
 output$showTablePilihJenisCapital <- renderUI({
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -86,7 +86,7 @@ valJenisPrivat<- eventReactive(input$showTabelAddCapPrivat,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -120,7 +120,7 @@ observeEvent(input$saveTambahBarisPrivat,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -173,7 +173,7 @@ valJenisSosial<- eventReactive(input$showTabelAddCapSosial,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -206,7 +206,7 @@ observeEvent(input$saveTambahBarisSosial,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -281,7 +281,7 @@ output$rhandsSuntingModalKapital <- renderRHandsontable({
 valCapital <- eventReactive(input$suntingModalKapital,{
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   

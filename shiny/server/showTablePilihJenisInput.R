@@ -1,7 +1,7 @@
 output$showTablePilihJenisInput <- renderUI({
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -118,7 +118,7 @@ observeEvent(input$saveTambahBarisPupuk,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -136,7 +136,7 @@ valJenisPupuk <- eventReactive(input$showTabelAddPupuk,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -200,7 +200,7 @@ observeEvent(input$saveTambahBarisBibit,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -218,7 +218,7 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -282,7 +282,7 @@ observeEvent(input$saveTambahBarisPeralatan,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -300,7 +300,7 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -364,7 +364,7 @@ observeEvent(input$saveTambahBarisTK,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -382,7 +382,7 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   

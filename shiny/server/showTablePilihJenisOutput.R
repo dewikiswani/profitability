@@ -1,7 +1,7 @@
 output$showTablePilihJenisOutput <- renderUI({
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -85,7 +85,7 @@ valJenisUtama<- eventReactive(input$showTabelAddUtama,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -119,7 +119,7 @@ observeEvent(input$saveTambahBarisUtama,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -171,7 +171,7 @@ valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
@@ -204,7 +204,7 @@ observeEvent(input$saveTambahBarisSampingan,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
-                     # input$sut,"_",input$kom,"_",
+                     input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
