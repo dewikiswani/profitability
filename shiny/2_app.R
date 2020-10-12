@@ -904,7 +904,10 @@ app <- shiny::shinyApp(
           column(3,
                  plotlyOutput('plotComparing')
                  ),
-          # column(7,plotlyOutput("plotComparingAllProvinsi")),
+          column(7,
+                 tags$div(id = 'uiShowPlotAllKomoditas')
+                 # plotlyOutput("plotComparingAllProvinsi")
+                 ),
           column(2,
                  actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;background-color: green;"),
                  br(),
@@ -916,6 +919,16 @@ app <- shiny::shinyApp(
       )
     })
     
+    
+    observeEvent(input$running_button,{
+      insertUI(selector='#uiShowPlotAllKomoditas',
+               where='afterEnd',
+               ui= plotlyOutput('showPlotAllKomoditas'))
+    })
+
+    output$showPlotAllKomoditas <- renderPlotly({
+      plotAllProvinsi()
+    })
     ################################################################################
     #                                                                              #
     #                                RESULT                                        #
@@ -1645,12 +1658,20 @@ app <- shiny::shinyApp(
     #                                                                              #
     ################################################################################
     
-    output$plotComparingAllProvinsi <- renderPlotly({
-      plotAllProvinsi()
-    })
+    # output$plotComparingAllProvinsi <- renderPlotly({
+    #   plotAllProvinsi()
+    # })
+    # 
+    # plotAllProvinsi <- reactive({
+    #   
+    #   print("panggil data plot all")
+    #   dataPlotAllProvinsi() %>%
+    #     group_by(tipe.kebun) %>%
+    #     plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
+    # })
     
-    plotAllProvinsi <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
-    
+    plotAllProvinsi <- eventReactive(input$running_button,{
+    # plotAllProvinsi <- reactive({
       print("persiapan membuat plot seluruh komoditas")
       # DATA PLOT BAU -----------------------------------------------------------
       folderSut <- sort(unique(komoditas$sut))
@@ -1723,17 +1744,20 @@ app <- shiny::shinyApp(
                                 tipe.kebun = tipe.kebun,
                                 tipe.data = tipe.data,
                                 NPV.Privat.RP=NPV.Privat.RP)
-      print("selesai - plot seluruh komoditas")
+      
       
       dataPlot <- rbind(dataPlotBAU,dataPlotSimulasi)
-      dataPlot$nama.komoditas <- factor(dataPlot$nama.komoditas, levels = unique(dataPlot$nama.komoditas)[order(dataPlot$tipe.kebun, decreasing = FALSE)])
-      dataPlot %>%
-        group_by(tipe.kebun) %>%
-        plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
       
+      dataPlot$nama.komoditas <- factor(dataPlot$nama.komoditas, levels = unique(dataPlot$nama.komoditas)[order(dataPlot$tipe.kebun, decreasing = FALSE)])
+      dataPlot
+      
+      print("panggil data plot all")
+      dataPlot %>%
+          group_by(tipe.kebun) %>%
+          plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
     })
     
-    
+
     
     # End - Section plot tipe kebun ---------------------------------------------
     
