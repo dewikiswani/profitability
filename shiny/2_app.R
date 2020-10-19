@@ -545,13 +545,20 @@ app <- shiny::shinyApp(
           h5("Langkah 2: menentukan asumsi makro untuk data PAM yang dibangun"),
           br(),
           fluidRow(
+            column(1,
+                   
+            ),
             column(3,
+                   tableOutput("showMakroBAU")
+            ),
+            column(2,
                    sliderInput(("rate.p"), "Discount Rate Private", 7.4 ,min = 0, max = 15, step = 0.01)
             ),
-            column(3,
+            column(2,
                    sliderInput(("rate.s"), "Discount Rate Social", 2.4 ,min = 0, max = 8, step = 0.01)
             ),
-            column(4,
+            
+            column(2,
                    sliderInput(("nilai.tukar"), "Nilai Tukar Rupiah", 14831 ,min = 10000, max = 20000, step = 10)
             ),
             column(2,
@@ -563,10 +570,31 @@ app <- shiny::shinyApp(
         )
       )
     })
+    
+    output$showMakroBAU <- renderTable({
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"resultTemplate","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      readDataTemplate <- readRDS(fileName)
+      dataView <- t(data.frame(rate.p.bau = readDataTemplate$rate.p, 
+                             rate.s.bau = readDataTemplate$rate.s,
+                             nilai.tukar.bau = readDataTemplate$nilai.tukar))
+      dataView[is.na(dataView)] <- 0 #NA replace with zero
+      
+      nameRow <- c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah")
+      dataView <- cbind(nameRow,data.frame(dataView))
+      
+      colnames(dataView) <- c(" ","Nilai BAU pada Tahun Terpilih")
+      dataView
+      
+    })
+    
     # End - Section asumsi makro ---------------------------------------------
     
     # Section tampilkan tabel---------------------------------------------
     observeEvent(input$tampilkanTabel_button, {
+      # browser()
       dataTemplate()
       resultTemplate()
       insertUI(selector='#uiShowTable',
@@ -1792,17 +1820,17 @@ app <- shiny::shinyApp(
       bau.profit <- data.gab()$tabel.profit
       simulasi.profit <- data.gab.new()$tabel.profit
       
-      trace_b_p <- bau.profit[,1]
+      profit.tahunan <- bau.profit[,1]
       trace_s_p <- simulasi.profit[,1]
       
-      panjangbaris <- length(trace_b_p)-1
+      panjangbaris <- length(profit.tahunan)-1
       
       x <- c(0:panjangbaris)
-      data <- data.frame(x,trace_b_p,trace_s_p)
+      data <- data.frame(x,profit.tahunan,trace_s_p)
       
       
       fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~trace_b_p, name = 'profit bau privat',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~profit.tahunan, name = 'profit bau privat',mode = 'lines')
       fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
       fig
     })
@@ -1811,17 +1839,17 @@ app <- shiny::shinyApp(
       bau.profit <- data.gab()$tabel.profit
       simulasi.profit <- data.gab.new()$tabel.profit
       
-      trace_b_s <- bau.profit[,2]
+      profit.tahunan <- bau.profit[,2]
       trace_s_s <- simulasi.profit[,2]
       
-      panjangbaris <- length(trace_b_s)-1
+      panjangbaris <- length(profit.tahunan)-1
       
       x <- c(0:panjangbaris)
-      data <- data.frame(x,trace_b_s,trace_s_s)
+      data <- data.frame(x,profit.tahunan,trace_s_s)
       
       
       fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~trace_b_s, name = 'profit bau sosial',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~profit.tahunan, name = 'profit bau sosial',mode = 'lines')
       fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
       fig
     })
@@ -1839,17 +1867,17 @@ app <- shiny::shinyApp(
       bau.profit <- data.gab()$tabel.profit
       simulasi.profit <- data.gab.new()$tabel.profit
       
-      trace_b_p <- cumsum(bau.profit[,1])
+      profit.kumulatif <- cumsum(bau.profit[,1])
       trace_s_p <- cumsum(simulasi.profit[,1])
       
-      panjangbaris <- length(trace_b_p)-1
+      panjangbaris <- length(profit.kumulatif)-1
       
       x <- c(0:panjangbaris)
-      data <- data.frame(x,trace_b_p,trace_s_p)
+      data <- data.frame(x,profit.kumulatif,trace_s_p)
       
       
       fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~trace_b_p, name = 'profit bau privat',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~profit.kumulatif, name = 'profit bau privat',mode = 'lines')
       fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
       fig
     })
@@ -1858,18 +1886,18 @@ app <- shiny::shinyApp(
       bau.profit <- data.gab()$tabel.profit
       simulasi.profit <- data.gab.new()$tabel.profit
       
-      trace_b_p <- cumsum(bau.profit[,2])
-      trace_s_p <- cumsum(simulasi.profit[,2])
+      profit.kumulatif <- cumsum(bau.profit[,2])
+      trace_s_s <- cumsum(simulasi.profit[,2])
       
-      panjangbaris <- length(trace_b_p)-1
+      panjangbaris <- length(profit.kumulatif)-1
       
       x <- c(0:panjangbaris)
-      data <- data.frame(x,trace_b_p,trace_s_p)
+      data <- data.frame(x,profit.kumulatif,trace_s_s)
       
       
       fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~trace_b_p, name = 'profit bau privat',mode = 'lines')
-      fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
+      fig <- fig %>% add_trace(y = ~profit.kumulatif, name = 'profit bau sosial',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
       fig
     })
     # End - Section plot tipe kebun ---------------------------------------------
