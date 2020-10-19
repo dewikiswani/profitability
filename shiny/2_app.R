@@ -27,6 +27,8 @@ library(DT)
 library(ggplot2)
 library(cowplot) #ggplot2 white theme 
 library(plotly)
+# library(waiter)
+# library(shinycssloaders)
 
 
 
@@ -40,6 +42,7 @@ source("shiny/footer.R")
 komoditas <- read.csv("shiny/data/template/komoditas.csv", stringsAsFactors = F)
 kumpulanDataJenisInputOutput <- read.csv("shiny/data/template/kumpulan jenis input output.csv")
 indonesia <- read.csv("shiny/data/template/prov sampai desa.csv", stringsAsFactors = F)
+# readDataAsumsiMakro <- read.table(paste0("shiny/data/template/asumsi makro",".csv"), header = T, sep = ",")
 
 
 # elements
@@ -79,7 +82,7 @@ app <- shiny::shinyApp(
     }
     
     # # Section informasi umum ---------------------------------------------
-    source("shiny/server/informasi umum.R", local = TRUE)
+    source("shiny/server/informasiUmum_server.R", local = TRUE)
     # # End - Section informasi umum ---------------------------------------
     
     
@@ -90,7 +93,7 @@ app <- shiny::shinyApp(
       
       readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
-      readDataTemplate <- lowcase(readDataTemplate, c(7:11))
+      readDataTemplate <- lowcase(readDataTemplate, c(10:13,16))
         
       yearIO <- 30 #tahun daur tanam
       
@@ -111,7 +114,7 @@ app <- shiny::shinyApp(
         capitalPrivat <- NULL
         capitalSosial <- NULL
       } else if(dim(capital)[1] > 0){
-        capital <- capital[c(8,9,11,14:43)]
+        capital <- capital[c("komponen","jenis","unit.harga",paste0(c(rep("Y", yearIO)),1:yearIO))]
         capitalPrivat <- filter(capital,str_detect(komponen,"privat"))
         capitalSosial <- filter(capital,str_detect(komponen,"sosial"))
       }
@@ -122,7 +125,7 @@ app <- shiny::shinyApp(
       provinsi <- input$selected_provinsi
       th <- input$th
       tipeLahan <- input$tipeLahan
-      tipeKebun <- readDataTemplate$tipe.kebun
+      tipeKebun <- readDataTemplate$tipe.kebun[1]
       tipeData <- c("SIMULASI")
       
       # asumsi makro
@@ -164,7 +167,7 @@ app <- shiny::shinyApp(
       
       readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
-      readDataTemplate <- lowcase(readDataTemplate, c(7:11))
+      readDataTemplate <- lowcase(readDataTemplate, c(10:13,16))
       yearIO <- 30 #tahun daur tanam
       
       inputData <- filter(readDataTemplate,faktor == c("input"))
@@ -186,18 +189,18 @@ app <- shiny::shinyApp(
         capitalPrivat <- NULL
         capitalSosial <- NULL
       } else if(dim(capital)[1] > 0){
-        capital <- capital[c(8,9,11,14:43)]
+        capital <- capital[c("komponen","jenis","unit.harga",paste0(c(rep("Y", yearIO)),1:yearIO))]
         capitalPrivat <- filter(capital,str_detect(komponen,"privat"))
         capitalSosial <- filter(capital,str_detect(komponen,"sosial"))
       }
       
       # Asumsi makro
-      readDataAsumsiMakro <- read.table(paste0("shiny/data/template/asumsi makro",".csv"), header = T, sep = ",")
-      asumsiMakroTemplate <- filter(readDataAsumsiMakro,tahun == input$th)
+      # readDataAsumsiMakro <- read.table(paste0("shiny/data/template/asumsi makro",".csv"), header = T, sep = ",")
+      # asumsiMakroTemplate <- filter(readDataAsumsiMakro,tahun == input$th)
       
-      rate.p <- asumsiMakroTemplate$rate.p
-      rate.s <- asumsiMakroTemplate$rate.s
-      nilai.tukar <- asumsiMakroTemplate$nilai.tukar
+      rate.p <- readDataTemplate$rate.p[1]
+      rate.s <- readDataTemplate$rate.s[1]
+      nilai.tukar <- readDataTemplate$nilai.tukar[1]
       
       # memmbuat list gabungan dataDefine
       dataDefine <- list(ioInput=ioInput,ioOutput=ioOutput,
@@ -213,7 +216,7 @@ app <- shiny::shinyApp(
       dataDefine$provinsi <- input$selected_provinsi
       dataDefine$th <- input$th
       dataDefine$tipeLahan <- input$tipeLahan
-      dataDefine$tipeKebun <- readDataTemplate$tipe.kebun
+      dataDefine$tipeKebun <- readDataTemplate$tipe.kebun[1]
       dataDefine$tipeData <- c("BAU")
       
       
@@ -242,16 +245,16 @@ app <- shiny::shinyApp(
       price.out[is.na(price.out)] <- 0
       price.all <- rbind(price.in, price.out)
       
-      p.price<-price.all[-6]
+      p.price<-select(price.all, -harga.sosial) #remove harga sosial
       p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
       colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-      p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
+      p.price<-cbind(status="harga.privat" ,p.price[c("grup", "komponen", "jenis", "unit.harga")],p.year)
       p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
       
-      s.price<-price.all[-5]
+      s.price<-select(price.all, -harga.privat) #remove harga privat
       s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
       colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-      s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
+      s.price<-cbind(status="harga.sosial",s.price[c("grup", "komponen", "jenis", "unit.harga")],s.year)
       s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
       
       price.all.year <- rbind(p.price, s.price)
@@ -687,6 +690,7 @@ app <- shiny::shinyApp(
       # browser()
       dataTemplate()
       resultTemplate()
+      removeUI(selector='#showResult')
       showModal(dataModalCreatePam())
       
     })
@@ -913,6 +917,22 @@ app <- shiny::shinyApp(
                  br(),
                  tags$div(id='teksNewPamSave')
                  )
+        ),
+        fluidRow(
+          column(6,
+                 plotlyOutput('showPlotProfitPrivat')
+          ),
+          column(6,
+                 plotlyOutput('showPlotProfitSosial')
+          )
+        ),
+        fluidRow(
+          column(6,
+                 plotlyOutput('showPlotKumProfitPrivat')
+          ),
+          column(6,
+                 plotlyOutput('showPlotKumProfitSosial')
+          )
         )
         
         
@@ -920,14 +940,27 @@ app <- shiny::shinyApp(
     })
     
     
-    observeEvent(input$running_button,{
+    
+    
+    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+      removeUI(selector = '#showPlotAllKomoditas')
+      
       insertUI(selector='#uiShowPlotAllKomoditas',
                where='afterEnd',
                ui= plotlyOutput('showPlotAllKomoditas'))
     })
 
+    
     output$showPlotAllKomoditas <- renderPlotly({
-      plotAllProvinsi()
+      withProgress(message = 'Collecting data in progress',
+                   detail = 'This may take a while...', value = 0, {
+                     for (i in 1:15) {
+                       incProgress(1/15)
+                       sum(runif(10000000,0,1))
+                     }
+                   })
+      
+      plotAllProvinsi() 
     })
     ################################################################################
     #                                                                              #
@@ -980,13 +1013,13 @@ app <- shiny::shinyApp(
       price.out[is.na(price.out)] <- 0
       price.all <- rbind(price.in, price.out)
       
-      p.price<-price.all[-6]
+      p.price<-select(price.all, -harga.sosial) #remove harga sosial
       p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
       colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
       p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
       p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
       
-      s.price<-price.all[-5]
+      s.price<-select(price.all, -harga.privat) #remove harga sosial
       s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
       colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
       s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
@@ -1227,7 +1260,14 @@ app <- shiny::shinyApp(
       tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
       tabel2
       
-      tabelGab <- list(tabel1=tabel1,tabel2=tabel2)
+      # tabel profit 
+      tabel.p.profit <- t(as.data.frame(t(p.profit)))
+      tabel.s.profit <- t(as.data.frame(t(s.profit)))
+      tabel.profit <- cbind(tabel.p.profit,tabel.s.profit)
+      rownames(tabel.profit) <- paste0(c(rep("Y", yearIO)),0:yearIO)
+      colnames(tabel.profit) <- c("p.profit","s.profit")
+      
+      tabelGab <- list(tabel1=tabel1,tabel2=tabel2, tabel.profit = tabel.profit)
       tabelGab
       
       
@@ -1280,13 +1320,13 @@ app <- shiny::shinyApp(
       price.out[is.na(price.out)] <- 0
       price.all <- rbind(price.in, price.out)
       
-      p.price<-price.all[-6]
+      p.price<-select(price.all, -harga.sosial) #remove harga sosial
       p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
       colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
       p.price<-cbind(status="harga.privat" ,p.price[c(1:4)],p.year)
       p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
       
-      s.price<-price.all[-5]
+      s.price<-select(price.all, -harga.privat) #remove harga privat
       s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
       colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
       s.price<-cbind(status="harga.sosial",s.price[c(1:4)],s.year)
@@ -1537,11 +1577,15 @@ app <- shiny::shinyApp(
       tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
       tabel2
       
-      tabelGab <- list(tabel1=tabel1,tabel2=tabel2)
+      # tabel profit 
+      tabel.p.profit <- t(as.data.frame(t(p.profit)))
+      tabel.s.profit <- t(as.data.frame(t(s.profit)))
+      tabel.profit <- cbind(tabel.p.profit,tabel.s.profit)
+      rownames(tabel.profit) <- paste0(c(rep("Y", yearIO)),0:yearIO)
+      colnames(tabel.profit) <- c("p.profit","s.profit")
+      
+      tabelGab <- list(tabel1=tabel1,tabel2=tabel2, tabel.profit = tabel.profit)
       tabelGab
-      
-      
-      
     })
     
     output$tableResultBAU1 <- renderDataTable({
@@ -1622,32 +1666,7 @@ app <- shiny::shinyApp(
         plot_ly(x = ~komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.data)
     })
     
-    observeEvent(input$saveNewPAM, {
-      browser()
-      datapath <- paste0("shiny/data/", input$sut, "/")
-      fileName <- paste0(datapath,"saveData","_",
-                         input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-      dataDefine <- readRDS(fileName)
-      
-      #replace informasi umum -- untuk lbh yakin yang tersave adalah pilihan terakhir user
-      dataDefine$sut <- input$sut
-      dataDefine$kom <- input$kom
-      dataDefine$provinsi <- input$selected_provinsi
-      dataDefine$th <- input$th
-      dataDefine$tipeLahan <- input$tipeLahan
-      # dataDefine$tipeKebun <- readDataTemplate$tipe.kebun
-      # dataDefine$tipeData <- c("BAU")
-      
-      #replace asumsi macro-- untuk lbh yakin yang tersave adalah pilihan terakhir user
-      dataDefine$rate.p <- input$rate.p
-      dataDefine$rate.s <- input$rate.s
-      dataDefine$nilai.tukar <- input$nilai.tukar
-      # dataDefine$tipeData <- c("SIMULASI")
-      
-      saveRDS(dataDefine,file = fileName)
-      
-    }) 
+    
     
     # End - Section Popup Modal Dialog ---------------------------------------------
     
@@ -1670,7 +1689,7 @@ app <- shiny::shinyApp(
     #     plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
     # })
     
-    plotAllProvinsi <- eventReactive(input$running_button,{
+    plotAllProvinsi <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
     # plotAllProvinsi <- reactive({
       print("persiapan membuat plot seluruh komoditas")
       # DATA PLOT BAU -----------------------------------------------------------
@@ -1734,7 +1753,7 @@ app <- shiny::shinyApp(
       nama.komoditas <- unlist(dataCheck[[9]])
       tipe.kebun <- unlist(dataCheck[[13]][1])
       tipe.data <- unlist(dataCheck[[14]])
-      NPV.Privat.RP <- unlist(dataCheck[[18]][1,1])
+      NPV.Privat.RP <- unlist(dataCheck[["npv"]][1,1])
       
       nama.komoditas <- paste0(nama.komoditas," (",tipe.data,")")
       tipe.kebun <- paste0(tipe.kebun," (",tipe.data,")")
@@ -1751,15 +1770,139 @@ app <- shiny::shinyApp(
       dataPlot$nama.komoditas <- factor(dataPlot$nama.komoditas, levels = unique(dataPlot$nama.komoditas)[order(dataPlot$tipe.kebun, decreasing = FALSE)])
       dataPlot
       
+      
+      
       print("panggil data plot all")
       dataPlot %>%
           group_by(tipe.kebun) %>%
-          plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
+          plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun) 
     })
     
-
     
+    
+    output$showPlotProfitPrivat <- renderPlotly({
+      profitPlotPrivat()
+    })
+    
+    output$showPlotProfitSosial <- renderPlotly({
+      profitPlotSosial()
+    })
+    
+    profitPlotPrivat <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+      bau.profit <- data.gab()$tabel.profit
+      simulasi.profit <- data.gab.new()$tabel.profit
+      
+      trace_b_p <- bau.profit[,1]
+      trace_s_p <- simulasi.profit[,1]
+      
+      panjangbaris <- length(trace_b_p)-1
+      
+      x <- c(0:panjangbaris)
+      data <- data.frame(x,trace_b_p,trace_s_p)
+      
+      
+      fig <- plot_ly(data, x = ~x)
+      fig <- fig %>% add_trace(y = ~trace_b_p, name = 'profit bau privat',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
+      fig
+    })
+    
+    profitPlotSosial <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+      bau.profit <- data.gab()$tabel.profit
+      simulasi.profit <- data.gab.new()$tabel.profit
+      
+      trace_b_s <- bau.profit[,2]
+      trace_s_s <- simulasi.profit[,2]
+      
+      panjangbaris <- length(trace_b_s)-1
+      
+      x <- c(0:panjangbaris)
+      data <- data.frame(x,trace_b_s,trace_s_s)
+      
+      
+      fig <- plot_ly(data, x = ~x)
+      fig <- fig %>% add_trace(y = ~trace_b_s, name = 'profit bau sosial',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
+      fig
+    })
+    
+    
+    output$showPlotKumProfitPrivat <- renderPlotly({
+      profitPlotKumulatifPrivat()
+    })
+    
+    output$showPlotKumProfitSosial <- renderPlotly({
+      profitPlotKumulatifSosial()
+    })
+    
+    profitPlotKumulatifPrivat <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+      bau.profit <- data.gab()$tabel.profit
+      simulasi.profit <- data.gab.new()$tabel.profit
+      
+      trace_b_p <- cumsum(bau.profit[,1])
+      trace_s_p <- cumsum(simulasi.profit[,1])
+      
+      panjangbaris <- length(trace_b_p)-1
+      
+      x <- c(0:panjangbaris)
+      data <- data.frame(x,trace_b_p,trace_s_p)
+      
+      
+      fig <- plot_ly(data, x = ~x)
+      fig <- fig %>% add_trace(y = ~trace_b_p, name = 'profit bau privat',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
+      fig
+    })
+    
+    profitPlotKumulatifSosial <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+      bau.profit <- data.gab()$tabel.profit
+      simulasi.profit <- data.gab.new()$tabel.profit
+      
+      trace_b_p <- cumsum(bau.profit[,2])
+      trace_s_p <- cumsum(simulasi.profit[,2])
+      
+      panjangbaris <- length(trace_b_p)-1
+      
+      x <- c(0:panjangbaris)
+      data <- data.frame(x,trace_b_p,trace_s_p)
+      
+      
+      fig <- plot_ly(data, x = ~x)
+      fig <- fig %>% add_trace(y = ~trace_b_p, name = 'profit bau privat',mode = 'lines')
+      fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
+      fig
+    })
     # End - Section plot tipe kebun ---------------------------------------------
+    
+    
+    
+    observeEvent(input$saveNewPAM, {
+      browser()
+      datapath <- paste0("shiny/data/", input$sut, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      #replace informasi umum -- untuk lbh yakin yang tersave adalah pilihan terakhir user
+      dataDefine$sut <- input$sut
+      dataDefine$kom <- input$kom
+      dataDefine$provinsi <- input$selected_provinsi
+      dataDefine$th <- input$th
+      dataDefine$tipeLahan <- input$tipeLahan
+      # dataDefine$tipeKebun <- readDataTemplate$tipe.kebun
+      # dataDefine$tipeData <- c("BAU")
+      
+      #replace asumsi macro-- untuk lbh yakin yang tersave adalah pilihan terakhir user
+      dataDefine$rate.p <- input$rate.p
+      dataDefine$rate.s <- input$rate.s
+      dataDefine$nilai.tukar <- input$nilai.tukar
+      # dataDefine$tipeData <- c("SIMULASI")
+      
+      saveRDS(dataDefine,file = fileName)
+      
+    }) 
+    
     
     # Start - Section sunting_button---------------------------------------------
     ################################################################################
@@ -1802,7 +1945,7 @@ app <- shiny::shinyApp(
       dataDefine <- readRDS(fileName)
       
       # replace data price
-      dataDefine$ioYear_input <- input$ioYear_input
+      # dataDefine$ioYear_input <- input$ioYear_input
       saveRDS(dataDefine,file = fileName)
       
       
@@ -2594,7 +2737,7 @@ app <- shiny::shinyApp(
     #                               PROSES 2 PAM BARU                             #
     #                                                                              #
     ################################################################################
-    source("shiny/server/proses_2_PAM_baru.R", local = TRUE)
+    source("shiny/server/pamBaru_server.R", local = TRUE)
     
   }
 )

@@ -1,36 +1,36 @@
-sut,komoditas,provinsi,tahun,tipe lahan,tipe kebun,faktor,komponen,jenis,unit,unit harga,harga privat,harga sosial,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,pupuk,urea,kg/ha,rp,1500,2000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,pupuk,sp,kg/ha,rp,2300,2500,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,pupuk,round up,liter/ha,rp,80000,80000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,pupuk,formic acid,botol,rp,6000,6000,,,,,,,,,0,2.03934096,3.73050792,4.953970368,5.3862948,5.424737139,5.500628649,5.683818816,5.90736672,5.9457555,6.02150706,6.09589782,6.16893642,6.049827576,6.01471301,5.7559284,5.385421728,5.385421728,5.211121878,5.1028056,4.91596695,4.73767803
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,bahan tanam /bibit,padi,kg,rp,4000,4000,70,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,bahan tanam /bibit,karet lokal,batang,rp,1000,1000,550,55,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,peralatan,Pisau sadap,unit,rp,20000,20000,,,,,,,,,,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,peralatan,Mangkok penampung (latex cup),unit,rp,200,200,,,,,,,,,,100,150,180,190,190,190,195,200,200,200,200,200,195,195,190,180,180,180,180,180,180
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,peralatan,Ember karet,pair,rp,10000,10000,,,,,,,,,,2,,2,,2,,2,,2,,2,,2,,2,,2,,2,,2
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,peralatan,Cangkul,unit,rp,25000,25000,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,peralatan,Parang,unit,rp,50000,50000,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,peralatan,Bak penampung,unit,rp,50000,50000,,,,,,,,,,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja,tebas,hok,rp,80000,80000,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja,tumbang,hok,rp,80000,80000,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja,bakar,hok,rp,80000,80000,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja,pancang,hok,rp,80000,80000,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja padi,penanaman,hok,rp,80000,80000,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja padi,penyiangan,hok,rp,80000,80000,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja padi,bird and pig waching,hok,rp,80000,80000,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja padi,pemanenan,hok,rp,80000,80000,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja padi,pengeringan,hok,rp,80000,80000,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja karet,pembuatan lubang,hok,rp,80000,80000,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja karet,penanaman,hok,rp,80000,80000,11,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja karet,penyiangan,hok,rp,80000,80000,21,21,21,21,21,21,21,21,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja karet,pruning,hok,rp,80000,80000,1,6,3,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja karet,penyadapan,hok,rp,80000,80000,0,0,0,0,0,0,0,0,10,8.28482265,15.15518843,20.12550462,21.88182263,22.03799463,22.34630389,23.09051394,23.9986773,24.15463172,24.46237243,24.76458489,25.06130421,24.57742453,24.4347716,23.38345913,21.87827577,21.87827577,21.17018263,20.73014775,19.97111573,19.246817
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja panen,panen durian,hok,rp,80000,80000,,,,,,,,,,,,2,,,8,,,8,,,8,,,8,,,8,,,8
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja panen,panen duku,hok,rp,80000,80000,,,,,,,,,,,,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,input,tenaga kerja panen,panen jengkol,hok,rp,80000,80000,,,,,,,,,,,,2,2,3,3,4,4,5,7,8,8,8,8,8,8,8,8,8,8,8
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,output,sampingan,Padi,kg,Rp/kg,8000,8000,500,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,output,utama,Karet basah,kg,Rp/kg,6500,6500,0,0,0,0,0,0,0,0,0,203.934096,373.050792,495.3970368,538.62948,542.4737139,550.0628649,568.3818816,590.736672,594.57555,602.150706,609.589782,616.893642,604.9827576,601.471301,575.59284,538.5421728,538.5421728,521.1121878,510.28056,491.596695,473.767803
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,output,sampingan,Durian ,butir,Rp/btr,5000,5000,,,,,,,,,,,,100,,,200,,,300,,,300,,,300,,,300,,,300
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,output,sampingan,Duku ,kg,Rp/kg,6000,6000,,,,,,,,,,,,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,output,sampingan,Jengkol ,kg,Rp/kg,8000,8000,,,,,,,,,,,,100,150,300,300,350,400,500,600,600,600,600,600,600,600,600,600,600,600,600
-AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,output,sampingan,kayu karet,m3,Rp/m3,300000,350000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+sut,komoditas,provinsi,tahun,tipe lahan,tipe kebun,rate.p,rate.s,nilai.tukar,faktor,komponen,jenis,unit harga,harga privat,harga sosial,unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
+AGROFORESTRI,KARET AF,ACEH,2020,MINERAL,SMALLHOLDER,7.4,2.4,14831,input,pupuk,urea,rp,1500,2000,kg/ha,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,pupuk,sp,rp,2300,2500,kg/ha,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,bahan kimia,round up,rp,80000,80000,liter/ha,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,bahan kimia,formic acid,rp,6000,6000,botol,,,,,,,,,0,2.03934096,3.73050792,4.953970368,5.3862948,5.424737139,5.500628649,5.683818816,5.90736672,5.9457555,6.02150706,6.09589782,6.16893642,6.049827576,6.01471301,5.7559284,5.385421728,5.385421728,5.211121878,5.1028056,4.91596695,4.73767803
+,,,,,,,,,input,bahan tanam /bibit,padi,rp,4000,4000,kg,70,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,bahan tanam /bibit,karet lokal,rp,1000,1000,batang,550,55,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,peralatan,Pisau sadap,rp,20000,20000,unit,,,,,,,,,,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+,,,,,,,,,input,peralatan,Mangkok penampung (latex cup),rp,200,200,unit,,,,,,,,,,100,150,180,190,190,190,195,200,200,200,200,200,195,195,190,180,180,180,180,180,180
+,,,,,,,,,input,peralatan,Ember karet,rp,10000,10000,pair,,,,,,,,,,2,,2,,2,,2,,2,,2,,2,,2,,2,,2,,2
+,,,,,,,,,input,peralatan,Cangkul,rp,25000,25000,unit,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,
+,,,,,,,,,input,peralatan,Parang,rp,50000,50000,unit,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
+,,,,,,,,,input,peralatan,Bak penampung,rp,50000,50000,unit,,,,,,,,,,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+,,,,,,,,,input,tenaga kerja,tebas,rp,80000,80000,hok,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,tenaga kerja,tumbang,rp,80000,80000,hok,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,tenaga kerja,bakar,rp,80000,80000,hok,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,tenaga kerja,pancang,rp,80000,80000,hok,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,tenaga kerja padi,penanaman,rp,80000,80000,hok,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja padi,penyiangan,rp,80000,80000,hok,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja padi,bird and pig waching,rp,80000,80000,hok,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja padi,pemanenan,rp,80000,80000,hok,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja padi,pengeringan,rp,80000,80000,hok,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja karet,pembuatan lubang,rp,80000,80000,hok,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja karet,penanaman,rp,80000,80000,hok,11,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,input,tenaga kerja karet,penyiangan,rp,80000,80000,hok,21,21,21,21,21,21,21,21,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+,,,,,,,,,input,tenaga kerja karet,pruning,rp,80000,80000,hok,1,6,3,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,tenaga kerja karet,penyadapan,rp,80000,80000,hok,0,0,0,0,0,0,0,0,10,8.28482265,15.15518843,20.12550462,21.88182263,22.03799463,22.34630389,23.09051394,23.9986773,24.15463172,24.46237243,24.76458489,25.06130421,24.57742453,24.4347716,23.38345913,21.87827577,21.87827577,21.17018263,20.73014775,19.97111573,19.246817
+,,,,,,,,,input,tenaga kerja panen,panen durian,rp,80000,80000,hok,,,,,,,,,,,,2,,,8,,,8,,,8,,,8,,,8,,,8
+,,,,,,,,,input,tenaga kerja panen,panen duku,rp,80000,80000,hok,,,,,,,,,,,,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
+,,,,,,,,,input,tenaga kerja panen,panen jengkol,rp,80000,80000,hok,,,,,,,,,,,,2,2,3,3,4,4,5,7,8,8,8,8,8,8,8,8,8,8,8
+,,,,,,,,,output,sampingan,Padi,Rp/kg,8000,8000,kg,500,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,output,utama,Karet basah,Rp/kg,6500,6500,kg,0,0,0,0,0,0,0,0,0,203.934096,373.050792,495.3970368,538.62948,542.4737139,550.0628649,568.3818816,590.736672,594.57555,602.150706,609.589782,616.893642,604.9827576,601.471301,575.59284,538.5421728,538.5421728,521.1121878,510.28056,491.596695,473.767803
+,,,,,,,,,output,sampingan,Durian ,Rp/btr,5000,5000,butir,,,,,,,,,,,,100,,,200,,,300,,,300,,,300,,,300,,,300
+,,,,,,,,,output,sampingan,Duku ,Rp/kg,6000,6000,kg,,,,,,,,,,,,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500
+,,,,,,,,,output,sampingan,Jengkol ,Rp/kg,8000,8000,kg,,,,,,,,,,,,100,150,300,300,350,400,500,600,600,600,600,600,600,600,600,600,600,600,600
+,,,,,,,,,output,sampingan,kayu karet,Rp/m3,300000,350000,m3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
