@@ -4,7 +4,7 @@ MONOKULTUR,KELAPA SAWIT,KALIMANTAN TIMUR,2019,MINERAL,SMALLHOLDER,7.85,2.85,1385
 ,,,,,,,,,input,pupuk,MOP,Rp/kg,2400,2400,kg,0,0,0.675,0.675,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35,1.35
 ,,,,,,,,,input,bahan kimia,Roundup,Rp/l,80000,80000,liter,2,2,1,1,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
 ,,,,,,,,,input,bahan tanam /bibit,padi,Rp/kg,4000,4000,kg,70,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,bahan tanam /bibit,kelapa sawit,Rp/bibit,45000,45000,seedlings,135,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,bahan tanam /bibit,kelapa sawit,Rp/bibit,15000,15000,seedlings,135,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,input,peralatan,Dodos,Rp/unit,150000,150000,unit,,,1,,1,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,input,peralatan,Egreg,Rp/unit,225000,225000,unit,,,,,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1
 ,,,,,,,,,input,peralatan,Angkong,Rp/unit,300000,300000,unit,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1

@@ -1,27 +1,27 @@
 sut,komoditas,provinsi,tahun,tipe lahan,tipe kebun,rate.p,rate.s,nilai.tukar,faktor,komponen,jenis,unit harga,harga privat,harga sosial,unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
-MONOKULTUR,KAKAO,KALIMANTAN TIMUR,2019,MINERAL,SMALLHOLDER,7.85,2.85,13850,input,pupuk,urea,rp/Kg,1800,1800,kg,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-,,,,,,,,,input,pupuk,NPK,rp/Kg,2600,2600,kg,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-,,,,,,,,,input,pupuk,KCL,rp/Kg,2000,2000,kg,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,pupuk,SP36,rp/Kg,2000,2000,kg,,,,,,16.48463591,16.48463591,16.48463591,16.48463591,17.2623474,18.77260696,19.12425183,19.36286909,19.08063828,18.78712471,18.54729954,18.28858668,17.60256599,16.91238393,16.47873306,15.98332409,15.49029528,14.93849201,14.4512784,13.42542461,12.41408577,11.47538198,10.54960218,9.586012064,8.69104764
-,,,,,,,,,input,pupuk,pupuk (liquid),rp/botol,40000,40000,botol,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,pupuk,pupuk (powder),rp/package,15000,15000,package,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,pupuk,basmilang,rp/liter,65000,65000,liter,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,pupuk,gramaxone,rp/liter,68000,68000,liter,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+MONOKULTUR,KAKAO,KALIMANTAN TIMUR,2019,MINERAL,SMALLHOLDER,7.85,2.85,13850,input,pupuk,urea,rp/Kg,1800,1800,Kg,,50,150,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,pupuk,NPK,rp/Kg,2600,2600,Kg,200,150,,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,100,100,100,100,100,100,100,100,100,100
+,,,,,,,,,input,pupuk,KCL,rp/Kg,2000,2000,Kg,,,300,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,pupuk,SP36,rp/Kg,2000,2000,Kg,,,150,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,pupuk,pupuk (liquid),rp/botol,40000,40000,botol,,,,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+,,,,,,,,,input,pupuk,pupuk (powder),rp/package,15000,15000,package,,,,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+,,,,,,,,,input,pupuk,basmilang,rp/liter,65000,65000,liter,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,input,pupuk,gramaxone,rp/liter,68000,68000,liter,,,,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 ,,,,,,,,,input,bahan tanam /bibit,Seed (banana),rp,5000,5000,pcs,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,input,bahan tanam /bibit,Seed (cacao),rp,7500,7500,pcs,1100,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,peralatan,Gunting,rp/pieces,75000,75000,pcs,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
-,,,,,,,,,input,peralatan,Gergaji,rp/pieces,35000,35000,pcs,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
-,,,,,,,,,input,peralatan,Cangkul,rp/pieces,45000,45000,pcs,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
-,,,,,,,,,input,peralatan,Handsprayer,rp/pieces,575000,575000,pcs,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
+,,,,,,,,,input,peralatan,Gunting,rp/pieces,75000,75000,pieces,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
+,,,,,,,,,input,peralatan,Gergaji,rp/pieces,35000,35000,pieces,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
+,,,,,,,,,input,peralatan,Cangkul,rp/pieces,45000,45000,pieces,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
+,,,,,,,,,input,peralatan,Handsprayer,rp/pieces,575000,575000,pieces,2,,,,,2,,,,,2,,,,,2,,,,,1,,,,,1,,,,
 ,,,,,,,,,input,peralatan,Plastik,rp/roll,35000,35000,roll,,,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1
-,,,,,,,,,input,peralatan,Bak kayu,rp/pieces,400000,400000,pcs,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,
-,,,,,,,,,input,peralatan,Tempat menjemur,rp/pieces,150000,150000,pcs,,,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1
-,,,,,,,,,input,peralatan,Jaring,rp/pieces,475000,475000,pcs,,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,
-,,,,,,,,,input,peralatan,Terpal,rp/pieces,85000,85000,pcs,,,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1
-,,,,,,,,,input,peralatan,Karung,rp/pieces,3000,3000,pcs,,,,10,,10,,10,,10,,10,,10,,10,,10,,10,,4,,4,,4,,4,,4
-,,,,,,,,,input,peralatan,Parang,rp/pieces,75000,75000,pcs,2,,2,,2,,2,,2,,2,,2,,2,,2,,2,,1,,1,,1,,1,,1,
-,,,,,,,,,input,peralatan,Termometer,rp/pieces,250000,250000,pcs,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,,
-,,,,,,,,,input,peralatan,Timbangan,rp/pieces,200000,200000,pcs,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,,
+,,,,,,,,,input,peralatan,Bak kayu,rp/pieces,400000,400000,pieces,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,
+,,,,,,,,,input,peralatan,Tempat menjemur,rp/pieces,150000,150000,pieces,,,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1
+,,,,,,,,,input,peralatan,Jaring,rp/pieces,475000,475000,pieces,,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,,1,,
+,,,,,,,,,input,peralatan,Terpal,rp/pieces,85000,85000,pieces,,,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1
+,,,,,,,,,input,peralatan,Karung,rp/pieces,3000,3000,pieces,,,,10,,10,,10,,10,,10,,10,,10,,10,,10,,4,,4,,4,,4,,4
+,,,,,,,,,input,peralatan,Parang,rp/pieces,75000,75000,pieces,2,,2,,2,,2,,2,,2,,2,,2,,2,,2,,1,,1,,1,,1,,1,
+,,,,,,,,,input,peralatan,Termometer,rp/pieces,250000,250000,pieces,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,,
+,,,,,,,,,input,peralatan,Timbangan,rp/pieces,200000,200000,pieces,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,,
 ,,,,,,,,,input,tenaga kerja,tebas+tebang+bakar,Rp/HOK,120000,120000,hok,36,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,input,tenaga kerja,penanaman,Rp/HOK,120000,120000,hok,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,input,tenaga kerja,penanaman pisang,Rp/HOK,120000,120000,hok,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
