@@ -85,7 +85,29 @@ app <- shiny::shinyApp(
     source("shiny/server/informasiUmum_server.R", local = TRUE)
     # # End - Section informasi umum ---------------------------------------
     
+    observeEvent(input$browser_button,{
+      browser()
+    })
     
+    reactData <- reactiveValues(
+      timeInput = NULL,
+      tableP1 = NULL, #price input
+      tableP2 = NULL, #price output
+      tableIO1 = NULL, #io input
+      tableIO2 = NULL, #io output
+      tableCapP = NULL, #capital privat
+      tableCapS = NULL, #capital sosial
+      tableAddPupuk = NULL,
+      tableAddBibit = NULL,
+      tableAddPeralatan = NULL,
+      tableAddTK = NULL,
+      tableAddUtama =NULL,
+      tableAddSampingan = NULL,
+      tableAddCapPrivat = NULL,
+      tableAddCapSosial = NULL,
+      tableCapitalAll = NULL,
+      tableScenLand = NULL
+    )
     
     # Section preparation data ---------
     dataTemplate <- reactive({
@@ -341,13 +363,13 @@ app <- shiny::shinyApp(
         # hitung npv --------------------------------------------------------------
         dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
         dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-        p.budget <- dataGeneral[-(c(1:6,37))] * dataPrivat[-c(1:6,37)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- dataGeneral[-(c(1:6,ncol(dataGeneral)))] * dataPrivat[-c(1:6,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
         p.budget <- cbind(dataGeneral[c("status","grup","bagian","komponen","jenis")],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
         p.budget <- p.budget %>%mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
         
         #perkalian antara general dengan Social Price
         dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-        s.budget <- dataGeneral[-c(1:6,37)] * dataSosial[-c(1:6,37)]
+        s.budget <- dataGeneral[-c(1:6,ncol(dataGeneral))] * dataSosial[-c(1:6,ncol(dataSosial))]
         s.budget <- cbind(dataGeneral[c("status","grup","bagian","komponen","jenis")],dataSosial["unit.harga"],s.budget)
         s.budget <- s.budget %>%
           mutate(status = case_when(status == "general" ~ "social budget"))
@@ -760,14 +782,14 @@ app <- shiny::shinyApp(
           # hitung npv --------------------------------------------------------------
           dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
           dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-          p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+          p.budget <- dataGeneral[-(c(1:5,ncol(dataGeneral)))] * dataPrivat[-c(ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
           p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
           p.budget <- p.budget %>%
             mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
           
           #perkalian antara general dengan Social Price
           dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-          s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+          s.budget <- dataGeneral[-c(1:5,ncol(dataGeneral))] * dataSosial[-c(1:5,ncol(dataSosial))]
           s.budget <- cbind(dataGeneral[c(1:4)],dataSosial["unit.harga"],s.budget)
           s.budget <- s.budget %>%
             mutate(status = case_when(status == "general" ~ "social budget"))
@@ -1045,10 +1067,10 @@ app <- shiny::shinyApp(
           h5("Langkah 2: menentukan asumsi makro untuk data PAM yang dibangun"),
           br(),
           fluidRow(
-            column(1,
-                   
-            ),
-            column(3,
+            # column(1,
+            #        
+            # ),
+            column(4,
                    tableOutput("showMakroBAU")
             ),
             column(2,
@@ -1079,13 +1101,14 @@ app <- shiny::shinyApp(
       readDataTemplate <- readRDS(fileName)
       dataView <- t(data.frame(rate.p.bau = readDataTemplate$rate.p, 
                              rate.s.bau = readDataTemplate$rate.s,
-                             nilai.tukar.bau = readDataTemplate$nilai.tukar))
+                             nilai.tukar.bau = readDataTemplate$nilai.tukar,
+                             tipe.kebun = readDataTemplate$tipeKebun))
       dataView[is.na(dataView)] <- 0 #NA replace with zero
       
-      nameRow <- c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah")
+      nameRow <- c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah", "Tipe Kebun")
       dataView <- cbind(nameRow,data.frame(dataView))
       
-      colnames(dataView) <- c(" ","Nilai BAU pada Tahun Terpilih")
+      colnames(dataView) <- c(" ","Nilai BAU pada Tahun Terpilih & Tipe Kebun")
       dataView
       
     })
@@ -1346,7 +1369,7 @@ app <- shiny::shinyApp(
       showModal(dataModalCreatePam())
     })
     
-    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       removeModal()
       insertUI(selector='#uiShowResult',
                where='afterEnd',
@@ -1354,24 +1377,7 @@ app <- shiny::shinyApp(
     })
     
     # Start Price Output ------------------------------------------------------
-    reactData <- reactiveValues(
-      timeInput = NULL,
-      tableP1 = NULL, #price input
-      tableP2 = NULL, #price output
-      tableIO1 = NULL, #io input
-      tableIO2 = NULL, #io output
-      tableCapP = NULL, #capital privat
-      tableCapS = NULL, #capital sosial
-      tableAddPupuk = NULL,
-      tableAddBibit = NULL,
-      tableAddPeralatan = NULL,
-      tableAddTK = NULL,
-      tableAddUtama =NULL,
-      tableAddSampingan = NULL,
-      tableAddCapPrivat = NULL,
-      tableAddCapSosial = NULL,
-      tableCapitalAll = NULL
-    )
+    
     
     valP2Template <- eventReactive(input$template_button,{
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -1510,7 +1516,7 @@ app <- shiny::shinyApp(
     
     
     
-    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       removeUI(selector = '#showPlotAllKomoditas')
       
       insertUI(selector='#uiShowPlotAllKomoditas',
@@ -1535,7 +1541,7 @@ app <- shiny::shinyApp(
     #                                RESULT                                        #
     #                                                                              #
     ################################################################################
-    data.graph <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    data.graph <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
     # data.graph <- reactive({  
     # observeEvent(input$running_button,{
       # browser()
@@ -1605,13 +1611,13 @@ app <- shiny::shinyApp(
         # hitung npv --------------------------------------------------------------
         dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
         dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-        p.budget <- dataGeneral[-(c(1:6,37))] * dataPrivat[-c(1:6,37)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- dataGeneral[-(c(1:6,ncol(dataGeneral)))] * dataPrivat[-c(1:6,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
         p.budget <- cbind(dataGeneral[c("status","grup","bagian","komponen","jenis")],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
         p.budget <- p.budget %>%mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
         
         #perkalian antara general dengan Social Price
         dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-        s.budget <- dataGeneral[-c(1:6,37)] * dataSosial[-c(1:6,37)]
+        s.budget <- dataGeneral[-c(1:6,ncol(dataGeneral))] * dataSosial[-c(1:6,ncol(dataSosial))]
         s.budget <- cbind(dataGeneral[c("status","grup","bagian","komponen","jenis")],dataSosial["unit.harga"],s.budget)
         s.budget <- s.budget %>%
           mutate(status = case_when(status == "general" ~ "social budget"))
@@ -1940,14 +1946,14 @@ app <- shiny::shinyApp(
           # hitung npv --------------------------------------------------------------
           dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
           dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-          p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+          p.budget <- dataGeneral[-(c(1:5,ncol(dataGeneral)))] * dataPrivat[-c(1:5,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
           p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
           p.budget <- p.budget %>%
             mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
           
           #perkalian antara general dengan Social Price
           dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-          s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+          s.budget <- dataGeneral[-c(1:5,ncol(dataGeneral))] * dataSosial[-c(1:5,ncol(dataSosial))]
           s.budget <- cbind(dataGeneral[c(1:4)],dataSosial["unit.harga"],s.budget)
           s.budget <- s.budget %>%
             mutate(status = case_when(status == "general" ~ "social budget"))
@@ -2177,7 +2183,7 @@ app <- shiny::shinyApp(
       }
     })
     
-    data.graph.new <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    data.graph.new <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       # observeEvent(input$running_button,{
       # browser()
       # 
@@ -2229,13 +2235,15 @@ app <- shiny::shinyApp(
         p.price<-select(price.all, -harga.sosial) #remove harga sosial
         p.year<-data.frame(replicate(yearIO,p.price$harga.privat)) #replicate nilai private price sebanyak n tahun
         colnames(p.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        p.price<-cbind(status="harga.privat" ,p.price[c("grup", "bagian","komponen", "jenis", "unit.harga")],p.year)
+        # p.price<-cbind(status="harga.privat" ,p.price[c("grup", "bagian","komponen", "jenis", "unit.harga")],p.year)
+        p.price<-cbind(status="harga.privat" ,p.price[c("grup", "komponen", "jenis", "unit.harga")],p.year)
         p.price <- p.price %>% mutate_if(is.factor,as.character) #change factor var to char var
         
         s.price<-select(price.all, -harga.privat) #remove harga privat
         s.year<-data.frame(replicate(yearIO,s.price$harga.sosial))
         colnames(s.year)<-paste0(c(rep("Y", yearIO)),1:yearIO)
-        s.price<-cbind(status="harga.sosial",s.price[c("grup", "bagian", "komponen", "jenis", "unit.harga")],s.year)
+        # s.price<-cbind(status="harga.sosial",s.price[c("grup", "bagian", "komponen", "jenis", "unit.harga")],s.year)
+        s.price<-cbind(status="harga.sosial",s.price[c("grup", "komponen", "jenis", "unit.harga")],s.year)
         s.price <- s.price %>% mutate_if(is.factor,as.character) #change factor var to char
         
         price.all.year <- rbind(p.price, s.price)
@@ -2246,13 +2254,13 @@ app <- shiny::shinyApp(
         # hitung npv --------------------------------------------------------------
         dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
         dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-        p.budget <- dataGeneral[-(c(1:6,37))] * dataPrivat[-c(1:6,37)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+        p.budget <- dataGeneral[-(c(1:6,ncol(dataGeneral)))] * dataPrivat[-c(1:6,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
         p.budget <- cbind(dataGeneral[c("status","grup","bagian","komponen","jenis")],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
         p.budget <- p.budget %>%mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
         
         #perkalian antara general dengan Social Price
         dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-        s.budget <- dataGeneral[-c(1:6,37)] * dataSosial[-c(1:6,37)]
+        s.budget <- dataGeneral[-c(1:6,ncol(dataGeneral))] * dataSosial[-c(1:6,ncol(dataSosial))]
         s.budget <- cbind(dataGeneral[c("status","grup","bagian","komponen","jenis")],dataSosial["unit.harga"],s.budget)
         s.budget <- s.budget %>%
           mutate(status = case_when(status == "general" ~ "social budget"))
@@ -2588,14 +2596,14 @@ app <- shiny::shinyApp(
           # hitung npv --------------------------------------------------------------
           dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
           dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-          p.budget <- dataGeneral[-(c(1:5,36))] * dataPrivat[-c(1:5,36)] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+          p.budget <- dataGeneral[-(c(1:5,ncol(dataGeneral)))] * dataPrivat[-c(1:5,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
           p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
           p.budget <- p.budget %>%
             mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
           
           #perkalian antara general dengan Social Price
           dataSosial <- filter(data.gab, status == c("harga.sosial")) #filter data social price
-          s.budget <- dataGeneral[-c(1:5,36)] * dataSosial[-c(1:5,36)]
+          s.budget <- dataGeneral[-c(1:5,ncol(dataGeneral))] * dataSosial[-c(1:5,ncol(dataSosial))]
           s.budget <- cbind(dataGeneral[c(1:4)],dataSosial["unit.harga"],s.budget)
           s.budget <- s.budget %>%
             mutate(status = case_when(status == "general" ~ "social budget"))
@@ -2861,7 +2869,7 @@ app <- shiny::shinyApp(
     })
   
     
-    preparePlot <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    preparePlot <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
     # preparePlot <- reactive({  
       # row_to_select=as.numeric(gsub("Row","",input$checked_rows))
       # row_to_select_newPam = as.numeric(gsub("Row","",input$checked_rows_newPam))
@@ -2937,7 +2945,7 @@ app <- shiny::shinyApp(
     #     plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
     # })
     
-    plotAllProvinsi <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    plotAllProvinsi <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
     # plotAllProvinsi <- reactive({
       print("persiapan membuat plot seluruh komoditas")
       # DATA PLOT BAU -----------------------------------------------------------
@@ -3036,42 +3044,89 @@ app <- shiny::shinyApp(
       profitPlotSosial()
     })
     
-    profitPlotPrivat <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    profitPlotPrivat <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       bau.profit <- data.graph()$tabel.profit
       simulasi.profit <- data.graph.new()$tabel.profit
       
       profit.tahunan <- bau.profit[,1]
       trace_s_p <- simulasi.profit[,1]
       
-      panjangbaris <- length(profit.tahunan)-1
+      profit.bau <- cbind.data.frame(yaxis = rep("BAU",length(profit.tahunan)),profit.tahunan)
+      profit.bau <- cbind.data.frame(no=seq(1,nrow(profit.bau), 1), profit.bau)
+      profit.simulasi <- cbind.data.frame(yaxis = rep("SIMULASI",length(trace_s_p)),profit.tahunan = trace_s_p)
+      profit.simulasi <- cbind.data.frame(no=seq(1,nrow(profit.simulasi), 1), profit.simulasi)
+      profit.gab <- rbind(profit.bau,profit.simulasi)
       
-      x <- c(0:panjangbaris)
-      data <- data.frame(x,profit.tahunan,trace_s_p)
+      SIMULASI <- list(
+        tickfont = list(color = "green"),
+        overlaying = "y",
+        side = "right",
+        title = "Toyota",
+        showgrid = FALSE
+      )
       
       
-      fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~profit.tahunan, name = 'profit bau privat',mode = 'lines')
-      fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
-      fig
+      profit.gab %>%
+        group_by(yaxis) %>%
+        plot_ly(x=~no, y=~profit.tahunan, type='scatter', color=~yaxis, mode="lines+markers", yaxis=~yaxis) %>%
+        layout(xaxis=list(title="Tahun", domain = list(0.15, 0.95)), yaxis=list(title="Profit Tahunan Privat"), yaxis2=SIMULASI)%>%
+        layout(legend = list(orientation = "h",   # show entries horizontally
+                             xanchor = "center",  # use center of legend as anchor
+                             x = 0.95))             # put legend in center of x-axis
+      
+      # panjangbaris <- length(trace_s_p)-1
+      # 
+      # x <- c(0:panjangbaris)
+      # data <- data.frame(x,profit.tahunan,trace_s_p)
+      # 
+      # 
+      # fig <- plot_ly(data, x = ~x)
+      # fig <- fig %>% add_trace(y = ~profit.tahunan, name = 'profit bau privat',mode = 'lines')
+      # fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
+      # fig
     })
     
-    profitPlotSosial <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    profitPlotSosial <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       bau.profit <- data.graph()$tabel.profit
       simulasi.profit <- data.graph.new()$tabel.profit
       
       profit.tahunan <- bau.profit[,2]
       trace_s_s <- simulasi.profit[,2]
       
-      panjangbaris <- length(profit.tahunan)-1
       
-      x <- c(0:panjangbaris)
-      data <- data.frame(x,profit.tahunan,trace_s_s)
+      profit.bau <- cbind.data.frame(yaxis = rep("BAU",length(profit.tahunan)),profit.tahunan)
+      profit.bau <- cbind.data.frame(no=seq(1,nrow(profit.bau), 1), profit.bau)
+      profit.simulasi <- cbind.data.frame(yaxis = rep("SIMULASI",length(trace_s_s)),profit.tahunan = trace_s_s)
+      profit.simulasi <- cbind.data.frame(no=seq(1,nrow(profit.simulasi), 1), profit.simulasi)
+      profit.gab <- rbind(profit.bau,profit.simulasi)
+      
+      SIMULASI <- list(
+        tickfont = list(color = "green"),
+        overlaying = "y",
+        side = "right",
+        title = "Toyota",
+        showgrid = FALSE
+      )
       
       
-      fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~profit.tahunan, name = 'profit bau sosial',mode = 'lines')
-      fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
-      fig
+      profit.gab %>%
+        group_by(yaxis) %>%
+        plot_ly(x=~no, y=~profit.tahunan, type='scatter', color=~yaxis, mode="lines+markers", yaxis=~yaxis) %>%
+        layout(xaxis=list(title="Tahun", domain = list(0.15, 0.95)), yaxis=list(title="Profit Tahunan Sosial"), yaxis2=SIMULASI)%>%
+        layout(legend = list(orientation = "h",   # show entries horizontally
+                             xanchor = "center",  # use center of legend as anchor
+                             x = 0.95))             # put legend in center of x-axis
+      
+      # panjangbaris <- length(profit.tahunan)-1
+      # 
+      # x <- c(0:panjangbaris)
+      # data <- data.frame(x,profit.tahunan,trace_s_s)
+      # 
+      # 
+      # fig <- plot_ly(data, x = ~x)
+      # fig <- fig %>% add_trace(y = ~profit.tahunan, name = 'profit bau sosial',mode = 'lines')
+      # fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
+      # fig
     })
     
     
@@ -3083,42 +3138,87 @@ app <- shiny::shinyApp(
       profitPlotKumulatifSosial()
     })
     
-    profitPlotKumulatifPrivat <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    profitPlotKumulatifPrivat <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       bau.profit <- data.graph()$tabel.profit
       simulasi.profit <- data.graph.new()$tabel.profit
       
       profit.kumulatif <- cumsum(bau.profit[,1])
       trace_s_p <- cumsum(simulasi.profit[,1])
       
-      panjangbaris <- length(profit.kumulatif)-1
+      profit.bau <- cbind.data.frame(yaxis = rep("BAU",length(profit.kumulatif)),profit.kumulatif)
+      profit.bau <- cbind.data.frame(no=seq(1,nrow(profit.bau), 1), profit.bau)
+      profit.simulasi <- cbind.data.frame(yaxis = rep("SIMULASI",length(trace_s_p)),profit.kumulatif = trace_s_p)
+      profit.simulasi <- cbind.data.frame(no=seq(1,nrow(profit.simulasi), 1), profit.simulasi)
+      profit.gab <- rbind(profit.bau,profit.simulasi)
       
-      x <- c(0:panjangbaris)
-      data <- data.frame(x,profit.kumulatif,trace_s_p)
+      SIMULASI <- list(
+        tickfont = list(color = "green"),
+        overlaying = "y",
+        side = "right",
+        title = "Toyota",
+        showgrid = FALSE
+      )
       
       
-      fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~profit.kumulatif, name = 'profit bau privat',mode = 'lines')
-      fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
-      fig
+      profit.gab %>%
+        group_by(yaxis) %>%
+        plot_ly(x=~no, y=~profit.kumulatif, type='scatter', color=~yaxis, mode="lines+markers", yaxis=~yaxis) %>%
+        layout(xaxis=list(title="Tahun", domain = list(0.15, 0.95)), yaxis=list(title="Profit Kumulatif Privat"), yaxis2=SIMULASI)%>%
+        layout(legend = list(orientation = "h",   # show entries horizontally
+                             xanchor = "center",  # use center of legend as anchor
+                             x = 0.95))             # put legend in center of x-axis
+      # panjangbaris <- length(profit.kumulatif)-1
+      # 
+      # x <- c(0:panjangbaris)
+      # data <- data.frame(x,profit.kumulatif,trace_s_p)
+      # 
+      # 
+      # fig <- plot_ly(data, x = ~x)
+      # fig <- fig %>% add_trace(y = ~profit.kumulatif, name = 'profit bau privat',mode = 'lines')
+      # fig <- fig %>% add_trace(y = ~trace_s_p, name = 'profit simulasi privat', mode = 'lines+markers')
+      # fig
     })
     
-    profitPlotKumulatifSosial <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital),{
+    profitPlotKumulatifSosial <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       bau.profit <- data.graph()$tabel.profit
       simulasi.profit <- data.graph.new()$tabel.profit
       
       profit.kumulatif <- cumsum(bau.profit[,2])
       trace_s_s <- cumsum(simulasi.profit[,2])
       
-      panjangbaris <- length(profit.kumulatif)-1
+      profit.bau <- cbind.data.frame(yaxis = rep("BAU",length(profit.kumulatif)),profit.kumulatif)
+      profit.bau <- cbind.data.frame(no=seq(1,nrow(profit.bau), 1), profit.bau)
+      profit.simulasi <- cbind.data.frame(yaxis = rep("SIMULASI",length(trace_s_s)),profit.kumulatif = trace_s_s)
+      profit.simulasi <- cbind.data.frame(no=seq(1,nrow(profit.simulasi), 1), profit.simulasi)
+      profit.gab <- rbind(profit.bau,profit.simulasi)
       
-      x <- c(0:panjangbaris)
-      data <- data.frame(x,profit.kumulatif,trace_s_s)
+      SIMULASI <- list(
+        tickfont = list(color = "green"),
+        overlaying = "y",
+        side = "right",
+        title = "Toyota",
+        showgrid = FALSE
+      )
       
       
-      fig <- plot_ly(data, x = ~x)
-      fig <- fig %>% add_trace(y = ~profit.kumulatif, name = 'profit bau sosial',mode = 'lines')
-      fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
-      fig
+      profit.gab %>%
+        group_by(yaxis) %>%
+        plot_ly(x=~no, y=~profit.kumulatif, type='scatter', color=~yaxis, mode="lines+markers", yaxis=~yaxis) %>%
+        layout(xaxis=list(title="Tahun", domain = list(0.15, 0.95)), yaxis=list(title="Profit Kumulatif Sosial"), yaxis2=SIMULASI)%>%
+        layout(legend = list(orientation = "h",   # show entries horizontally
+                             xanchor = "center",  # use center of legend as anchor
+                             x = 0.95))             # put legend in center of x-axis
+      
+      # panjangbaris <- length(profit.kumulatif)-1
+      # 
+      # x <- c(0:panjangbaris)
+      # data <- data.frame(x,profit.kumulatif,trace_s_s)
+      # 
+      # 
+      # fig <- plot_ly(data, x = ~x)
+      # fig <- fig %>% add_trace(y = ~profit.kumulatif, name = 'profit bau sosial',mode = 'lines')
+      # fig <- fig %>% add_trace(y = ~trace_s_s, name = 'profit simulasi sosial', mode = 'lines+markers')
+      # fig
     })
     # End - Section plot tipe kebun ---------------------------------------------
     
@@ -3160,45 +3260,34 @@ app <- shiny::shinyApp(
     ################################################################################
     observeEvent(input$sunting_button,{
       showModal(
-        modalDialog( 
-          footer=tagList(
-            actionButton(("sunting_button_1"), "Simpan dan Lanjut",style="color: white;background-color: green;")
-          ),
-          argonTabSet(
-            id = "tabSunting1",
-            card_wrapper = TRUE,
-            horizontal = TRUE,
-            circle = FALSE,
-            size = "l",
-            width = 12,
-            argonTab(
-              tabName = "Pilih Tahun Daur Tanam",
-              active = T,
-              selectInput(("ioYear_input"),
-                          "pilih tahun skenario:",
-                          choices = c(30:60),selected = 30, width = "600px"),# pilihannnya masih 30 tahun sesuai default
-              tags$div(id = 'uiTahunDaurTanam')
-            ))
-          ,
-          size="l",
-          easyClose = FALSE)
+        modalTahunDaurTanam()
       )
     })
     
-    observeEvent(input$sunting_button_1,{
-      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-      fileName <- paste0(datapath,"saveData","_",
-                         input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-      dataDefine <- readRDS(fileName)
-      
-      # replace data price
-      # dataDefine$ioYear_input <- input$ioYear_input
-      saveRDS(dataDefine,file = fileName)
-      
-      
-      showModal(modalPilihBarisOutput())
-    })
+    modalTahunDaurTanam <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          actionButton(("sunting_button_1"), "Simpan dan Lanjut",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabSunting1",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Pilih Tahun Daur Tanam",
+            active = T,
+            selectInput(("ioYear_input"),
+                        "pilih tahun skenario:",
+                        choices = c(30:60),selected = 30, width = "600px"),# pilihannnya masih 30 tahun sesuai default
+            tags$div(id = 'uiTahunDaurTanam')
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
     
     observeEvent(input$ioYear_input,{
       if (input$ioYear_input > 30){
@@ -3223,6 +3312,215 @@ app <- shiny::shinyApp(
                    selected = "tabel berisi data template diambil dari tahun ke-1")
     })
     
+    
+    observeEvent(input$sunting_button_1,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      # replace data price
+      # dataDefine$ioYear_input <- input$ioYear_input
+      saveRDS(dataDefine,file = fileName)
+      
+      if(dataDefine$tipeKebun == "LARGE SCALE"){
+        showModal(modalScenLand())
+      }else{
+        showModal(modalPilihBarisOutput())
+      }
+      
+    })
+    
+    
+    modalScenLand <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          actionButton(("scenLand_button"), "Lanjut",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabTahunScenLand",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Skenario Lahan",
+            active = T,
+            h3("Apakah user akan menyunting skenario lahan?"),
+            radioButtons(("scenLandKomponen"),
+                         " ",
+                         choices = c("Tidak","Ya"),selected = "Tidak"),
+            
+            tags$div(id = 'uiScenLand')
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+    
+    observeEvent(input$scenLandKomponen,{
+      if(input$scenLandKomponen == "Tidak"){
+        removeUI(selector = '#scenLand')
+      }else if (input$scenLandKomponen == "Ya"){
+        insertUI(selector='#uiScenLand',
+                 where='afterEnd',
+                 ui= uiOutput('scenLand'))
+      }  
+    })
+    
+
+    
+    output$scenLand <- renderUI({
+      
+      fluidPage(
+        tags$br(),
+        h3("Tabel Skenario Lahan", align = "center"),
+        rHandsontableOutput('editScenLand'),
+        tags$br(),
+        tags$br(),
+        tags$div(id='teksTotalArea'),
+        tags$br(),
+        tags$br(),
+        actionButton(('saveScenLand'), 'simpan tabel'),
+        tags$br(),
+        tags$div(id='teksSaveScenLand')
+      )
+      
+     
+    })
+    
+    
+    
+    output$editScenLand <- renderRHandsontable({
+      rhandsontable(valScenLand(),
+                    rowHeaderWidth = 50,
+                    fixedColumnsLeft = 1,
+                    height = 100
+      )%>%
+        hot_col(1, readOnly = TRUE)
+    })
+    
+    valScenLand <- eventReactive(input$scenLandKomponen,{
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      # reactData$tableScenLand <- dataDefine$cum.landScene[1,]
+      # idRow <- c("per Tahun")
+      # reactData$tableScenLand <- cbind(idRow,reactData$tableScenLand)
+      # colnames(reactData$tableScenLand)[1] <- c(" ")
+      # rownames(reactData$tableScenLand) <- c(1)
+      # reactData$tableScenLand
+      
+      
+      
+      if(input$ioYear_input == 30){
+        reactData$tableScenLand <- dataDefine$cum.landScene[1,]
+        idRow <- c("per Tahun")
+        reactData$tableScenLand <- cbind(idRow,reactData$tableScenLand)
+        colnames(reactData$tableScenLand)[1] <- c(" ")
+        rownames(reactData$tableScenLand) <- c(1)
+        reactData$tableScenLand
+      } else if(input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
+        
+        reactData$tableScenLand <- dataDefine$cum.landScene[1,]
+        yearIOadd <- as.numeric(input$ioYear_input)
+        addCol <- data.frame(matrix(0, nrow = nrow(dataDefine$cum.landScene[1,]), ncol = yearIOadd - 30))
+        colnames(addCol)<-paste0(c(rep("Y", yearIOadd)),1:yearIOadd)[31:yearIOadd] # start dari thun 31 utk nama kolom baru
+        
+        idRow <- c("per Tahun")
+        
+        reactData$tableScenLand <- cbind(idRow,dataDefine$cum.landScene[1,],addCol)
+        colnames(reactData$tableScenLand)[1] <- c(" ")
+        rownames(reactData$tableScenLand) <- c(1)
+        reactData$tableScenLand
+        
+      } else if(input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
+        reactData$tableScenLand <- dataDefine$cum.landScene[1,]
+        yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
+        yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
+        filterIO <-  dataDefine$cum.landScene[1,][,c(paste0(c(rep("Y", yearIO)),1:yearIO))]
+        addCol <- filterIO[,1:yearIOaddMin30] 
+        
+        yearIOadd <- as.numeric(input$ioYear_input)
+        colnames(addCol)<-paste0(c(rep("Y", ncol(addCol))),31:yearIOadd)
+        
+        idRow <- c("per Tahun")
+        
+        reactData$tableScenLand <- cbind(idRow,dataDefine$cum.landScene[1,],addCol)
+        colnames(reactData$tableScenLand)[1] <- c(" ")
+        rownames(reactData$tableScenLand) <- c(1)
+        reactData$tableScenLand
+      }
+    })
+    
+    
+    
+    observeEvent(input$saveScenLand,{
+      removeUI(selector='#textTampilScenLand')
+      removeUI(selector='#textTampilTotalArea')
+      # browser()
+      
+      editNew<-as.data.frame(hot_to_r(input$editScenLand))
+      editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      # replace data price
+      landScene <- editNew[,-1]
+      yearIO <- 30
+      transpose.landScene <- data.frame(t(landScene[,c(paste0(c(rep("Y", yearIO)),1:yearIO))]))
+      colnames(transpose.landScene) <- c("per.year")
+      cum.landScene <- within(transpose.landScene,cummulative.land <- cumsum(per.year)) #buat kolom cumulativ land
+      cum.landScene <- data.frame(t(cum.landScene))
+      
+      dataDefine$cum.landScene <- cum.landScene
+      
+      #total area setelah sunting
+      totalAreaNew <- sum(landScene)
+      
+      dataDefine$totalArea <- totalAreaNew
+      saveRDS(dataDefine,file = fileName)
+      
+      textTotalArea <- paste0("Total Area (dalam Ha) = ", totalAreaNew)
+      
+      insertUI(selector='#teksSaveScenLand',
+               where = 'afterEnd',
+               ui = tags$div(id="textTampilScenLand","tabel di atas sudah tersimpan"))
+      
+      insertUI(selector='#teksTotalArea',
+               where = 'afterEnd',
+               ui = tags$div(id="textTampilTotalArea",textTotalArea))
+      
+      # insertUI(selector='#teksSaveScenLand',
+      #          where = 'afterEnd',
+      #          ui = uiOutput("textTampilTotalArea"))
+      # browser()
+    })
+    
+    
+    # output$textTampilTotalArea <- renderUI({
+    #   fluidPage(
+    #     textOutput("showTotalArea")
+    #   )
+    # })
+    # 
+    # output$showTotalArea <- renderText(
+    #   
+    #   
+    # )
+    
+    observeEvent(input$scenLand_button,{
+      showModal(modalPilihBarisOutput())
+    }) 
     
     modalPilihBarisOutput <- function(failed = FALSE) {
       modalDialog( 
@@ -3389,7 +3687,8 @@ app <- shiny::shinyApp(
       } else if((is.null(dataDefine$addUtama) | is.null(dataDefine$addSampingan)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
         reactData$tableIO2 <- dataDefine$ioOutput
         yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
-        filterIO <-  dataDefine$ioOutput[,-(1:3)]
+        yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
+        filterIO <-  dataDefine$ioOutput[,c(paste0(c(rep("Y", yearIO)),1:yearIO))]
         addCol <- filterIO[,1:yearIOaddMin30] 
         
         yearIOadd <- as.numeric(input$ioYear_input)
@@ -3410,7 +3709,8 @@ app <- shiny::shinyApp(
       } else if((!is.null(dataDefine$addUtama) | !is.null(dataDefine$addSampingan)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
         reactData$tableIO2 <- dataDefine$ioOutput
         yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
-        filterIO <-  dataDefine$ioOutput[,-(1:3)]
+        yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
+        filterIO <-  dataDefine$ioOutput[,c(paste0(c(rep("Y", yearIO)),1:yearIO))]
         addCol <- filterIO[,1:yearIOaddMin30] 
         
         yearIOadd <- as.numeric(input$ioYear_input)
@@ -3576,6 +3876,7 @@ app <- shiny::shinyApp(
     }
     
     observeEvent(input$batalSunting_button_kuantitasInput,{
+      browser()
       removeModal()
     })
     
@@ -3621,7 +3922,8 @@ app <- shiny::shinyApp(
       } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
         reactData$tableIO1 <- dataDefine$ioInput
         yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
-        filterIO <-  dataDefine$ioInput[,-(1:3)]
+        yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
+        filterIO <-  dataDefine$ioInput[,c(paste0(c(rep("Y", yearIO)),1:yearIO))]
         addCol <- filterIO[,1:yearIOaddMin30] 
         
         yearIOadd <- as.numeric(input$ioYear_input)
@@ -3641,7 +3943,8 @@ app <- shiny::shinyApp(
       } else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
         reactData$tableIO1 <- dataDefine$ioInput
         yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
-        filterIO <-  dataDefine$ioInput[,-(1:3)]
+        yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
+        filterIO <-  dataDefine$ioInput[,c(paste0(c(rep("Y", yearIO)),1:yearIO))]
         addCol <- filterIO[,1:yearIOaddMin30] 
         
         yearIOadd <- as.numeric(input$ioYear_input)
@@ -3677,12 +3980,12 @@ app <- shiny::shinyApp(
     #                                                                              #
     #                                 MODAL  HARGA                                 #
     #                                                                              #
-    ################################################################################
+    ######################################F##########################################
     modalTabelHarga <- function(failed = FALSE) {
       modalDialog( 
         footer=tagList(
           actionButton(("batalButtonHarga"), "Batal", style="color: white;background-color: red;"),
-          actionButton(("capitalButton"), "Simpan Tabel dan Lanjutkan Membangun Tabel Modal Kapital",style="color: white;background-color: green;")
+          actionButton(("capitalButton"), "Simpan Tabel dan Lanjutkan",style="color: white;background-color: green;")
         ),
         argonTabSet(
           id = "tabHarga",
@@ -3737,7 +4040,7 @@ app <- shiny::shinyApp(
       
       dataDefine <- readRDS(fileName)
       
-      reactData$tableP2 <- dataDefine$ioOutput[,1:2]
+      reactData$tableP2 <- dataDefine$ioOutput[,c("komponen","jenis")]
       no.id <- as.numeric(rownames(reactData$tableP2))
       reactData$tableP2 <- cbind(no.id,reactData$tableP2)
       
@@ -3775,7 +4078,7 @@ app <- shiny::shinyApp(
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
-      reactData$tableP1 <- dataDefine$ioInput[,1:2]
+      reactData$tableP1 <- dataDefine$ioInput[,c("komponen","jenis")]
       no.id <- as.numeric(rownames(reactData$tableP1))
       reactData$tableP1 <- cbind(no.id,reactData$tableP1)
       
@@ -3813,14 +4116,38 @@ app <- shiny::shinyApp(
       
       # browser()
       
-      if(is.null(dataDefine$capital)){
-        showModal(modalTanpaCapital())
+      if(is.null(dataDefine$capital) & dataDefine$tipeKebun == "LARGE SCALE"){
+        showModal(modalLargeScale())
       }else if(!is.null(dataDefine$capital)){
         showModal(modalTabelCapital())
+      }else if(is.null(dataDefine$capital)){
+        showModal(modalTanpaCapital())
       }
       
       
     })
+    
+    modalLargeScale <- function(failed = FALSE) {
+      modalDialog( 
+        footer=tagList(
+          actionButton(("running_button_LargeScale"), "Jalankan Analisis",style="color: white;background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabNew",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Jalankan Analisis",
+            active = T,
+            h3("Silahkan menekan tombol JALANKAN ANALISIS untuk mendapatkan hasil simulasi", align = "center")
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
     
     modalTanpaCapital <- function(failed = FALSE) {
       modalDialog( 
