@@ -96,7 +96,8 @@ valJenisUtama<- eventReactive(input$showTabelAddUtama,{
     reactData$tableAddUtama[] <- lapply(reactData$tableAddUtama, as.character) #ubah dr faktor jd char
     reactData$tableAddUtama
   } else if (is.null(dataDefine$addUtama)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
     dataKomponen <- filter(dataKomponen,komponen == c("utama"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain utama ga masuk level faktor nya
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen utama aja
@@ -115,7 +116,6 @@ observeEvent(input$saveTambahBarisUtama,{
   
   editNew<-as.data.frame(hot_to_r(input$tabelTambahUtama))
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "utama", editNew)
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
@@ -123,7 +123,13 @@ observeEvent(input$saveTambahBarisUtama,{
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
-  # replace data price
+  # replace data 
+  if(dataDefine$tipeKebun == "LARGE SCALE"){
+    editNew <- cbind(bagian = "output",komponen = "utama", editNew)
+  }else{
+    editNew <- cbind(komponen = "utama", editNew)
+  }
+  
   dataDefine$addUtama <- editNew
   saveRDS(dataDefine,file = fileName)
   
@@ -182,7 +188,8 @@ valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
     reactData$tableAddSampingan[] <- lapply(reactData$tableAddSampingan, as.character) #ubah dr faktor jd char
     reactData$tableAddSampingan
   } else if (is.null(dataDefine$addSampingan)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
+    # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
     dataKomponen <- filter(dataKomponen,komponen == c("sampingan"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain Sampingan ga masuk level faktor nya
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen Sampingan aja
@@ -200,7 +207,7 @@ observeEvent(input$saveTambahBarisSampingan,{
   
   editNew<-as.data.frame(hot_to_r(input$tabelTambahSampingan))
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "sampingan", editNew)
+  # editNew <- cbind(komponen = "sampingan", editNew)
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
@@ -208,7 +215,13 @@ observeEvent(input$saveTambahBarisSampingan,{
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
   dataDefine <- readRDS(fileName)
   
-  # replace data price
+  # replace data 
+  if(dataDefine$tipeKebun == "LARGE SCALE"){
+    editNew <- cbind(bagian = "output",komponen = "sampingan", editNew)
+  }else{
+    editNew <- cbind(komponen = "sampingan", editNew)
+  }
+  
   dataDefine$addSampingan <- editNew
   saveRDS(dataDefine,file = fileName)
   

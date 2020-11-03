@@ -108,27 +108,12 @@ output$showRhandsAddPupuk <- renderUI({
   
 })
 
-observeEvent(input$saveTambahBarisPupuk,{
-  # browser()
-  removeUI(selector='#textTampilSaveTambahPupuk')
-  
-  editNew<-as.data.frame(hot_to_r(input$tabelTambahPupuk))
-  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "pupuk", editNew)
-  
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-  fileName <- paste0(datapath,"saveData","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  # replace data price
-  dataDefine$addPupuk <- editNew
-  saveRDS(dataDefine,file = fileName)
-  
-  insertUI(selector='#teksSaveTambahPupuk',
-           where = 'afterEnd',
-           ui = tags$div(id="textTampilSaveTambahPupuk","tabel di atas sudah tersimpan"))
+output$tabelTambahPupuk <- renderRHandsontable({
+  rhandsontable(valJenisPupuk(),
+                rowHeaderWidth = 50,
+                fixedColumnsLeft = 2,
+                height = 300
+  )
 })
 
 
@@ -146,25 +131,52 @@ valJenisPupuk <- eventReactive(input$showTabelAddPupuk,{
     rownames(reactData$tableAddPupuk) <- c(1:nrow(reactData$tableAddPupuk))
     reactData$tableAddPupuk
   } else if (is.null(dataDefine$addPupuk)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("pupuk"))
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    dataKomponen <- filter(dataKomponen,komponen == c("pupuk"))
     dataKomponen <- lowcase(dataKomponen,c(2:ncol(dataKomponen)))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain pupuk ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen pupuk aja
-    reactData$tableAddPupuk <- as.data.frame(dataKomponen[,c(3:4)])
+    reactData$tableAddPupuk <- as.data.frame(dataKomponen[,c("jenis","unit")])
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk),])
     rownames(reactData$tableAddPupuk) <- c(1:nrow(reactData$tableAddPupuk))
     reactData$tableAddPupuk
   } 
-
+  
 })
 
-output$tabelTambahPupuk <- renderRHandsontable({
-  rhandsontable(valJenisPupuk(),
-                rowHeaderWidth = 50,
-                fixedColumnsLeft = 2,
-                height = 300
-  )
+
+observeEvent(input$saveTambahBarisPupuk,{
+  # browser()
+  removeUI(selector='#textTampilSaveTambahPupuk')
+  
+  editNew<-as.data.frame(hot_to_r(input$tabelTambahPupuk))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  editNew <- cbind(komponen = "pupuk", editNew)
+  
+  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  fileName <- paste0(datapath,"saveData","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  # replace data
+  # if(dataDefine$tipeKebun == "LARGE SCALE"){
+  #   editNew <- cbind(bagian = "tradable input",komponen = "pupuk", editNew)
+  # }else{
+  #   editNew <- cbind(komponen = "pupuk", editNew)
+  # }
+  # 
+  
+  dataDefine$addPupuk <- editNew
+  saveRDS(dataDefine,file = fileName)
+  
+  insertUI(selector='#teksSaveTambahPupuk',
+           where = 'afterEnd',
+           ui = tags$div(id="textTampilSaveTambahPupuk","tabel di atas sudah tersimpan"))
 })
+
+
+
 
 ################################################################################
 #                                                                              #
@@ -189,31 +201,6 @@ output$showRhandsAddBibit <- renderUI({
   ))
   
 })
-
-observeEvent(input$saveTambahBarisBibit,{
-  # browser()
-  removeUI(selector='#textTampilSaveTambahBibit')
-  
-  editNew<-as.data.frame(hot_to_r(input$tabelTambahBibit))
-  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "bibit", editNew)
-  
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-  fileName <- paste0(datapath,"saveData","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  # replace data price
-  dataDefine$addBibit <- editNew
-  saveRDS(dataDefine,file = fileName)
-  
-  insertUI(selector='#teksSaveTambahBibit',
-           where = 'afterEnd',
-           ui = tags$div(id="textTampilSaveTambahBibit","tabel di atas sudah tersimpan"))
-})
-
-
 valJenisBibit <- eventReactive(input$showTabelAddBibit,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -229,10 +216,11 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
     reactData$tableAddBibit[] <- lapply(reactData$tableAddBibit, as.character) #ubah dr faktor jd char
     reactData$tableAddBibit
   } else if (is.null(dataDefine$addBibit)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("bibit"))
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    dataKomponen <- filter(dataKomponen,komponen == c("bibit"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain bibit ga masuk level faktor nya
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen bibit aja
-    reactData$tableAddBibit <- as.data.frame(dataKomponen[,c(3:4)])
+    reactData$tableAddBibit <- as.data.frame(dataKomponen[,c("jenis","unit")])
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
     rownames(reactData$tableAddBibit) <- c(1:nrow(reactData$tableAddBibit))
     reactData$tableAddBibit
@@ -247,6 +235,32 @@ output$tabelTambahBibit <- renderRHandsontable({
                 height = 300
   )
 })
+
+
+observeEvent(input$saveTambahBarisBibit,{
+  # browser()
+  removeUI(selector='#textTampilSaveTambahBibit')
+  
+  editNew<-as.data.frame(hot_to_r(input$tabelTambahBibit))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  editNew <- cbind(komponen = "bibit", editNew)
+  
+  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  fileName <- paste0(datapath,"saveData","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  # replace data
+  dataDefine$addBibit <- editNew
+  saveRDS(dataDefine,file = fileName)
+  
+  insertUI(selector='#teksSaveTambahBibit',
+           where = 'afterEnd',
+           ui = tags$div(id="textTampilSaveTambahBibit","tabel di atas sudah tersimpan"))
+})
+
+
 
 ################################################################################
 #                                                                              #
@@ -272,30 +286,6 @@ output$showRhandsAddPeralatan <- renderUI({
   
 })
 
-observeEvent(input$saveTambahBarisPeralatan,{
-  # browser()
-  removeUI(selector='#textTampilSaveTambahPeralatan')
-  
-  editNew<-as.data.frame(hot_to_r(input$tabelTambahPeralatan))
-  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "Peralatan", editNew)
-  
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-  fileName <- paste0(datapath,"saveData","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  # replace data price
-  dataDefine$addPeralatan <- editNew
-  saveRDS(dataDefine,file = fileName)
-  
-  insertUI(selector='#teksSaveTambahPeralatan',
-           where = 'afterEnd',
-           ui = tags$div(id="textTampilSaveTambahPeralatan","tabel di atas sudah tersimpan"))
-})
-
-
 valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -308,13 +298,14 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
     reactData$tableAddPeralatan <- as.data.frame(dataDefine$addPeralatan[,-1])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
     rownames(reactData$tableAddPeralatan) <- c(1:nrow(reactData$tableAddPeralatan))
-    reactData$tableAddPeralatant[] <- lapply(reactData$tableAddPeralatant, as.character) #ubah dr faktor jd char
-    reactData$tableAddPeralatant
+    reactData$tableAddPeralatan[] <- lapply(reactData$tableAddPeralatan, as.character) #ubah dr faktor jd char
+    reactData$tableAddPeralatan
   } else if (is.null(dataDefine$addPeralatan)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("peralatan"))
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    dataKomponen <- filter(dataKomponen,komponen == c("peralatan"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain peralatan ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen peralatan aja
-    reactData$tableAddPeralatan <- as.data.frame(dataKomponen[,c(3:4)])
+    reactData$tableAddPeralatan <- as.data.frame(dataKomponen[,c("jenis","unit")])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
     rownames(reactData$tableAddPeralatan) <- c(1:nrow(reactData$tableAddPeralatan))
     reactData$tableAddPeralatan
@@ -329,6 +320,32 @@ output$tabelTambahPeralatan <- renderRHandsontable({
                 height = 300
   )
 })
+
+
+observeEvent(input$saveTambahBarisPeralatan,{
+  # browser()
+  removeUI(selector='#textTampilSaveTambahPeralatan')
+  
+  editNew<-as.data.frame(hot_to_r(input$tabelTambahPeralatan))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  editNew <- cbind(komponen = "Peralatan", editNew)
+  
+  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  fileName <- paste0(datapath,"saveData","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  # replace data 
+  dataDefine$addPeralatan <- editNew
+  saveRDS(dataDefine,file = fileName)
+  
+  insertUI(selector='#teksSaveTambahPeralatan',
+           where = 'afterEnd',
+           ui = tags$div(id="textTampilSaveTambahPeralatan","tabel di atas sudah tersimpan"))
+})
+
+
 
 ################################################################################
 #                                                                              #
@@ -354,30 +371,6 @@ output$showRhandsAddTK <- renderUI({
   
 })
 
-observeEvent(input$saveTambahBarisTK,{
-  # browser()
-  removeUI(selector='#textTampilSaveTambahTK')
-  
-  editNew<-as.data.frame(hot_to_r(input$tabelTambahTK))
-  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
-  editNew <- cbind(komponen = "tenaga kerja", editNew)
-  
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
-  fileName <- paste0(datapath,"saveData","_",
-                     input$sut,"_",input$kom,"_",
-                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-  dataDefine <- readRDS(fileName)
-  
-  # replace data price
-  dataDefine$addTK <- editNew
-  saveRDS(dataDefine,file = fileName)
-  
-  insertUI(selector='#teksSaveTambahTK',
-           where = 'afterEnd',
-           ui = tags$div(id="textTampilSaveTambahTK","tabel di atas sudah tersimpan"))
-})
-
-
 valJenisTK <- eventReactive(input$showTabelAddTK,{
   
   datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
@@ -394,10 +387,11 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
     reactData$tableAddTK
   } else if (is.null(dataDefine$addTK)){
     # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("tenaga kerja"))
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    dataKomponen <- filter(dataKomponen,komponen == c("tenaga kerja"))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain TK ga masuk level faktor nya
     dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen TK aja
-    reactData$tableAddTK <- as.data.frame(dataKomponen[,c(3:4)])
+    reactData$tableAddTK <- as.data.frame(dataKomponen[,c("jenis","unit")])
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
     rownames(reactData$tableAddTK) <- c(1:nrow(reactData$tableAddTK))
     reactData$tableAddTK
@@ -412,6 +406,32 @@ output$tabelTambahTK <- renderRHandsontable({
                 height = 300
   )
 })
+
+
+observeEvent(input$saveTambahBarisTK,{
+  # browser()
+  removeUI(selector='#textTampilSaveTambahTK')
+  
+  editNew<-as.data.frame(hot_to_r(input$tabelTambahTK))
+  editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+  editNew <- cbind(komponen = "tenaga kerja", editNew)
+  
+  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  fileName <- paste0(datapath,"saveData","_",
+                     input$sut,"_",input$kom,"_",
+                     input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+  dataDefine <- readRDS(fileName)
+  
+  # replace data 
+  dataDefine$addTK <- editNew
+  saveRDS(dataDefine,file = fileName)
+  
+  insertUI(selector='#teksSaveTambahTK',
+           where = 'afterEnd',
+           ui = tags$div(id="textTampilSaveTambahTK","tabel di atas sudah tersimpan"))
+})
+
+
 
 
 

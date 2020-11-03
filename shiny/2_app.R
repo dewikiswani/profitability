@@ -106,7 +106,12 @@ app <- shiny::shinyApp(
       tableAddCapPrivat = NULL,
       tableAddCapSosial = NULL,
       tableCapitalAll = NULL,
-      tableScenLand = NULL
+      tableScenLand = NULL,
+      tableAddBahanKimia = NULL,
+      tableAddTradCapital = NULL,
+      tableAddTKAhli = NULL,
+      tableAddTKUnskilled = NULL,
+      tableAddFactorCapital = NULL
     )
     
     # Section preparation data ---------
@@ -1903,11 +1908,18 @@ app <- shiny::shinyApp(
         hp
         
         # ending  hp ------------------------------------------------------- 
+        
+        # Total area
+        totArea <- data.frame(dataDefine$totalArea)
+        colnames(totArea)<-c("Total Area (Ha)")
+        rownames(totArea) <- c("Value")
+        totArea
+        
         tabel1 <- rbind(hsl.npv,ypc,lfe,lfo)
         tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
         tabel1
         
-        tabel2 <- data.frame(t(hp))
+        tabel2 <- data.frame(t(cbind(hp,totArea)))
         tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
         tabel2
         
@@ -2554,13 +2566,29 @@ app <- shiny::shinyApp(
         saveRDS(dataDefine,file = fileName)
         
         # ending  hp ------------------------------------------------------- 
+        
+        # Total area
+        totArea <- data.frame(dataDefine$totalArea)
+        colnames(totArea)<-c("Total Area (Ha)")
+        rownames(totArea) <- c("Value")
+        totArea
+        
         tabel1 <- rbind(hsl.npv,ypc,lfe,lfo)
         tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
         tabel1
         
-        tabel2 <- data.frame(t(hp))
+        tabel2 <- data.frame(t(cbind(hp,totArea)))
         tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
         tabel2
+        
+        
+        # tabel1 <- rbind(hsl.npv,ypc,lfe,lfo)
+        # tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
+        # tabel1
+        # 
+        # tabel2 <- data.frame(t(hp))
+        # tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
+        # tabel2
         
         # tabel profit 
         tabel.p.profit <- t(as.data.frame(t(p.profit.ha)))
@@ -3576,7 +3604,7 @@ app <- shiny::shinyApp(
               column(9,
                      selectInput('pilihKomponenOutput',"Pilih Komponen", width = "600px", 
                                  choices = c(" ","utama", "sampingan")),
-                     #dibuat manipulasi option nilai kosong krn utk mengaktifkan nilai input$pilihKomponenInput saat user kedua kalinya masuk 
+                     #dibuat manipulasi option nilai kosong krn utk mengaktifkan nilai input$pilihKomponenOutput saat user kedua kalinya masuk 
                      
               ),
               column(3,
@@ -3657,7 +3685,7 @@ app <- shiny::shinyApp(
                     fixedColumnsLeft = 2,
                     height = 300
       )%>%
-        hot_col(1, readOnly = TRUE)
+        hot_col(c(1:3), readOnly = TRUE)
     })
     
     valIO2 <- eventReactive(c(input$sunting_button_2_output,input$sunting_button_3_output),{
@@ -3773,13 +3801,75 @@ app <- shiny::shinyApp(
     
     
     observeEvent(input$sunting_button_2_input,{
-      if (input$ioKomponen_input == "Ya"){
-        showModal(modalTambahBarisInput()) 
+      datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDefine <- readRDS(fileName)
+      
+      
+      if (input$ioKomponen_input == "Ya" & dataDefine$tipeKebun == "LARGE SCALE"){
+        showModal(modalTambahBarisInputLargeScale())
+      }else if(input$ioKomponen_input == "Ya" & dataDefine$tipeKebun != "LARGE SCALE"){
+        showModal(modalTambahBarisInput())
       }else if(input$ioKomponen_input == "Tidak"){
         showModal(suntingTabelKuantitas_input())
       }
+      
+      # if (input$ioKomponen_input == "Ya"){
+      #   showModal(modalTambahBarisInput())
+      # }else if(input$ioKomponen_input == "Tidak"){
+      #   showModal(suntingTabelKuantitas_input())
+      # }
     })
     
+    
+    modalTambahBarisInputLargeScale <- function(failed = FALSE) {
+      modalDialog(
+        footer=tagList(
+          actionButton(("sunting_button_3_inputLargeScale"),"Lanjut",style="color: white;
+                         background-color: green;")
+        ),
+        argonTabSet(
+          id = "tabSunting3",
+          card_wrapper = TRUE,
+          horizontal = TRUE,
+          circle = FALSE,
+          size = "l",
+          width = 12,
+          argonTab(
+            tabName = "Sunting Tabel Kuantitas (Input)",
+            active = T,
+            fluidRow(
+              column(9,
+                     selectInput('pilihKomponenInput_LargeScale',"Pilih Komponen", width = "600px",
+                                 choices = c(" ","pupuk","bibit" ,"peralatan", "bahan kimia","tradable capital","tenaga kerja ahli","tenaga kerja unskilled","factor capital")),
+                     #dibuat manipulasi option nilai kosong krn utk mengaktifkan nilai input$pilihKomponenInput_LargeScale saat user kedua kalinya masuk
+
+              ),
+              column(3,
+                     br(),
+                     actionButton("showTabelJenis_LargeScale","pilih jumlah baris")
+              ),
+              column(12,
+                     tags$div(id = 'uiShowTablePilihJenisInput_LargeScale')
+              )
+            )
+          ))
+        ,
+        size="l",
+        easyClose = FALSE)
+    }
+
+    observeEvent(input$pilihKomponenInput_LargeScale,{
+      removeUI(selector='#showTablePilihJenisInput_LargeScale')
+    })
+
+    observeEvent(input$showTabelJenis_LargeScale,{
+      insertUI(selector='#uiShowTablePilihJenisInput_LargeScale',
+               where='afterEnd',
+               ui= uiOutput('showTablePilihJenisInput_LargeScale'))
+    })
     
     modalTambahBarisInput <- function(failed = FALSE) {
       modalDialog(
@@ -3835,10 +3925,13 @@ app <- shiny::shinyApp(
     #                      MODAL DIALOG PILIH KOMPONEN INPUT                       #
     #                                                                              #
     ################################################################################
-    
+    source("shiny/server/showTablePilihJenisInput_LargeScale.R", local = TRUE)
     source("shiny/server/showTablePilihJenisInput.R", local = TRUE)
     
     # End -  Modal Pilih Komponen Input ----------------------------------------
+    observeEvent(input$sunting_button_3_inputLargeScale,{
+      showModal(suntingTabelKuantitas_input())
+    })
     
     observeEvent(input$sunting_button_3_input,{
       showModal(suntingTabelKuantitas_input())
@@ -3892,7 +3985,7 @@ app <- shiny::shinyApp(
                     fixedColumnsLeft = 2,
                     height = 300,
       )%>%
-        hot_col(1, readOnly = TRUE)
+        hot_col(c(1:3), readOnly = TRUE)
     })
     
     valIO1 <- eventReactive(c(input$sunting_button_2_input,input$sunting_button_3_input),{
@@ -3902,24 +3995,31 @@ app <- shiny::shinyApp(
                          input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
-      if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
+      if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK) 
+          |is.null(dataDefine$addTKUnskilled) |is.null(dataDefine$addBahanKimia) |is.null(dataDefine$addTradCapital) | is.null(dataDefine$addFactorCapital)) & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
         reactData$tableIO1 <- dataDefine$ioInput
         reactData$tableIO1
-      } else if  ((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK))  & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
+      } else if  ((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)
+                   |!is.null(dataDefine$addTKUnskilled) |!is.null(dataDefine$addBahanKimia) |!is.null(dataDefine$addTradCapital) | !is.null(dataDefine$addFactorCapital))  & input$ioYear_input == 30 & input$ioKomponen_input == "Tidak"){
         reactData$tableIO1 <- dataDefine$ioInput
         reactData$tableIO1
-      } else if ((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK))  & input$ioYear_input == 30 & input$ioKomponen_input == "Ya"){
-        reactData$tableIO1 <- bind_rows(dataDefine$ioInput,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
+      } else if ((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)
+                  |!is.null(dataDefine$addTKUnskilled) |!is.null(dataDefine$addBahanKimia) |!is.null(dataDefine$addTradCapital) | !is.null(dataDefine$addFactorCapital))  & input$ioYear_input == 30 & input$ioKomponen_input == "Ya"){
+        reactData$tableIO1 <- bind_rows(dataDefine$ioInput,dataDefine$addPupuk,dataDefine$addBahanKimia,dataDefine$addBibit,dataDefine$addPeralatan,
+                                        dataDefine$addTK,dataDefine$addTKUnskilled,dataDefine$addTradCapital,dataDefine$addFactorCapital) 
         reactData$tableIO1
-      } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
+      } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)
+                 |is.null(dataDefine$addTKUnskilled) |is.null(dataDefine$addBahanKimia) |is.null(dataDefine$addTradCapital) | is.null(dataDefine$addFactorCapital)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
         reactData$tableIO1 <- dataDefine$ioInput
         yearIOadd <- as.numeric(input$ioYear_input)
         addCol <- data.frame(matrix(0, nrow = nrow(dataDefine$ioInput), ncol = yearIOadd - 30))
         colnames(addCol)<-paste0(c(rep("Y", yearIOadd)),1:yearIOadd)[31:yearIOadd] # start dari thun 31 utk nama kolom baru
         addCol <- cbind(dataDefine$ioInput,addCol)
-        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
+        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBahanKimia,dataDefine$addBibit,dataDefine$addPeralatan,
+                                        dataDefine$addTK,dataDefine$addTKUnskilled,dataDefine$addTradCapital,dataDefine$addFactorCapital) 
         reactData$tableIO1
-      } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
+      } else if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK)
+                 |is.null(dataDefine$addTKUnskilled) |is.null(dataDefine$addBahanKimia) |is.null(dataDefine$addTradCapital) | is.null(dataDefine$addFactorCapital)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
         reactData$tableIO1 <- dataDefine$ioInput
         yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
         yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
@@ -3929,18 +4029,22 @@ app <- shiny::shinyApp(
         yearIOadd <- as.numeric(input$ioYear_input)
         colnames(addCol)<-paste0(c(rep("Y", ncol(addCol))),31:yearIOadd)
         addCol <- cbind(dataDefine$ioInput,addCol)
-        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK)
+        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBahanKimia,dataDefine$addBibit,dataDefine$addPeralatan,
+                                        dataDefine$addTK,dataDefine$addTKUnskilled,dataDefine$addTradCapital,dataDefine$addFactorCapital)
         reactData$tableIO1
-      }else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
+      }else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)
+                |!is.null(dataDefine$addTKUnskilled) |!is.null(dataDefine$addBahanKimia) |!is.null(dataDefine$addTradCapital) | !is.null(dataDefine$addFactorCapital)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi nilai 0" ){
         reactData$tableIO1 <- dataDefine$ioInput
         yearIOadd <- as.numeric(input$ioYear_input)
         addCol <- data.frame(matrix(0, nrow = nrow(dataDefine$ioInput), ncol = yearIOadd - 30))
         colnames(addCol)<-paste0(c(rep("Y", yearIOadd)),1:yearIOadd)[31:yearIOadd] # start dari thun 31 utk nama kolom baru
         addCol <- cbind(dataDefine$ioInput,addCol)
-        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
+        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBahanKimia,dataDefine$addBibit,dataDefine$addPeralatan,
+                                        dataDefine$addTK,dataDefine$addTKUnskilled,dataDefine$addTradCapital,dataDefine$addFactorCapital) 
         reactData$tableIO1
         
-      } else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
+      } else if((!is.null(dataDefine$addPupuk) | !is.null(dataDefine$addBibit) | !is.null(dataDefine$addPeralatan) |!is.null(dataDefine$addTK)
+                 |!is.null(dataDefine$addTKUnskilled) |!is.null(dataDefine$addBahanKimia) |!is.null(dataDefine$addTradCapital) | !is.null(dataDefine$addFactorCapital)) & input$ioYear_input > 30 & input$ioTipeDaurTanam == "tabel berisi data template diambil dari tahun ke-1" ){
         reactData$tableIO1 <- dataDefine$ioInput
         yearIOaddMin30 <- as.numeric(input$ioYear_input) - 30
         yearIO <- as.numeric(input$ioYear_input) - yearIOaddMin30
@@ -3950,7 +4054,8 @@ app <- shiny::shinyApp(
         yearIOadd <- as.numeric(input$ioYear_input)
         colnames(addCol)<-paste0(c(rep("Y", ncol(addCol))),31:yearIOadd)
         addCol <- cbind(dataDefine$ioInput,addCol)
-        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBibit,dataDefine$addPeralatan,dataDefine$addTK) 
+        reactData$tableIO1 <- bind_rows(addCol,dataDefine$addPupuk,dataDefine$addBahanKimia,dataDefine$addBibit,dataDefine$addPeralatan,
+                                        dataDefine$addTK,dataDefine$addTKUnskilled,dataDefine$addTradCapital,dataDefine$addFactorCapital) 
         reactData$tableIO1
         
       }
@@ -3969,6 +4074,12 @@ app <- shiny::shinyApp(
       
       editNew<-as.data.frame(hot_to_r(input$suntingKuantitasInput))
       editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+      
+      # if(dataDefine$tipeKebun == "LARGE SCALE"){
+      #   editNew[,1] <- as.factor(editNew[,1]) #ubah char jd faktor, spy bs di drop down
+      # }
+      
+      
       
       dataDefine$ioInput <- editNew
       
@@ -4271,7 +4382,6 @@ app <- shiny::shinyApp(
               column(9,
                      selectInput('pilihKomponenCapital',"Pilih Komponen", width = "600px", 
                                  choices = c(" ","privat", "sosial")),
-                     #dibuat manipulasi option nilai kosong krn utk mengaktifkan nilai input$pilihKomponenInput saat user kedua kalinya masuk 
                      
               ),
               column(3,
