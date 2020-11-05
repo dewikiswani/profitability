@@ -2819,13 +2819,13 @@ app <- shiny::shinyApp(
         ############# PERHITUNGAN HARVESTING PRODUCT
         fil.prod <- dataGeneral %>%  filter(str_detect(grup,"output")) #filter io untuk grup output (hasil panen)
         fil.prod <- fil.prod %>%  filter(str_detect(komponen,"utama"))
-        sum.prod <- fil.prod[,-c(1:5,36)] %>%
+        sum.prod <- fil.prod[,-c(1:5,ncol(fil.prod))] %>%
           colSums(na.rm = T)
         tot.prod <- sum(sum.prod)
         
         fil.labor <- dataGeneral %>%  filter(str_detect(komponen, c("tenaga kerja")))
         fil.labor <- filter(fil.labor, str_detect(unit, c("hok")))
-        sum.labor <- fil.labor[,-c(1:5,36)] %>%
+        sum.labor <- fil.labor[,-c(1:5,ncol(fil.prod))] %>%
           colSums(na.rm = T)
         tot.labor <- sum(sum.labor)
         
@@ -4101,7 +4101,7 @@ app <- shiny::shinyApp(
       modalDialog( 
         footer=tagList(
           actionButton(("batalButtonHarga"), "Batal", style="color: white;background-color: red;"),
-          actionButton(("capitalButton"), "Simpan Tabel dan Lanjutkan",style="color: white;background-color: green;")
+          actionButton(("capitalButtonNext"), "Simpan Tabel dan Lanjutkan",style="color: white;background-color: green;")
         ),
         argonTabSet(
           id = "tabHarga",
@@ -4134,7 +4134,8 @@ app <- shiny::shinyApp(
                     rowHeaderWidth = 50,
                     fixedColumnsLeft = 2,
                     height = 100,
-      )
+      )%>%
+        hot_col(c(1:3), readOnly = TRUE)
     })
     
     
@@ -4176,7 +4177,8 @@ app <- shiny::shinyApp(
                     rowHeaderWidth = 50,
                     fixedColumnsLeft = 2,
                     height = 600,
-      )
+      )%>%
+        hot_col(c(1:3), readOnly = TRUE)
     })
     
     valP1 <- eventReactive(input$sunting_button_4,{
@@ -4211,7 +4213,7 @@ app <- shiny::shinyApp(
     })
     
 
-    observeEvent(input$capitalButton,{
+    observeEvent(input$capitalButtonNext,{
       # save data untuk setiap perubahan
       datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
@@ -4227,20 +4229,45 @@ app <- shiny::shinyApp(
       
       dataDefine$priceInput <- editNewP1
       dataDefine$priceOutput <- editNewP2
-      
       saveRDS(dataDefine,file = fileName)
-      
-      # browser()
+      print("cek tabel modal kapital dan tipe kebun")
       
       if(is.null(dataDefine$capital) & dataDefine$tipeKebun == "LARGE SCALE"){
+        
+        # editNewP1<-as.data.frame(hot_to_r(input$hargaInput))
+        # editNewP1[is.na(editNewP1)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+        # 
+        # editNewP2<-as.data.frame(hot_to_r(input$hargaOutput))
+        # editNewP2[is.na(editNewP2)] <- 0 
+        # 
+        # dataDefine$priceInput <- editNewP1
+        # dataDefine$priceOutput <- editNewP2
+        # saveRDS(dataDefine,file = fileName)
         showModal(modalLargeScale())
-      }else if(!is.null(dataDefine$capital)){
+      }else if(!is.null(dataDefine$capital) & dataDefine$tipeKebun != "LARGE SCALE"){
+        
+        # editNewP1<-as.data.frame(hot_to_r(input$hargaInput))
+        # editNewP1[is.na(editNewP1)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+        # 
+        # editNewP2<-as.data.frame(hot_to_r(input$hargaOutput))
+        # editNewP2[is.na(editNewP2)] <- 0 
+        # 
+        # dataDefine$priceInput <- editNewP1
+        # dataDefine$priceOutput <- editNewP2
+        # saveRDS(dataDefine,file = fileName)
         showModal(modalTabelCapital())
-      }else if(is.null(dataDefine$capital)){
+      }else if(is.null(dataDefine$capital) & dataDefine$tipeKebun != "LARGE SCALE"){
+        # editNewP1<-as.data.frame(hot_to_r(input$hargaInput))
+        # editNewP1[is.na(editNewP1)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
+        # 
+        # editNewP2<-as.data.frame(hot_to_r(input$hargaOutput))
+        # editNewP2[is.na(editNewP2)] <- 0 
+        # 
+        # dataDefine$priceInput <- editNewP1
+        # dataDefine$priceOutput <- editNewP2
+        # saveRDS(dataDefine,file = fileName)
         showModal(modalTanpaCapital())
       }
-      
-      
     })
     
     modalLargeScale <- function(failed = FALSE) {
@@ -4296,7 +4323,7 @@ app <- shiny::shinyApp(
     modalTabelCapital <- function(failed = FALSE) {
       modalDialog( 
         footer=tagList(
-          # actionButton(("running_button"), "Jalankan Analisis",style="color: white;background-color: green;")
+          # actionButton(("apalah_button"), "Jalankan Analisis",style="color: white;background-color: green;")
         ),
         argonTabSet(
           id = "tabNew",

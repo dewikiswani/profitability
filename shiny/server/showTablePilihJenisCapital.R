@@ -91,19 +91,23 @@ valJenisPrivat<- eventReactive(input$showTabelAddCapPrivat,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addCapPrivat)){
-    reactData$tableAddCapPrivat <- as.data.frame(dataDefine$addCapPrivat[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddCapPrivat <- as.data.frame(dataDefine$addCapPrivat[,c("jenis","unit.harga")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddCapPrivat <- as.data.frame(reactData$tableAddCapPrivat[1:as.numeric(input$tambahBarisPrivat),])
     rownames(reactData$tableAddCapPrivat) <- c(1:nrow(reactData$tableAddCapPrivat))
     reactData$tableAddCapPrivat[] <- lapply(reactData$tableAddCapPrivat, as.character) #ubah dr faktor jd char
     reactData$tableAddCapPrivat
   } else if (is.null(dataDefine$addCapPrivat)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("modal kapital privat"))
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    dataKomponen <- filter(dataKomponen,komponen == c("modal kapital privat"))
+    dataKomponen <- lowcase(dataKomponen,c(2:ncol(dataKomponen)))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain privat ga masuk level faktor nya
-    reactData$tableAddCapPrivat <- as.data.frame(dataKomponen[,c(3)])
+    # reactData$tableAddCapPrivat <- as.data.frame(dataKomponen[,c(3)])
+    # reactData$tableAddCapPrivat <- as.data.frame(reactData$tableAddCapPrivat[1:as.numeric(input$tambahBarisPrivat),])
+    # colnames(reactData$tableAddCapPrivat) <- c("jenis")
+    reactData$tableAddCapPrivat <- as.data.frame(dataKomponen[,c("jenis","unit.harga")])
     reactData$tableAddCapPrivat <- as.data.frame(reactData$tableAddCapPrivat[1:as.numeric(input$tambahBarisPrivat),])
-    colnames(reactData$tableAddCapPrivat) <- c("jenis")
     rownames(reactData$tableAddCapPrivat) <- c(1:input$tambahBarisPrivat)
-    reactData$tableAddCapPrivat <- cbind(reactData$tableAddCapPrivat, unit.harga="rp")
+    # reactData$tableAddCapPrivat <- cbind(reactData$tableAddCapPrivat, unit.harga="rp")
     reactData$tableAddCapPrivat
   } 
   
@@ -178,19 +182,24 @@ valJenisSosial<- eventReactive(input$showTabelAddCapSosial,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addCapSosial)){
-    reactData$tableAddCapSosial <- as.data.frame(dataDefine$addCapSosial[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddCapSosial <- as.data.frame(dataDefine$addCapSosial[,c("jenis","unit.harga")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddCapSosial <- as.data.frame(reactData$tableAddCapSosial[1:as.numeric(input$tambahBarisSosial),])
     rownames(reactData$tableAddCapSosial) <- c(1:nrow(reactData$tableAddCapSosial))
     reactData$tableAddCapSosial[] <- lapply(reactData$tableAddCapSosial, as.character) #ubah dr faktor jd char
     reactData$tableAddCapSosial
   } else if (is.null(dataDefine$addCapSosial)){
-    dataKomponen <- filter(kumpulanDataJenisInputOutput,komponen == c("modal kapital sosial"))
+    
+    dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
+    dataKomponen <- filter(dataKomponen,komponen == c("modal kapital sosial"))
+    dataKomponen <- lowcase(dataKomponen,c(2:ncol(dataKomponen)))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain sosial ga masuk level faktor nya
-    reactData$tableAddCapSosial <- as.data.frame(dataKomponen[,c(3)])
+    # reactData$tableAddCapSosial <- as.data.frame(dataKomponen[,c(3)])
+    # reactData$tableAddCapSosial <- as.data.frame(reactData$tableAddCapSosial[1:as.numeric(input$tambahBarisSosial),])
+    # colnames(reactData$tableAddCapSosial) <- c("jenis")
+    reactData$tableAddCapSosial <- as.data.frame(dataKomponen[,c("jenis","unit.harga")])
     reactData$tableAddCapSosial <- as.data.frame(reactData$tableAddCapSosial[1:as.numeric(input$tambahBarisSosial),])
-    colnames(reactData$tableAddCapSosial) <- c("jenis")
     rownames(reactData$tableAddCapSosial) <- c(1:input$tambahBarisSosial)
-    reactData$tableAddCapSosial <- cbind(reactData$tableAddCapSosial, unit.harga="rp")
+    # reactData$tableAddCapSosial <- cbind(reactData$tableAddCapSosial, unit.harga="rp")
     reactData$tableAddCapSosial
   } 
   
