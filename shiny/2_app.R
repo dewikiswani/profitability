@@ -322,6 +322,7 @@ app <- shiny::shinyApp(
         dataDefine$tipeLahan <- input$tipeLahan
         dataDefine$tipeKebun <- readDataTemplate$tipe.kebun[1]
         dataDefine$totalArea <- readDataTemplate$total.area[1]
+        dataDefine$lokasi <- readDataTemplate$lokasi[1]
         dataDefine$tipeData <- c("BAU")
         
         #### io  ####    
@@ -736,6 +737,7 @@ app <- shiny::shinyApp(
         dataDefine$th <- input$th
         dataDefine$tipeLahan <- input$tipeLahan
         dataDefine$tipeKebun <- readDataTemplate$tipe.kebun[1]
+        dataDefine$lokasi <- readDataTemplate$lokasi[1]
         dataDefine$tipeData <- c("BAU")
         
         
@@ -787,7 +789,7 @@ app <- shiny::shinyApp(
           # hitung npv --------------------------------------------------------------
           dataGeneral <- filter(data.gab,status == c("general")) #filter data input output (yg sudah diberi status=general)
           dataPrivat <- filter(data.gab,status == c("harga.privat")) #filter data private price
-          p.budget <- dataGeneral[-(c(1:5,ncol(dataGeneral)))] * dataPrivat[-c(ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
+          p.budget <- dataGeneral[-(c(1:5,ncol(dataGeneral)))] * dataPrivat[-c(1:5,ncol(dataPrivat))] #perkalian antara unit pada tabel io dg price tanpa variabel 1 sd 5, kolom terakhir adalah kolom unit harga
           p.budget <- cbind(dataGeneral[c(1:4)],dataPrivat["unit.harga"],p.budget) #memunculkan kembali variabel 1 sd 5
           p.budget <- p.budget %>%
             mutate(status = case_when(status == "general" ~ "privat budget")) #mengubah status yg General mjd Private Budget (hasil perkalian io dengan harga privat lalu di tambah modal kapital)
@@ -1030,20 +1032,20 @@ app <- shiny::shinyApp(
     
     # Section input informasi umum  dan asumsi makcro---------------------------------------------
     observeEvent(c(input$sut,input$kom,input$selected_provinsi,input$th,input$tipeLahan), {
-      
+      removeUI(selector='#showResult')
       removeUI(selector='#showMakro')
       removeUI(selector='#showTable')
       removeUI(selector='#showButton')
-      removeUI(selector='#showResult')
       
       # dataTemplate()
       # resultTemplate()
     })
     
     observeEvent(c(input$rate.p,input$rate.s,input$nilai.tukar), {
+      removeUI(selector='#showResult')
       removeUI(selector='#showTable')
       removeUI(selector='#showButton')
-      removeUI(selector='#showResult')
+      
       
       # dataTemplate()
       # resultTemplate()
@@ -1107,13 +1109,14 @@ app <- shiny::shinyApp(
       dataView <- t(data.frame(rate.p.bau = readDataTemplate$rate.p, 
                              rate.s.bau = readDataTemplate$rate.s,
                              nilai.tukar.bau = readDataTemplate$nilai.tukar,
-                             tipe.kebun = readDataTemplate$tipeKebun))
+                             tipe.kebun = readDataTemplate$tipeKebun,
+                             lokasi=readDataTemplate$lokasi))
       dataView[is.na(dataView)] <- 0 #NA replace with zero
       
-      nameRow <- c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah", "Tipe Kebun")
+      nameRow <- c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah", "Tipe Kebun","Lokasi")
       dataView <- cbind(nameRow,data.frame(dataView))
       
-      colnames(dataView) <- c(" ","Nilai BAU pada Tahun Terpilih & Tipe Kebun")
+      colnames(dataView) <- c(" ","Nilai BAU pada Tahun Terpilih, Tipe Kebun & Lokasi")
       dataView
       
     })
@@ -1484,17 +1487,12 @@ app <- shiny::shinyApp(
           ),
         ),
         fluidRow(
-          column(3,
+          column(4,
                  plotlyOutput('plotComparing')
                  ),
-          column(7,
+          column(8,
                  tags$div(id = 'uiShowPlotAllKomoditas')
                  # plotlyOutput("plotComparingAllProvinsi")
-                 ),
-          column(2,
-                 actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;background-color: green;"),
-                 br(),
-                 tags$div(id='teksNewPamSave')
                  )
         ),
         fluidRow(
@@ -1511,6 +1509,13 @@ app <- shiny::shinyApp(
           ),
           column(6,
                  plotlyOutput('showPlotKumProfitSosial')
+          )
+        ),
+        fluidRow(
+          column(2,
+                 actionButton(("saveNewPAM"),"Simpan PAM baru",icon("paper-plane"),style="color: white;background-color: green;"),
+                 br(),
+                 tags$div(id='teksNewPamSave')
           )
         )
         

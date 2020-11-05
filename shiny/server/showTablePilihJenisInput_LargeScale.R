@@ -200,7 +200,7 @@ valJenisPupuk_LS <- eventReactive(input$showTabelAddPupuk_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addPupuk)){
-    reactData$tableAddPupuk <- as.data.frame(dataDefine$addPupuk[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddPupuk <- as.data.frame(dataDefine$addPupuk[,c("jenis","unit")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk_LS),])
     rownames(reactData$tableAddPupuk) <- c(1:nrow(reactData$tableAddPupuk))
     reactData$tableAddPupuk
@@ -278,7 +278,7 @@ valJenisBibit_LS <- eventReactive(input$showTabelAddBibit_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addBibit)){
-    reactData$tableAddBibit <- as.data.frame(dataDefine$addBibit[,-1])
+    reactData$tableAddBibit <- as.data.frame(dataDefine$addBibit[,c("jenis","unit")])
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit_LS),])
     rownames(reactData$tableAddBibit) <- c(1:nrow(reactData$tableAddBibit))
     reactData$tableAddBibit[] <- lapply(reactData$tableAddBibit, as.character) #ubah dr faktor jd char
@@ -364,7 +364,7 @@ valJenisPeralatan_LS <- eventReactive(input$showTabelAddPeralatan_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addPeralatan)){
-    reactData$tableAddPeralatan <- as.data.frame(dataDefine$addPeralatan[,-1])
+    reactData$tableAddPeralatan <- as.data.frame(dataDefine$addPeralatan[,c("jenis","unit")])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan_LS),])
     rownames(reactData$tableAddPeralatan) <- c(1:nrow(reactData$tableAddPeralatan))
     reactData$tableAddPeralatant[] <- lapply(reactData$tableAddPeralatant, as.character) #ubah dr faktor jd char
@@ -448,7 +448,7 @@ valJenisBahanKimia_LS <- eventReactive(input$showTabelAddBahanKimia_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$BahanKimia)){
-    reactData$tableBahanKimia <- as.data.frame(dataDefine$BahanKimia[,-1])
+    reactData$tableBahanKimia <- as.data.frame(dataDefine$BahanKimia[,c("jenis","unit")])
     reactData$tableBahanKimia <- as.data.frame(reactData$tableBahanKimia[1:as.numeric(input$tambahBarisBahanKimia_LS),])
     rownames(reactData$tableBahanKimia) <- c(1:nrow(reactData$tableBahanKimia))
     reactData$tableBahanKimia[] <- lapply(reactData$tableBahanKimia, as.character) #ubah dr faktor jd char
@@ -542,7 +542,7 @@ valJenisTradCapital_LS <- eventReactive(input$showTabelAddTradCapital_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addTradCapital)){
-    reactData$tableAddTradCapital <- as.data.frame(dataDefine$addTradCapital[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddTradCapital <- as.data.frame(dataDefine$addTradCapital[,c("jenis","unit")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddTradCapital <- as.data.frame(reactData$tableAddTradCapital[1:as.numeric(input$tambahBarisTradCapital_LS),])
     rownames(reactData$tableAddTradCapital) <- c(1:nrow(reactData$tableAddTradCapital))
     reactData$tableAddTradCapital[] <- lapply(reactData$tableAddTradCapital, as.character) #ubah dr faktor jd char
@@ -618,7 +618,7 @@ valJenisTK_LS <- eventReactive(input$showTabelAddTK_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addTK)){
-    reactData$tableAddTK <- as.data.frame(dataDefine$addTK[,-1])
+    reactData$tableAddTK <- as.data.frame(dataDefine$addTK[,c("jenis","unit")])
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK_LS),])
     rownames(reactData$tableAddTK) <- c(1:nrow(reactData$tableAddTK))
     reactData$tableAddTK[] <- lapply(reactData$tableAddTK, as.character) #ubah dr faktor jd char
@@ -704,7 +704,7 @@ valJenisTKUnskilled_LS <- eventReactive(input$showTabelAddTKUnskilled_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addTKUnskilled)){
-    reactData$tableAddTKUnskilled <- as.data.frame(dataDefine$addTKUnskilled[,-1])
+    reactData$tableAddTKUnskilled <- as.data.frame(dataDefine$addTKUnskilled[,c("jenis","unit")])
     reactData$tableAddTKUnskilled <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTKUnskilled_LS),])
     rownames(reactData$tableAddTKUnskilled) <- c(1:nrow(reactData$tableAddTKUnskilled))
     reactData$tableAddTKUnskilled[] <- lapply(reactData$tableAddTKUnskilled, as.character) #ubah dr faktor jd char
@@ -799,7 +799,7 @@ valJenisFactorCapital_LS <- eventReactive(input$showTabelAddFactorCapital_LS,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addFactorCapital)){
-    reactData$tableAddFactorCapital <- as.data.frame(dataDefine$addFactorCapital[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddFactorCapital <- as.data.frame(dataDefine$addFactorCapital[,c("jenis","unit")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddFactorCapital <- as.data.frame(reactData$tableAddFactorCapital[1:as.numeric(input$tambahBarisFactorCapital_LS),])
     rownames(reactData$tableAddFactorCapital) <- c(1:nrow(reactData$tableAddFactorCapital))
     reactData$tableAddFactorCapital[] <- lapply(reactData$tableAddFactorCapital, as.character) #ubah dr faktor jd char

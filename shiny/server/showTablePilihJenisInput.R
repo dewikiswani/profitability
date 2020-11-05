@@ -126,7 +126,7 @@ valJenisPupuk <- eventReactive(input$showTabelAddPupuk,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addPupuk)){
-    reactData$tableAddPupuk <- as.data.frame(dataDefine$addPupuk[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddPupuk <- as.data.frame(dataDefine$addPupuk[,c("jenis","unit")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddPupuk <- as.data.frame(reactData$tableAddPupuk[1:as.numeric(input$tambahBarisPupuk),])
     rownames(reactData$tableAddPupuk) <- c(1:nrow(reactData$tableAddPupuk))
     reactData$tableAddPupuk
@@ -210,7 +210,7 @@ valJenisBibit <- eventReactive(input$showTabelAddBibit,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addBibit)){
-    reactData$tableAddBibit <- as.data.frame(dataDefine$addBibit[,-1])
+    reactData$tableAddBibit <- as.data.frame(dataDefine$addBibit[,c("jenis","unit")])
     reactData$tableAddBibit <- as.data.frame(reactData$tableAddBibit[1:as.numeric(input$tambahBarisBibit),])
     rownames(reactData$tableAddBibit) <- c(1:nrow(reactData$tableAddBibit))
     reactData$tableAddBibit[] <- lapply(reactData$tableAddBibit, as.character) #ubah dr faktor jd char
@@ -295,7 +295,7 @@ valJenisPeralatan <- eventReactive(input$showTabelAddPeralatan,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addPeralatan)){
-    reactData$tableAddPeralatan <- as.data.frame(dataDefine$addPeralatan[,-1])
+    reactData$tableAddPeralatan <- as.data.frame(dataDefine$addPeralatan[,c("jenis","unit")])
     reactData$tableAddPeralatan <- as.data.frame(reactData$tableAddPeralatan[1:as.numeric(input$tambahBarisPeralatan),])
     rownames(reactData$tableAddPeralatan) <- c(1:nrow(reactData$tableAddPeralatan))
     reactData$tableAddPeralatan[] <- lapply(reactData$tableAddPeralatan, as.character) #ubah dr faktor jd char
@@ -380,7 +380,7 @@ valJenisTK <- eventReactive(input$showTabelAddTK,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addTK)){
-    reactData$tableAddTK <- as.data.frame(dataDefine$addTK[,-1])
+    reactData$tableAddTK <- as.data.frame(dataDefine$addTK[,c("jenis","unit")])
     reactData$tableAddTK <- as.data.frame(reactData$tableAddTK[1:as.numeric(input$tambahBarisTK),])
     rownames(reactData$tableAddTK) <- c(1:nrow(reactData$tableAddTK))
     reactData$tableAddTK[] <- lapply(reactData$tableAddTK, as.character) #ubah dr faktor jd char

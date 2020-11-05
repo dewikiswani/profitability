@@ -1,12 +1,12 @@
-sut,komoditas,provinsi,tahun,tipe lahan,tipe kebun,rate.p,rate.s,nilai.tukar,faktor,komponen,jenis,unit harga,harga privat,harga sosial,unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
-AGROFORESTRI,KEBUN CAMPUR AF,ACEH,2020,MINERAL,SMALLHOLDER,7.4,2.4,14831,input,peralatan,Cangkul,Rp/unit,100000,100000,unit,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,
-,,,,,,,,,input,peralatan,Parang,Rp/unit,75000,75000,unit,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
-,,,,,,,,,input,tenaga kerja buah,"pembuatan lubang, tanam, pagar",Rp/HOK,80000,80000,hok,15,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,tenaga kerja buah,penyiangan,Rp/HOK,80000,80000,hok,21,21,21,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
-,,,,,,,,,input,tenaga kerja buah,pruning,Rp/HOK,80000,80000,hok,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,input,tenaga kerja buah,pemanenan durian,Rp/HOK,80000,80000,hok,,,,,,,,,,,,2,,,8,,,8,,,8,,,8,,,8,,,8
-,,,,,,,,,input,tenaga kerja buah,pemanenan duku,Rp/HOK,80000,80000,hok,,,,,,,,,,,,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
-,,,,,,,,,input,tenaga kerja buah,pemanenan jengkol,Rp/HOK,80000,80000,hok,,,,,,,,,,,,2,2,3,3,4,4,5,7,8,8,8,8,8,8,8,8,8,8,8
-,,,,,,,,,output,utama,Durian ,Rp/btr,5000,5000,butir,,,,,,,,,,,,100,,,200,,,300,,,300,,,300,,,300,,,300
-,,,,,,,,,output,utama,Duku ,Rp/kg,5000,5000,kg,,,,,,,,,,,,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500
-,,,,,,,,,output,utama,Jengkol ,Rp/kg,10000,10000,kg,,,,,,,,,,,,100,150,300,300,350,400,500,600,600,600,600,600,600,600,600,600,600,600,600
+sut,komoditas,provinsi,lokasi,tahun,tipe lahan,tipe kebun,rate.p,rate.s,nilai.tukar,faktor,komponen,jenis,unit harga,harga privat,harga sosial,unit,Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,Y9,Y10,Y11,Y12,Y13,Y14,Y15,Y16,Y17,Y18,Y19,Y20,Y21,Y22,Y23,Y24,Y25,Y26,Y27,Y28,Y29,Y30
+AGROFORESTRI,KEBUN CAMPUR AF,ACEH,-,2020,MINERAL,SMALLHOLDER,7.4,2.4,14831,input,peralatan,Cangkul,Rp/unit,100000,100000,unit,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,,1,,,,
+,,,,,,,,,,input,peralatan,Parang,Rp/unit,75000,75000,unit,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,,1,
+,,,,,,,,,,input,tenaga kerja buah,"pembuatan lubang, tanam, pagar",Rp/HOK,80000,80000,hok,15,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,input,tenaga kerja buah,penyiangan,Rp/HOK,80000,80000,hok,21,21,21,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+,,,,,,,,,,input,tenaga kerja buah,pruning,Rp/HOK,80000,80000,hok,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,input,tenaga kerja buah,pemanenan durian,Rp/HOK,80000,80000,hok,,,,,,,,,,,,2,,,8,,,8,,,8,,,8,,,8,,,8
+,,,,,,,,,,input,tenaga kerja buah,pemanenan duku,Rp/HOK,80000,80000,hok,,,,,,,,,,,,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
+,,,,,,,,,,input,tenaga kerja buah,pemanenan jengkol,Rp/HOK,80000,80000,hok,,,,,,,,,,,,2,2,3,3,4,4,5,7,8,8,8,8,8,8,8,8,8,8,8
+,,,,,,,,,,output,utama,Durian ,Rp/btr,5000,5000,butir,,,,,,,,,,,,100,,,200,,,300,,,300,,,300,,,300,,,300
+,,,,,,,,,,output,utama,Duku ,Rp/kg,5000,5000,kg,,,,,,,,,,,,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500
+,,,,,,,,,,output,utama,Jengkol ,Rp/kg,10000,10000,kg,,,,,,,,,,,,100,150,300,300,350,400,500,600,600,600,600,600,600,600,600,600,600,600,600

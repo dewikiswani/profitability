@@ -90,7 +90,7 @@ valJenisUtama<- eventReactive(input$showTabelAddUtama,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addUtama)){
-    reactData$tableAddUtama <- as.data.frame(dataDefine$addUtama[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddUtama <- as.data.frame(dataDefine$addUtama[,c("jenis","unit")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddUtama <- as.data.frame(reactData$tableAddUtama[1:as.numeric(input$tambahBarisUtama),])
     rownames(reactData$tableAddUtama) <- c(1:nrow(reactData$tableAddUtama))
     reactData$tableAddUtama[] <- lapply(reactData$tableAddUtama, as.character) #ubah dr faktor jd char
@@ -99,9 +99,10 @@ valJenisUtama<- eventReactive(input$showTabelAddUtama,{
     dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
     # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
     dataKomponen <- filter(dataKomponen,komponen == c("utama"))
+    dataKomponen <- lowcase(dataKomponen,c(2:ncol(dataKomponen)))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain utama ga masuk level faktor nya
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen utama aja
-    reactData$tableAddUtama <- as.data.frame(dataKomponen[,c(3:4)])
+    reactData$tableAddUtama <- as.data.frame(dataKomponen[,c("jenis","unit")])
     reactData$tableAddUtama <- as.data.frame(reactData$tableAddUtama[1:as.numeric(input$tambahBarisUtama),])
     rownames(reactData$tableAddUtama) <- c(1:input$tambahBarisUtama)
     reactData$tableAddUtama
@@ -182,7 +183,7 @@ valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
   dataDefine <- readRDS(fileName)
   
   if (!is.null(dataDefine$addSampingan)){
-    reactData$tableAddSampingan <- as.data.frame(dataDefine$addSampingan[,-1]) #kolom komponen yg sudah di save pd file rds di hide
+    reactData$tableAddSampingan <- as.data.frame(dataDefine$addSampingan[,c("jenis","unit")]) #kolom komponen yg sudah di save pd file rds di hide
     reactData$tableAddSampingan <- as.data.frame(reactData$tableAddSampingan[1:as.numeric(input$tambahBarisSampingan),])
     rownames(reactData$tableAddSampingan) <- c(1:nrow(reactData$tableAddSampingan))
     reactData$tableAddSampingan[] <- lapply(reactData$tableAddSampingan, as.character) #ubah dr faktor jd char
@@ -191,9 +192,10 @@ valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
     # dataKomponen <- filter(kumpulanDataJenisInputOutput,komoditas == input$kom)
     dataKomponen <- filter(kumpulanDataJenisInputOutput,tipe.kebun == c("UMUM"))
     dataKomponen <- filter(dataKomponen,komponen == c("sampingan"))
+    dataKomponen <- lowcase(dataKomponen,c(2:ncol(dataKomponen)))
     dataKomponen[] <- lapply(dataKomponen, as.character) #ubah dr faktor jd char, spy faktor selain Sampingan ga masuk level faktor nya
     # dataKomponen[] <- lapply(dataKomponen, as.factor) #ubah char jd faktor, spy bs di drop down yg hanya komponen Sampingan aja
-    reactData$tableAddSampingan <- as.data.frame(dataKomponen[,c(3:4)])
+    reactData$tableAddSampingan <- as.data.frame(dataKomponen[,c("jenis","unit")])
     reactData$tableAddSampingan <- as.data.frame(reactData$tableAddSampingan[1:as.numeric(input$tambahBarisSampingan),])
     rownames(reactData$tableAddSampingan) <- c(1:input$tambahBarisSampingan)
     reactData$tableAddSampingan

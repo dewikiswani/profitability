@@ -44,7 +44,7 @@ pamBaru <- argonTabItem(
                    
             ),
             column(2,
-                   selectInput(("tipeKebun_new"),"Tipe Lahan",choices = c("CROP", "SMALLHOLDER", "LARGE SCALE") ),
+                   selectInput(("tipeKebun_new"),"Tipe Lahan",choices = c("CROP", "SMALLHOLDER") ),
                    
             ),
             column(2,
