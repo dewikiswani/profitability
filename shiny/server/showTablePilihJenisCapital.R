@@ -1,5 +1,5 @@
 output$showTablePilihJenisCapital <- renderUI({
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -84,7 +84,7 @@ output$tabelTambahPrivat <- renderRHandsontable({
 
 valJenisPrivat<- eventReactive(input$showTabelAddCapPrivat,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -122,7 +122,7 @@ observeEvent(input$saveTambahBarisPrivat,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   editNew <- cbind(komponen = "modal kapital privat", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -175,7 +175,7 @@ output$tabelTambahSosial <- renderRHandsontable({
 
 valJenisSosial<- eventReactive(input$showTabelAddCapSosial,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -213,7 +213,7 @@ observeEvent(input$saveTambahBarisSosial,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   editNew <- cbind(komponen = "modal kapital sosial", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -288,7 +288,7 @@ output$rhandsSuntingModalKapital <- renderRHandsontable({
 
 
 valCapital <- eventReactive(input$suntingModalKapital,{
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")

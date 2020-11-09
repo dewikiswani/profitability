@@ -1,5 +1,5 @@
 output$showTablePilihJenisOutput <- renderUI({
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -83,7 +83,7 @@ output$tabelTambahUtama <- renderRHandsontable({
 
 valJenisUtama<- eventReactive(input$showTabelAddUtama,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -118,7 +118,7 @@ observeEvent(input$saveTambahBarisUtama,{
   editNew<-as.data.frame(hot_to_r(input$tabelTambahUtama))
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -176,7 +176,7 @@ output$tabelTambahSampingan <- renderRHandsontable({
 
 valJenisSampingan<- eventReactive(input$showTabelAddSampingan,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -211,7 +211,7 @@ observeEvent(input$saveTambahBarisSampingan,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "sampingan", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")

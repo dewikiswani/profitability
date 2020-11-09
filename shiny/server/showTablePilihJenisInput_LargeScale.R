@@ -1,5 +1,5 @@
 output$showTablePilihJenisInput_LargeScale <- renderUI({
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -193,7 +193,7 @@ output$tabelTambahPupuk_LS <- renderRHandsontable({
 
 valJenisPupuk_LS <- eventReactive(input$showTabelAddPupuk_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -227,7 +227,7 @@ observeEvent(input$saveTambahBarisPupuk_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "pupuk", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -271,7 +271,7 @@ output$showRhandsAddBibit_LS <- renderUI({
 })
 valJenisBibit_LS <- eventReactive(input$showTabelAddBibit_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -313,7 +313,7 @@ observeEvent(input$saveTambahBarisBibit_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "bibit", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -357,7 +357,7 @@ output$showRhandsAddPeralatan_LS <- renderUI({
 
 valJenisPeralatan_LS <- eventReactive(input$showTabelAddPeralatan_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -399,7 +399,7 @@ observeEvent(input$saveTambahBarisPeralatan_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "Peralatan", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -441,7 +441,7 @@ output$showRhandsAddBahanKimia_LS <- renderUI({
 
 valJenisBahanKimia_LS <- eventReactive(input$showTabelAddBahanKimia_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -483,7 +483,7 @@ observeEvent(input$saveTambahBarisBahanKimia_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "bahan kimia", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -535,7 +535,7 @@ output$tabelTambahTradCapital_LS <- renderRHandsontable({
 
 valJenisTradCapital_LS <- eventReactive(input$showTabelAddTradCapital_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -570,7 +570,7 @@ observeEvent(input$saveTambahBarisTradCapital_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "tradable capital", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -611,7 +611,7 @@ output$showRhandsAddTK_LS <- renderUI({
 
 valJenisTK_LS <- eventReactive(input$showTabelAddTK_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -654,7 +654,7 @@ observeEvent(input$saveTambahBarisTK_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "tenaga kerja", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -697,7 +697,7 @@ output$showRhandsAddTKUnskilled_LS <- renderUI({
 
 valJenisTKUnskilled_LS <- eventReactive(input$showTabelAddTKUnskilled_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -739,7 +739,7 @@ observeEvent(input$saveTambahBarisTKUnskilled_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "tenaga kerja unskilled", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -792,7 +792,7 @@ output$tabelTambahFactorCapital_LS <- renderRHandsontable({
 
 valJenisFactorCapital_LS <- eventReactive(input$showTabelAddFactorCapital_LS,{
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
@@ -827,7 +827,7 @@ observeEvent(input$saveTambahBarisFactorCapital_LS,{
   editNew[is.na(editNew)] <- 0 #jika ada nilai numeric yang kosong, klo kol 1:3 kosong dia baca nya ttp ada nilai bukan null atau na
   # editNew <- cbind(komponen = "factor capital", editNew)
   
-  datapath <- paste0("shiny/data/", input$sut, "/",input$kom, "/")
+  datapath <- paste0("data/", input$sut, "/",input$kom, "/")
   fileName <- paste0(datapath,"saveData","_",
                      input$sut,"_",input$kom,"_",
                      input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
