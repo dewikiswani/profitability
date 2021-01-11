@@ -453,7 +453,16 @@ app <- shiny::shinyApp(
             colSums(na.rm = T)
           sum(s.labor.unskill)
           
-        
+          p.working.capital<- p.budget %>%
+            filter(str_detect(bagian,"working capital privat"))
+          p.working.capital <- p.working.capital[,-(1:6)] %>%
+            colSums(na.rm = T)
+          # sum(p.factor.capital)
+          s.working.capital<- s.budget %>%
+            filter(str_detect(bagian,"working capital sosial"))
+          s.working.capital <- s.working.capital[,-(1:6)] %>%
+            colSums(na.rm = T)
+          
           
         p.factor.capital<- p.budget %>%
           filter(str_detect(bagian,"factor capital"))
@@ -464,10 +473,10 @@ app <- shiny::shinyApp(
           filter(str_detect(bagian,"factor capital"))
         s.factor.capital <- s.factor.capital[,-(1:6)] %>%
           colSums(na.rm = T)
-        sum(s.factor.capital)
+        # sum(s.factor.capital)
         
-        p.total.cost <- p.trad.input + p.trad.capital + p.labor.admin + p.labor.skill + p.labor.unskill + p.factor.capital
-        s.total.cost <- s.trad.input + s.trad.capital + s.labor.admin + s.labor.skill + s.labor.unskill + s.factor.capital
+        p.total.cost <- p.trad.input + p.trad.capital + p.labor.admin + p.labor.skill + p.labor.unskill + p.working.capital + p.factor.capital
+        s.total.cost <- s.trad.input + s.trad.capital + s.labor.admin + s.labor.skill + s.labor.unskill + s.working.capital + s.factor.capital
         
         
         # PERHITUNGAN MANUAL
@@ -1442,7 +1451,8 @@ app <- shiny::shinyApp(
           column(11,
                  br(),
                  br(),
-                 h1("Hasil Analisis", align = "center"),
+                 h1(paste0("HASIL ANALISIS"," ",input$kom," ",input$sut), align = "center"),
+                 h1(paste0("di ",input$selected_provinsi," pada tahun ",input$th," dengan tipe lahan ", input$tipeLahan), align = "center"),
                  br(),
           )
         ),
@@ -1705,6 +1715,15 @@ app <- shiny::shinyApp(
           colSums(na.rm = T)
         sum(s.labor.unskill)
         
+        p.working.capital<- p.budget %>%
+          filter(str_detect(bagian,"working capital privat"))
+        p.working.capital <- p.working.capital[,-(1:6)] %>%
+          colSums(na.rm = T)
+        # sum(p.factor.capital)
+        s.working.capital<- s.budget %>%
+          filter(str_detect(bagian,"working capital sosial"))
+        s.working.capital <- s.working.capital[,-(1:6)] %>%
+          colSums(na.rm = T)
         
         
         p.factor.capital<- p.budget %>%
@@ -1716,10 +1735,11 @@ app <- shiny::shinyApp(
           filter(str_detect(bagian,"factor capital"))
         s.factor.capital <- s.factor.capital[,-(1:6)] %>%
           colSums(na.rm = T)
-        sum(s.factor.capital)
+        # sum(s.factor.capital)
         
-        p.total.cost <- p.trad.input + p.trad.capital + p.labor.admin + p.labor.skill + p.labor.unskill + p.factor.capital
-        s.total.cost <- s.trad.input + s.trad.capital + s.labor.admin + s.labor.skill + s.labor.unskill + s.factor.capital
+        p.total.cost <- p.trad.input + p.trad.capital + p.labor.admin + p.labor.skill + p.labor.unskill + p.working.capital + p.factor.capital
+        s.total.cost <- s.trad.input + s.trad.capital + s.labor.admin + s.labor.skill + s.labor.unskill + s.working.capital + s.factor.capital
+        
         
         
         # PERHITUNGAN MANUAL
@@ -1916,7 +1936,7 @@ app <- shiny::shinyApp(
         rownames(totArea) <- c("Value")
         totArea
         
-        tabel1 <- rbind(hsl.npv,ypc,lfe,lfo)
+        tabel1 <- rbind(hsl.npv,dec,ypc,lfe,lfo)
         tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
         tabel1
         
@@ -2560,6 +2580,7 @@ app <- shiny::shinyApp(
         
         # RESULT 
         dataDefine$npv <- hsl.npv
+        dataDefine$dec <- dec
         dataDefine$ypc <- ypc
         dataDefine$lfe <- lfe
         dataDefine$lfo <- lfo
@@ -2574,7 +2595,7 @@ app <- shiny::shinyApp(
         rownames(totArea) <- c("Value")
         totArea
         
-        tabel1 <- rbind(hsl.npv,ypc,lfe,lfo)
+        tabel1 <- rbind(hsl.npv,dec,ypc,lfe,lfo)
         tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
         tabel1
         
