@@ -33,7 +33,7 @@ pamTemplate <- argonTabItem(
             ),
             column(2,
                    selectInput("selected_provinsi",
-                               "Pilih Provinsi:",
+                               "Pilih Wilayah:",
                                choices = ""),
             ),
             column(2,

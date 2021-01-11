@@ -37,7 +37,7 @@ pamBaru <- argonTabItem(
                                choices = ""),
             ),
             column(1,
-                   selectInput(("th_new"),"Tahun",choices = c(1995:as.integer(format(Sys.Date(), "%Y"))) ),
+                   selectInput(("th_new"),"Tahun",selected = as.integer(format(Sys.Date(), "%Y")),choices = c(1995:as.integer(format(Sys.Date(), "%Y"))) ),
             ),
             column(1,
                    selectInput(("tipeLahan_new"),"Tipe Lahan",choices = c("MINERAL","GAMBUT") ),

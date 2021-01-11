@@ -30,7 +30,7 @@ library(plotly)
 
 
 # template
-source("2_sidebar.R")
+source("sidebar.R")
 source("navbar.R")
 source("header.R")
 source("footer.R")
@@ -43,9 +43,8 @@ indonesia <- read.csv("data/template/prov sampai desa.csv", stringsAsFactors = F
 
 
 # elements
-source("2_pamTemplate_modul1.R")
-source("2_pamBaru_modul2.R")
-# source("analisis.R")
+source("pamTemplate_modul1.R")
+source("pamBaru_modul2.R")
 
 
 # App
