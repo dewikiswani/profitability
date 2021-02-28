@@ -15,6 +15,5 @@ MONOKULTUR,KELAPA,BANYUASIN,-,2014,GAMBUT,SMALLHOLDER,7,2,"10,337",input,pupuk,s
 ,,,,,,,,,,input,tenaga kerja,Penanaman ,Rp/HOK,60000,60000,hok,6.5,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,input,tenaga kerja,Penyiangan,Rp/HOK,60000,60000,hok,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
 ,,,,,,,,,,input,tenaga kerja,Penyemprotan,Rp/HOK,60000,60000,hok,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3
-,,,,,,,,,,input,skenario pemanenan,Pemanenan,Rp/buah,500,500,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,input,skenario pengangkutan,Transport ke langkau,rp,0,0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,input,skenario pemanenan,Pemanenan,Rp/buah,500,500,jumlah buah,0,0,0,0,0,3500,3500,3500,5000,5000,7500,7500,7500,7500,7500,7500,7500,7500,7500,7500,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000
 ,,,,,,,,,,output,utama,Kelapa,Rp/buah,2000,2000,butir,0,0,0,0,0,3500,3500,3500,5000,5000,7500,7500,7500,7500,7500,7500,7500,7500,7500,7500,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000

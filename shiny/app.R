@@ -840,8 +840,8 @@ app <- shiny::shinyApp(
           
           hsl.npv<-data.frame(PRIVATE=npv.p,SOCIAL=npv.s)
           
-          npv.p.us<-npv.p/dataDefine$nilai.tukar
-          npv.s.us<-npv.s/dataDefine$nilai.tukar
+          npv.p.us<-npv.p/as.numeric(dataDefine$nilai.tukar)
+          npv.s.us<-npv.s/as.numeric(dataDefine$nilai.tukar)
           npv.us<-data.frame(PRIVATE=npv.p.us,SOCIAL=npv.s.us)
           hsl.npv<-rbind(hsl.npv,npv.us)
           
@@ -1500,6 +1500,11 @@ app <- shiny::shinyApp(
                  tags$div(id = 'uiShowPlotAllKomoditas')
                  # plotlyOutput("plotComparingAllProvinsi")
                  )
+        ),
+        fluidRow(
+          column(6,
+                 dataTableOutput('showTableAllProvinsi')
+          )
         ),
         fluidRow(
           column(6,
@@ -3084,7 +3089,91 @@ app <- shiny::shinyApp(
           plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun) 
     })
     
+    tableAllProvinsi <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
+      
+      # DATA PLOT BAU -----------------------------------------------------------
+      folderSut <- sort(unique(komoditas$sut))
+      folderProvinsi <- filter(komoditas, provinsi == input$selected_provinsi)
+      folderKom <- sort(unique(folderProvinsi$nama_komoditas))
+      
+      kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
+      dirFile <- paste0("data/",kombinasiFolder)
+      
+      nameFiles <- list.files(path = paste0(dirFile,"/"),pattern = paste0("resultTemplate"))
+      kombinasiFile <- as.vector(outer(dirFile, nameFiles, paste, sep="/"))
+      cekFile <- file.exists(kombinasiFile) #cek keberadaan file ini ada atau engga
+      
+      # remove index yang cekFilenya == F, munculin yang cekFilenya == T aja
+      indexFileTrue <- which(cekFile == T)
+      kombinasiFile <- kombinasiFile[which(cekFile == T)]
+      
+      funcFile <- function(x){
+        a <- readRDS(x)
+        b <- c(x,a)
+        b}
+      
+      
+      ##### step 2 filter yang ada pattern input$selected_provinsi ex: (_ACEH)
+      # cek dari vector kombinasiFile yang sudah di cek T or F nya
+      provFile <- kombinasiFile %>% 
+        str_subset(pattern = paste0("_",input$selected_provinsi))
+      
+      
+      ##### step 3 filter yang ada pattern input$th ex: (_2020)
+      tahunFile <- provFile %>% 
+        str_subset(pattern = paste0("_",input$th))
+      # tahunFile
+      
+      patternAll <- lapply(tahunFile, funcFile)
+      dataCheck <- patternAll
+      
+      sut <- unlist(lapply(dataCheck, function(x)x[["sut"]]))
+      nama.komoditas <- unlist(lapply(dataCheck, function(x)x[["kom"]]))
+      tipe.kebun <- unlist(lapply(dataCheck, function(x)x[["tipeKebun"]][1]))
+      tipe.data <- unlist(lapply(dataCheck, function(x)x[["tipeData"]]))
+      NPV.Privat.RP <- unlist(lapply(dataCheck, function(x)x[["npv"]][1,1]))
+      
+      dataPlotBAU <- data.frame(sut=sut,
+                                nama.komoditas=nama.komoditas,
+                                tipe.kebun = tipe.kebun,
+                                tipe.data = tipe.data,
+                                NPV.Privat.RP=NPV.Privat.RP)
+      # dataPlotBAU.sort <- dataPlotBAU[order(dataPlotBAU$tipe.kebun),]
+      # rownames(dataPlotBAU.sort)<-1:nrow(dataPlotBAU.sort)
+      
+      # DATA PLOT SIMULASI -----------------------------------------------------------
+      datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+      fileName <- paste0(datapath,"saveData","_",
+                         input$sut,"_",input$kom,"_",
+                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+      dataCheck <- readRDS(fileName)
+      
+      sut <- unlist(dataCheck[["sut"]])
+      nama.komoditas <- unlist(dataCheck[["kom"]])
+      tipe.kebun <- unlist(dataCheck[["tipeKebun"]][1])
+      tipe.data <- unlist(dataCheck[["tipeData"]])
+      NPV.Privat.RP <- unlist(dataCheck[["npv"]][1,1])
+      
+      nama.komoditas <- paste0(nama.komoditas," (",tipe.data,")")
+      tipe.kebun <- paste0(tipe.kebun," (",tipe.data,")")
+      
+      dataPlotSimulasi <- data.frame(sut=sut,
+                                     nama.komoditas = nama.komoditas,
+                                     tipe.kebun = tipe.kebun,
+                                     tipe.data = tipe.data,
+                                     NPV.Privat.RP=NPV.Privat.RP)
+      
+      
+      dataPlot <- rbind(dataPlotBAU,dataPlotSimulasi)
+      
+      dataPlot$nama.komoditas <- factor(dataPlot$nama.komoditas, levels = unique(dataPlot$nama.komoditas)[order(dataPlot$tipe.kebun, decreasing = FALSE)])
+      dataPlot
+      
+    })
     
+    output$showTableAllProvinsi <- renderDataTable({
+      datatable(tableAllProvinsi())
+    })
     
     output$showPlotProfitPrivat <- renderPlotly({
       profitPlotPrivat()
