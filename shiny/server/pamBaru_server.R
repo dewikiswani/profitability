@@ -70,7 +70,7 @@ data_new <- reactive({
   # informasi umum
   sut <- input$sut_new
   kom <- toupper(input$kom_new)
-  provinsi <- input$selected_provinsi_new
+  wilayah <- input$selected_wilayah_new
   th <- input$th_new
   tipeLahan <- input$tipeLahan_new
   tipeKebun <- input$tipeKebun_new
@@ -86,7 +86,7 @@ data_new <- reactive({
   combineDef <- list(
     sut=sut,
     kom=kom,
-    provinsi = provinsi,
+    wilayah = wilayah,
     th=th,
     tipeLahan = tipeLahan,
     tipeKebun = tipeKebun,

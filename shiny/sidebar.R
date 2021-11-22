@@ -20,6 +20,11 @@ argonSidebar <- argonDashSidebar(
       "Membangun PAM dari Data Template"
     ),
     argonSidebarItem(
+      tabName = "pamParsial",
+      icon = argonIcon(name = "atom", color = "danger"),
+      "Simulasi Parsial Data Template"
+    ),
+    argonSidebarItem(
       tabName = "pamBaru",
       icon = argonIcon(name = "bullet-list-67", color = "danger"),
       "Membuat PAM Baru"

@@ -42,15 +42,17 @@ indonesia <- read.csv("data/template/prov sampai desa.csv", stringsAsFactors = F
 # readDataAsumsiMakro <- read.table(paste0("data/template/asumsi makro",".csv"), header = T, sep = ",")
 
 
+
 # elements
 source("pamTemplate_modul1.R")
 source("pamBaru_modul2.R")
+source("pamParsial_modul3.R")
 
 
 # App
 app <- shiny::shinyApp(
   ui = argonDashPage(
-    title = "Argon Dashboard Demo",
+    title = "LUSITA",
     author = "Dewi Kiswani Bodro",
     description = "ICRAF",
     sidebar = argonSidebar,
@@ -60,6 +62,7 @@ app <- shiny::shinyApp(
       argonTabItems(
         #home,
         pamTemplate,
+        pamParsial,
         pamBaru
         # ,
         # deskriptifPlot
@@ -115,7 +118,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       print(paste0(datapath," SIMULASI"))
       
-      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
       
       if (readDataTemplate$tipe.kebun[1] == "LARGE SCALE"){
@@ -149,7 +152,7 @@ app <- shiny::shinyApp(
         # informasi umum
         sut <- input$sut
         kom <- input$kom
-        provinsi <- input$selected_provinsi
+        wilayah <- input$selected_wilayah
         th <- input$th
         tipeLahan <- input$tipeLahan
         tipeKebun <- readDataTemplate$tipe.kebun[1]
@@ -166,7 +169,7 @@ app <- shiny::shinyApp(
                            cum.landScene = cum.landScene,
                            sut=sut,
                            kom=kom,
-                           provinsi = provinsi,
+                           wilayah = wilayah,
                            th=th,
                            tipeLahan = tipeLahan,
                            tipeKebun = tipeKebun,
@@ -181,7 +184,7 @@ app <- shiny::shinyApp(
         datapath <- paste0("data/", input$sut, "/",input$kom, "/")
         fileName <- paste0(datapath,"saveData","_",
                            input$sut,"_",input$kom,"_",
-                           input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                           input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
         saveRDS(combineDef,file = fileName)
         
         
@@ -220,7 +223,7 @@ app <- shiny::shinyApp(
         # informasi umum
         sut <- input$sut
         kom <- input$kom
-        provinsi <- input$selected_provinsi
+        wilayah <- input$selected_wilayah
         th <- input$th
         tipeLahan <- input$tipeLahan
         tipeKebun <- readDataTemplate$tipe.kebun[1]
@@ -236,7 +239,7 @@ app <- shiny::shinyApp(
                            capital=capital, capitalPrivat = capitalPrivat, capitalSosial = capitalSosial,
                            sut=sut,
                            kom=kom,
-                           provinsi = provinsi,
+                           wilayah = wilayah,
                            th=th,
                            tipeLahan = tipeLahan,
                            tipeKebun = tipeKebun,
@@ -250,7 +253,7 @@ app <- shiny::shinyApp(
         datapath <- paste0("data/", input$sut, "/",input$kom, "/")
         fileName <- paste0(datapath,"saveData","_",
                            input$sut,"_",input$kom,"_",
-                           input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                           input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
         saveRDS(combineDef,file = fileName)
         
         
@@ -264,7 +267,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       print(paste0(datapath," BAU"))
       
-      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
       
       if (readDataTemplate$tipe.kebun[1] == "LARGE SCALE"){
@@ -313,7 +316,7 @@ app <- shiny::shinyApp(
         #informasi umum
         dataDefine$sut <- input$sut
         dataDefine$kom <- input$kom
-        dataDefine$provinsi <- input$selected_provinsi
+        dataDefine$wilayah <- input$selected_wilayah
         dataDefine$th <- input$th
         dataDefine$tipeLahan <- input$tipeLahan
         dataDefine$tipeKebun <- readDataTemplate$tipe.kebun[1]
@@ -479,42 +482,6 @@ app <- shiny::shinyApp(
         s.total.cost <- s.trad.input + s.trad.capital + s.labor.admin + s.labor.skill + s.labor.unskill + s.working.capital + s.factor.capital
         
         
-        # PERHITUNGAN MANUAL
-        # p.sum.rev<-c(value0,p.sum.rev)
-        # p.trad.input<-c(value0,p.trad.input)
-        # p.trad.capital<-c(value0,p.trad.capital)
-        # p.labor.admin<-c(value0,p.labor.admin)
-        # p.labor.skill<-c(value0,p.labor.skill)
-        # p.labor.unskill<-c(value0,p.labor.unskill)
-        # p.factor.capital<-c(value0,p.factor.capital)
-        # 
-        # s.sum.rev<-c(value0,s.sum.rev)
-        # s.trad.input<-c(value0,s.trad.input)
-        # s.trad.capital<-c(value0,s.trad.capital)
-        # s.labor.admin<-c(value0,s.labor.admin)
-        # s.labor.skill<-c(value0,s.labor.skill)
-        # s.labor.unskill<-c(value0,s.labor.unskill)
-        # s.factor.capital<-c(value0,s.factor.capital)
-        # 
-        # npv.p.sum.rev<-npv(dataDefine$rate.p/100,p.sum.rev)
-        # npv.p.trad.input<-npv(dataDefine$rate.p/100,p.trad.input)
-        # npv.p.trad.capital<-npv(dataDefine$rate.p/100,p.trad.capital)
-        # npv.p.labor.admin<-npv(dataDefine$rate.p/100,p.labor.admin)
-        # npv.p.labor.skill<-npv(dataDefine$rate.p/100,p.labor.skill)
-        # npv.p.labor.unskill<-npv(dataDefine$rate.p/100,p.labor.unskill)
-        # npv.p.factor.capital<-npv(dataDefine$rate.p/100,p.factor.capital)
-        # npv.p.total.cost <- npv.p.trad.input +npv.p.trad.capital + npv.p.labor.admin + npv.p.labor.skill + npv.p.labor.unskill + npv.p.factor.capital
-        # npv.p <- npv.p.sum.rev - npv.p.total.cost
-        # 
-        # npv.s.sum.rev<-npv(dataDefine$rate.s/100,s.sum.rev)
-        # npv.s.trad.input<-npv(dataDefine$rate.s/100,s.trad.input)
-        # npv.s.trad.capital<-npv(dataDefine$rate.s/100,s.trad.capital)
-        # npv.s.labor.admin<-npv(dataDefine$rate.s/100,s.labor.admin)
-        # npv.s.labor.skill<-npv(dataDefine$rate.s/100,s.labor.skill)
-        # npv.s.labor.unskill<-npv(dataDefine$rate.s/100,s.labor.unskill)
-        # npv.s.factor.capital<-npv(dataDefine$rate.s/100,s.factor.capital)
-        # npv.s.total.cost <- npv.s.trad.input +npv.s.trad.capital + npv.s.labor.admin + npv.s.labor.skill + npv.s.labor.unskill + npv.s.factor.capital
-        # npv.s <- npv.s.sum.rev - npv.s.total.cost
         
         
         p.profit <- p.sum.rev - p.total.cost
@@ -681,7 +648,7 @@ app <- shiny::shinyApp(
         
         fileName <- paste0(datapath,"resultTemplate","_",
                            input$sut,"_",input$kom,"_",
-                           input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                           input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
         saveRDS(dataDefine,file = fileName)
         
         
@@ -738,7 +705,7 @@ app <- shiny::shinyApp(
         #informasi umum
         dataDefine$sut <- input$sut
         dataDefine$kom <- input$kom
-        dataDefine$provinsi <- input$selected_provinsi
+        dataDefine$wilayah <- input$selected_wilayah
         dataDefine$th <- input$th
         dataDefine$tipeLahan <- input$tipeLahan
         dataDefine$tipeKebun <- readDataTemplate$tipe.kebun[1]
@@ -1021,7 +988,7 @@ app <- shiny::shinyApp(
         
         fileName <- paste0(datapath,"resultTemplate","_",
                            input$sut,"_",input$kom,"_",
-                           input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                           input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
         saveRDS(dataDefine,file = fileName)
         
         
@@ -1036,7 +1003,7 @@ app <- shiny::shinyApp(
     # end - Section preparation data --------
     
     # Section input informasi umum  dan asumsi makcro---------------------------------------------
-    observeEvent(c(input$sut,input$kom,input$selected_provinsi,input$th,input$tipeLahan), {
+    observeEvent(c(input$sut, input$kom, input$selected_prov, input$selected_wilayah, input$th, input$tipeLahan), {
       removeUI(selector='#showResult')
       removeUI(selector='#showMakro')
       removeUI(selector='#showTable')
@@ -1046,7 +1013,8 @@ app <- shiny::shinyApp(
       # resultTemplate()
     })
     
-    observeEvent(c(input$rate.p,input$rate.s,input$nilai.tukar), {
+    observeEvent(c(input$sut, input$kom, input$selected_prov, input$selected_wilayah, input$th, input$tipeLahan,
+                   input$rate.p,input$rate.s,input$nilai.tukar), {
       removeUI(selector='#showResult')
       removeUI(selector='#showTable')
       removeUI(selector='#showButton')
@@ -1109,7 +1077,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"resultTemplate","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       readDataTemplate <- readRDS(fileName)
       dataView <- t(data.frame(rate.p.bau = readDataTemplate$rate.p, 
                              rate.s.bau = readDataTemplate$rate.s,
@@ -1121,7 +1089,7 @@ app <- shiny::shinyApp(
       nameRow <- c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah", "Tipe Kebun","Lokasi")
       dataView <- cbind(nameRow,data.frame(dataView))
       
-      colnames(dataView) <- c(" ","Nilai BAU pada Tahun Terpilih, Tipe Kebun & Lokasi")
+      colnames(dataView) <- c(" ","Nilai BAU pada informasi umum yang terpilih")
       dataView
       
     })
@@ -1146,14 +1114,14 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       argonRow(
         argonColumn(
           width = 12,
           argonH1("Tabel", display = 4),
-          h5("Langkah 3: menampilkan Tabel PAM yang terpilih"),
+          h5("Langkah 3: Menampilkan atau menyunting Tabel PAM yang terpilih"),
           
           # jika tdk bisa jadi input buttton maka coba ubah nama action  buttonnya sepertinya conflict dengan script lain
           argonTabSet(
@@ -1166,16 +1134,21 @@ app <- shiny::shinyApp(
             iconList = lapply(X = 1:3, FUN = argonIcon, name = "atom"),
             argonTab(
               tabName = "Tabel Harga",
-              active = T,
+              active = F,
               # tableOutput("cekTable"),
+              
               dataTableOutput("showTablePrice"),
-              style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+              # actionButton("simPrice_button","Sunting Harga",icon("paper-plane"),style="color: white;
+              #              background-color: green;"),
+              style = "height:650px; overflow-y: scroll;overflow-x: scroll;"
             ),
             argonTab(
               tabName = "Tabel Kuantitas",
               active = F,
               dataTableOutput(("showTableKuantitas")),
-              style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+              # actionButton("simIO_button","Sunting Kuantitas",icon("paper-plane"),style="color: white;
+              #              background-color: green;"),
+              style = "height:650px; overflow-y: scroll;overflow-x: scroll;"
             ),
             
             if(dataDefine$tipeKebun == "LARGE SCALE"){
@@ -1184,7 +1157,9 @@ app <- shiny::shinyApp(
                 active = F,
                 dataTableOutput("showTableScenLand")
                 ,
-                style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+                # actionButton("simSkenLahan_button","Sunting Skenario Lahan",icon("paper-plane"),style="color: white;
+                #            background-color: green;"),
+                style = "height:650px; overflow-y: scroll;overflow-x: scroll;"
               )
             }else{
               argonTab(
@@ -1192,7 +1167,9 @@ app <- shiny::shinyApp(
                   active = F,
                   dataTableOutput("showTableKapital")
                   ,
-                  style = "height:600px; overflow-y: scroll;overflow-x: scroll;"
+                  # actionButton("simCapital_button","Sunting Modal Kapital",icon("paper-plane"),style="color: white;
+                  #          background-color: green;"),
+                  style = "height:650px; overflow-y: scroll;overflow-x: scroll;"
                 )}
             
           ),
@@ -1200,70 +1177,101 @@ app <- shiny::shinyApp(
       )
     })
     
+    
+    # output$showTablePrice <- renderDataTable({
+    #   datapath <- paste0("data/", input$sut, "/",input$kom, "/")
+    #   fileName <- paste0(datapath,"saveData","_",
+    #                      input$sut,"_",input$kom,"_",
+    #                      input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
+    #   dataDefine <- readRDS(fileName)
+    #   dataView <- rbind(dataDefine$priceInput, dataDefine$priceOutput)
+    #   dataView[is.na(dataView)] <- 0 #NA replace with zero
+    #   dataView
+    #   
+    # })
+    
     output$showTablePrice <- renderDataTable({
+      showTableP()
+    })
+    
+    
+    showTableP <- eventReactive(c(input$tampilkanTabel_button,input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       dataView <- rbind(dataDefine$priceInput, dataDefine$priceOutput)
       dataView[is.na(dataView)] <- 0 #NA replace with zero
+      
+      print("tabel harga yang terupdate")
+      
       dataView
       
     })
     
     output$showTableKuantitas <- renderDataTable({
+      showTableK()
+      
+    })
+    
+    showTableK <- eventReactive(c(input$tampilkanTabel_button,input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       # print("data terakhir tersimpan di rds")
       dataDefine <- readRDS(fileName)
       dataView <- rbind(dataDefine$ioInput, dataDefine$ioOutput)
       dataView[is.na(dataView)] <- 0 #NA replace with zero
+      
+      print("tabel harga yang terupdate")
       dataView
       
     })
     
     output$showTableKapital <- renderDataTable({
+      showTableCap()
+    })
+    
+    showTableCap <- eventReactive(c(input$tampilkanTabel_button,input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       # case for modal kapital
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       if (!is.null(dataDefine$capital)){
         dataView <- dataDefine$capital
         dataView[is.na(dataView)] <- 0 #NA replace with zero
+        print("tabel harga yang terupdate")
         dataView    
       }
       else if (is.null(dataDefine$capital)){
         dataView <- data.frame(matrix("tidak terdapat tabel modal kapital",nrow=1,ncol=1))
         colnames(dataView) <- "Keterangan"
+        print("tabel harga yang terupdate")
         dataView
       }
     })
     
     output$showTableScenLand <- renderDataTable({
+      showTableS()
+      
+    })
+    
+    showTableS <- eventReactive(c(input$tampilkanTabel_button,input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
-      
-      # baseScene <- filter(dataDefine,str_detect(bagian,"dasar"))
-      # landScene <- baseScene[,c("bagian","komponen","jenis","unit",paste0(c(rep("Y", yearIO)),1:yearIO))] #memfilter tabel kuantitas
-      # transpose.landScene <- data.frame(t(landScene[,c(paste0(c(rep("Y", yearIO)),1:yearIO))]))
-      # colnames(transpose.landScene) <- c("per.year")
-      # cum.landScene <- within(transpose.landScene,cummulative.land <- cumsum(per.year)) #buat kolom cumulativ land
-      # cum.landScene <- t(cum.landScene)
-      
       dataView <- cbind("Total Area (Ha)" = dataDefine$totalArea, dataDefine$cum.landScene)
       dataView[is.na(dataView)] <- 0 #NA replace with zero
       dataView
-      
     })
+    
     
     
     output$showButton <- renderUI({
@@ -1271,13 +1279,13 @@ app <- shiny::shinyApp(
         argonColumn(
           width = 12,
           br(),
-          h5("Langkah 4: Membangun tabel PAM dengan menyunting atau menggunakan data template", align = "center"),
+          h5("Langkah 4: Jalankan Analisis", align = "center"),
           fluidRow(
             column(5,
                    
             ),
-            column(7,
-                   actionButton("buatPAM_button","Membangun PAM",icon("paper-plane"),style="color: white;
+            column(6,
+                   actionButton("buatPAM_button","Jalankan Analisis",icon("paper-plane"),style="color: white;
                            background-color: green;")
             )
           )
@@ -1287,6 +1295,7 @@ app <- shiny::shinyApp(
     })
     
     # End - Section tampilkan tabel ---------------------------------------------
+    
     
     # Section Popup Modal Dialog---------------------------------------------
     observeEvent(input$buatPAM_button,{
@@ -1396,7 +1405,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       reactData$tableP2 <- dataDefine$priceOutput
@@ -1423,7 +1432,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       # replace data price
@@ -1452,7 +1461,7 @@ app <- shiny::shinyApp(
                  br(),
                  br(),
                  h1(paste0("HASIL ANALISIS"," ",input$kom," ",input$sut), align = "center"),
-                 h1(paste0("di ",input$selected_provinsi," pada tahun ",input$th," dengan tipe lahan ", input$tipeLahan), align = "center"),
+                 h1(paste0("di ",input$selected_wilayah," pada tahun ",input$th," dengan tipe lahan ", input$tipeLahan), align = "center"),
                  br(),
           )
         ),
@@ -1463,7 +1472,6 @@ app <- shiny::shinyApp(
                  tags$style('#bau {
                             background-color: #00cca3;
                             }'),
-                 # tags$head(tags$style('h3 {color:white;}')),
                  h3("Business As Usual (BAU)", align = "center")
                  
           ),
@@ -1476,35 +1484,75 @@ app <- shiny::shinyApp(
           )
         ),
         fluidRow(
-          column(4,
+          column(6,
                  dataTableOutput("tableResultBAU1"),
           ),
-          column(2,
-                 dataTableOutput("tableResultBAU2")
-                 
-          ),
-          column(4,
+          
+          column(6,
                  dataTableOutput("tableResultSimulasi1"),
                  
           ),
-          column(2,
+          
+          column(6,
+                 dataTableOutput("tableResultBAU2")
+                 
+          ),
+          column(6,
                  dataTableOutput("tableResultSimulasi2")
                  
           ),
         ),
+        
+        br(),
+        br(),
+        column(12,
+               id = 'tableNPV',
+               tags$style('#tableNPV {
+                            background-color: #CCFFCC;
+                            }'),
+               h3("Tabel NPV seluruh SUT dalam 1 Wilayah", align = "center")
+               
+        ),
+        fluidRow(
+          column(12,
+                 dataTableOutput('showTableAllProvinsi')
+          )
+        ),
+        br(),
+        br(),
         fluidRow(
           column(4,
-                 plotlyOutput('plotComparing')
+                 id = 'plotCom',
+                 tags$style('#plotCom {
+                            background-color: #CCFFCC;
+                            }'),
+                 h3("Barchart NPV BAU vs Simulasi", align = "center")
+                 
+          ),
+          column(8,
+                 id = 'plotAll',
+                 tags$style('#plotAll {
+                            background-color: #CCFFCC;
+                            }'),
+                 h3("Barchart NPV seluruh SUT dalam 1 Wilayah", align = "center")
+                 
+          ),
+          column(4,
+                 tags$div(id = 'uiplotComparing')
                  ),
           column(8,
                  tags$div(id = 'uiShowPlotAllKomoditas')
-                 # plotlyOutput("plotComparingAllProvinsi")
                  )
         ),
-        fluidRow(
-          column(6,
-                 dataTableOutput('showTableAllProvinsi')
-          )
+        br(),
+        br(),
+        column(12,
+               id = 'grafikProfit',
+               tags$style('#grafikProfit {
+                            background-color: #CCFFCC;
+                            }'),
+               h3("Grafik Profit Tahunan", align = "center")
+               
         ),
         fluidRow(
           column(6,
@@ -1537,14 +1585,31 @@ app <- shiny::shinyApp(
     
     
     
-    observeEvent(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
+    observeEvent(c(input$sut, input$kom, input$selected_prov, input$selected_wilayah, input$th, input$tipeLahan,
+                  input$asumsiMakro_button, input$tampilkanTabel_button,input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
+      removeUI(selector = '#showplotComparing')
       removeUI(selector = '#showPlotAllKomoditas')
+      
+      insertUI(selector='#uiplotComparing',
+               where='afterEnd',
+               ui= plotlyOutput('showplotComparing'))
       
       insertUI(selector='#uiShowPlotAllKomoditas',
                where='afterEnd',
                ui= plotlyOutput('showPlotAllKomoditas'))
     })
 
+    output$showplotComparing <- renderPlotly({
+      # withProgress(message = 'Collecting data in progress',
+      #              detail = 'This may take a while...', value = 0, {
+      #                for (i in 1:15) {
+      #                  incProgress(1/15)
+      #                  sum(runif(10000000,0,1))
+      #                }
+      #              })
+      
+      preparePlot()
+    })
     
     output$showPlotAllKomoditas <- renderPlotly({
       withProgress(message = 'Collecting data in progress',
@@ -1555,7 +1620,7 @@ app <- shiny::shinyApp(
                      }
                    })
       
-      plotAllProvinsi() 
+      plotAllKomoditas() 
     })
     ################################################################################
     #                                                                              #
@@ -1576,12 +1641,12 @@ app <- shiny::shinyApp(
       #setelah dataTemplate(data default) aktif, 
       # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
       # datapath <- paste0("data/", input$sut, "/",input$kom, "/")
-      # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
+      # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_wilayah,".rds")
       print("cek data gab ")
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"resultTemplate","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       #### io  ####    
@@ -2201,11 +2266,22 @@ app <- shiny::shinyApp(
         
         # ending  lr ------------------------------------------------------- 
         
+        # tampilan rate.p, rate.s, nilai tukar rupiah --------------------------------------------------------------
+        showRateP <- (dataDefine$rate.p)
+        showRateS <- (dataDefine$rate.s)
+        showExRate <- (dataDefine$nilai.tukar)
+        showBauMacro <- rbind(showRateP,showRateS,showExRate)
+        rownames(showBauMacro)<-c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah")
+        colnames(showBauMacro) <- c("Nilai")
+        showBauMacro
+        
+        # ending  ------------------------------------------------------- 
+        
         tabel1 <- rbind(hsl.npv,nlc,ec)
         tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
         tabel1
         
-        tabel2 <- rbind(hp,lr)
+        tabel2 <- rbind(hp,lr, showBauMacro)
         tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
         tabel2
         
@@ -2234,13 +2310,13 @@ app <- shiny::shinyApp(
       #setelah dataTemplate(data default) aktif, 
       # lalu read kembali file rds yang tersimpan dr hasil edit jika ada yang diedit
       # datapath <- paste0("data/", input$sut, "/",input$kom, "/")
-      # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_provinsi,".rds")
+      # fileName <- paste0(datapath,"saveData","_",input$th,"_",input$sut,"_",input$kom,"_",input$selected_wilayah,".rds")
       
       
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       #### io  ####    
@@ -2866,7 +2942,18 @@ app <- shiny::shinyApp(
         lr <- data.frame(t(lr))
         lr
         
-        # ending  lr ------------------------------------------------------- 
+        # ending  lr -------------------------------------------------------
+        
+        # tampilan rate.p, rate.s, nilai tukar rupiah --------------------------------------------------------------
+        showRateP <- (dataDefine$rate.p)
+        showRateS <- (dataDefine$rate.s)
+        showExRate <- (dataDefine$nilai.tukar)
+        showBauMacro <- rbind(showRateP,showRateS,showExRate)
+        rownames(showBauMacro)<-c("Discount Rate Private", "Discount Rate Social", "Nilai Tukar Rupiah")
+        colnames(showBauMacro) <- c("Nilai")
+        showBauMacro
+        
+        # ending  -------------------------------------------------------
         
         # RESULT 
         dataDefine$npv <- hsl.npv
@@ -2881,7 +2968,7 @@ app <- shiny::shinyApp(
         tabel1[] <- lapply(tabel1, function(i) sprintf('%.6g', i))
         tabel1
         
-        tabel2 <- rbind(hp,lr)
+        tabel2 <- rbind(hp,lr, showBauMacro)
         tabel2[] <- lapply(tabel2, function(i) sprintf('%.6g', i))
         tabel2
         
@@ -2919,29 +3006,18 @@ app <- shiny::shinyApp(
       datatable(data.graph.new()$tabel2, option=list(dom = "t"))
     })
     
-    output$plotComparing <- renderPlotly({
-      preparePlot()
-    })
+    # output$plotComparing <- renderPlotly({
+    #   preparePlot()
+    # })
   
     
     preparePlot <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
-    # preparePlot <- reactive({  
-      # row_to_select=as.numeric(gsub("Row","",input$checked_rows))
-      # row_to_select_newPam = as.numeric(gsub("Row","",input$checked_rows_newPam))
-      
-      # data template BAU
-      # dataCheck <- loadRDSAll()
-      # dataCheck <- dataCheck[row_to_select]
-      # sut <- unlist(lapply(dataCheck, function(x)x[[15]]))
-      # komoditas <- unlist(lapply(dataCheck, function(x)x[[16]]))
-      # NPV.Privat.RP <- unlist(lapply(dataCheck, function(x)x[[7]][1,1]))
-      # browser()
-      # cekbutton <- input$running_button
+
       print("persiapan membuat plot komoditas simulasi")
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"resultTemplate","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       
@@ -2961,12 +3037,12 @@ app <- shiny::shinyApp(
       # datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
-      dataDefine <- readRDS(fileName)
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
+      dataDef <- readRDS(fileName)
       
-      dataPlotSimulasi <- data.frame(tipe.data=dataDefine$tipeData,
-                                     komoditas=dataDefine$kom,
-                                     NPV.Privat.RP=dataDefine$npv[1,1])
+      dataPlotSimulasi <- data.frame(tipe.data=dataDef$tipeData,
+                                     komoditas=dataDef$kom,
+                                     NPV.Privat.RP=dataDef$npv[1,1])
       
       
       dataPlot <- rbind(dataPlotBAU,dataPlotSimulasi)
@@ -2989,10 +3065,10 @@ app <- shiny::shinyApp(
     ################################################################################
     
     # output$plotComparingAllProvinsi <- renderPlotly({
-    #   plotAllProvinsi()
+    #   plotAllKomoditas()
     # })
     # 
-    # plotAllProvinsi <- reactive({
+    # plotAllKomoditas <- reactive({
     #   
     #   print("panggil data plot all")
     #   dataPlotAllProvinsi() %>%
@@ -3000,16 +3076,18 @@ app <- shiny::shinyApp(
     #     plot_ly(x = ~nama.komoditas, y = ~NPV.Privat.RP, type = "bar", color = ~tipe.kebun)
     # })
     
-    plotAllProvinsi <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
-    # plotAllProvinsi <- reactive({
+    plotAllKomoditas <- eventReactive(c(input$running_button,input$running_button_tanpaCapital, input$runningButton_capital, input$running_button_noEditCapital,input$running_button_LargeScale),{
+    # plotAllKomoditas <- reactive({
       print("persiapan membuat plot seluruh komoditas")
       # DATA PLOT BAU -----------------------------------------------------------
       folderSut <- sort(unique(komoditas$sut))
-      folderProvinsi <- filter(komoditas, provinsi == input$selected_provinsi)
+      folderProvinsi <- filter(komoditas, wilayah == input$selected_wilayah)
       folderKom <- sort(unique(folderProvinsi$nama_komoditas))
-      
+
       kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
       dirFile <- paste0("data/",kombinasiFolder)
+
+
       
       nameFiles <- list.files(path = paste0(dirFile,"/"),pattern = paste0("resultTemplate"))
       kombinasiFile <- as.vector(outer(dirFile, nameFiles, paste, sep="/"))
@@ -3025,10 +3103,10 @@ app <- shiny::shinyApp(
         b}
       
       
-      ##### step 2 filter yang ada pattern input$selected_provinsi ex: (_ACEH)
+      ##### step 2 filter yang ada pattern input$selected_wilayah ex: (_ACEH)
       # cek dari vector kombinasiFile yang sudah di cek T or F nya
       provFile <- kombinasiFile %>% 
-        str_subset(pattern = paste0("_",input$selected_provinsi))
+        str_subset(pattern = paste0("_",input$selected_wilayah))
       
       
       ##### step 3 filter yang ada pattern input$th ex: (_2020)
@@ -3057,7 +3135,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataCheck <- readRDS(fileName)
       
       sut <- unlist(dataCheck[["sut"]])
@@ -3093,7 +3171,7 @@ app <- shiny::shinyApp(
       
       # DATA PLOT BAU -----------------------------------------------------------
       folderSut <- sort(unique(komoditas$sut))
-      folderProvinsi <- filter(komoditas, provinsi == input$selected_provinsi)
+      folderProvinsi <- filter(komoditas, wilayah == input$selected_wilayah)
       folderKom <- sort(unique(folderProvinsi$nama_komoditas))
       
       kombinasiFolder <- as.vector(outer(folderSut, folderKom, paste, sep="/"))
@@ -3113,10 +3191,10 @@ app <- shiny::shinyApp(
         b}
       
       
-      ##### step 2 filter yang ada pattern input$selected_provinsi ex: (_ACEH)
+      ##### step 2 filter yang ada pattern input$selected_wilayah ex: (_ACEH)
       # cek dari vector kombinasiFile yang sudah di cek T or F nya
       provFile <- kombinasiFile %>% 
-        str_subset(pattern = paste0("_",input$selected_provinsi))
+        str_subset(pattern = paste0("_",input$selected_wilayah))
       
       
       ##### step 3 filter yang ada pattern input$th ex: (_2020)
@@ -3145,7 +3223,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataCheck <- readRDS(fileName)
       
       sut <- unlist(dataCheck[["sut"]])
@@ -3368,13 +3446,13 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       #replace informasi umum -- untuk lbh yakin yang tersave adalah pilihan terakhir user
       dataDefine$sut <- input$sut
       dataDefine$kom <- input$kom
-      dataDefine$provinsi <- input$selected_provinsi
+      dataDefine$wilayah <- input$selected_wilayah
       dataDefine$th <- input$th
       dataDefine$tipeLahan <- input$tipeLahan
       # dataDefine$tipeKebun <- readDataTemplate$tipe.kebun
@@ -3394,7 +3472,7 @@ app <- shiny::shinyApp(
     # Start - Section sunting_button---------------------------------------------
     ################################################################################
     #                                                                              #
-    #                                 BUTTON IO KUANTITAS                          #
+    #                                 BUTTON SUNTING DARI AWAL                     #
     #                                                                              #
     ################################################################################
     observeEvent(input$sunting_button,{
@@ -3406,7 +3484,7 @@ app <- shiny::shinyApp(
     modalTahunDaurTanam <- function(failed = FALSE) {
       modalDialog( 
         footer=tagList(
-          actionButton(("sunting_button_1"), "Simpan dan Lanjut",style="color: white;background-color: green;")
+          actionButton(("sunting_button_1"), "Simpan dan Lanjutkan",style="color: white;background-color: green;")
         ),
         argonTabSet(
           id = "tabSunting1",
@@ -3456,7 +3534,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       # replace data price
@@ -3545,7 +3623,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       # reactData$tableScenLand <- dataDefine$cum.landScene[1,]
@@ -3610,7 +3688,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       # replace data price
@@ -3803,7 +3881,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       if((is.null(dataDefine$addUtama) | is.null(dataDefine$addSampingan)) & input$ioYear_input == 30 & input$ioKomponen_output == "Tidak"){
@@ -3871,7 +3949,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       editNew<-as.data.frame(hot_to_r(input$suntingKuantitasOutput))
@@ -3915,7 +3993,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       
@@ -4080,7 +4158,7 @@ app <- shiny::shinyApp(
     }
     
     observeEvent(input$batalSunting_button_kuantitasInput,{
-      browser()
+     #  browser()
       removeModal()
     })
     
@@ -4103,7 +4181,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       if((is.null(dataDefine$addPupuk) | is.null(dataDefine$addBibit) | is.null(dataDefine$addPeralatan) |is.null(dataDefine$addTK) 
@@ -4180,7 +4258,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       editNew<-as.data.frame(hot_to_r(input$suntingKuantitasInput))
@@ -4248,7 +4326,7 @@ app <- shiny::shinyApp(
     valP2 <- eventReactive(input$sunting_button_4,{
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       
-      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
       readDataTemplate <- lowcase(readDataTemplate, c("faktor","komponen","jenis","unit.harga","unit"))
       
@@ -4259,7 +4337,7 @@ app <- shiny::shinyApp(
       
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       
       dataDefine <- readRDS(fileName)
       
@@ -4289,7 +4367,7 @@ app <- shiny::shinyApp(
     
     valP1 <- eventReactive(input$sunting_button_4,{
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
-      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
+      readDataTemplate <- read.table(paste0(datapath,input$sut,"_",input$kom,"_",input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".csv"), header = T, sep = ",")
       readDataTemplate[is.na(readDataTemplate)] <- 0
       readDataTemplate <- lowcase(readDataTemplate, c("faktor","komponen","jenis","unit.harga","unit"))
       
@@ -4299,7 +4377,7 @@ app <- shiny::shinyApp(
       
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       reactData$tableP1 <- dataDefine$ioInput[,c("komponen","jenis")]
@@ -4324,7 +4402,7 @@ app <- shiny::shinyApp(
       datapath <- paste0("data/", input$sut, "/",input$kom, "/")
       fileName <- paste0(datapath,"saveData","_",
                          input$sut,"_",input$kom,"_",
-                         input$selected_provinsi,"_",input$th,"_",input$tipeLahan,".rds")
+                         input$selected_wilayah,"_",input$th,"_",input$tipeLahan,".rds")
       dataDefine <- readRDS(fileName)
       
       editNewP1<-as.data.frame(hot_to_r(input$hargaInput))
@@ -4562,6 +4640,13 @@ app <- shiny::shinyApp(
     #                                                                              #
     ################################################################################
     source("server/pamBaru_server.R", local = TRUE)
+    
+    ################################################################################
+    #                                                                              #
+    #                               PROSES 3 PAM BARU                             #
+    #                                                                              #
+    ################################################################################
+    source("server/pamParsial_server.R", local = TRUE)
     
   }
 )

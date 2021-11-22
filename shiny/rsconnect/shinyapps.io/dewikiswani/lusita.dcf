@@ -1,0 +1,12 @@
+name: lusita
+title: lusita
+username:
+account: dewikiswani
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4371296
+bundleId: 4883143
+url: https://dewikiswani.shinyapps.io/lusita/
+when: 1627985183.04334
+asMultiple: FALSE
+asStatic: FALSE
